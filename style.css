@@ -1,0 +1,129 @@
+/* Reset & Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Geist", sans-serif;
+}
+
+/* Headers */
+h1,
+h2,
+h3 {
+  font-weight: 700; /* Bold */
+  letter-spacing: -0.01em;
+}
+
+body {
+  background-color: #f9f9f9;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Sticky Navbar */
+.navbar {
+  position: -webkit-sticky; /* Support for Safari */
+  position: sticky;
+  top: 0;
+  z-index: 1000; /* Keeps navbar on top of other content */
+
+  /* Navbar Styling */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  padding: 30px 30px;
+}
+
+/* Navbar Links */
+.navbar a {
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav-links a {
+  margin-left: 20px;
+}
+
+.nav-links a:hover {
+  color: #007bff; /* Simple hover effect */
+}
+
+/* Content Area */
+.content {
+  padding: 40px 30px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Hamburger button — hidden on desktop */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;
+  height: 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.nav-toggle span {
+  display: block;
+  height: 2px;
+  background-color: #333;
+  border-radius: 2px;
+  transition:
+    transform 0.25s,
+    opacity 0.25s;
+}
+
+/* Animate to × when active */
+.nav-toggle.active span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+.nav-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+.nav-toggle.active span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    justify-content: space-between; /* logo left, burger right */
+  }
+  .nav-toggle {
+    display: flex;
+  }
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%; /* sits right below the sticky navbar */
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    padding: 12px 30px 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  .nav-links.open {
+    display: flex;
+    flex-direction: column;
+  }
+  .nav-links a {
+    margin-left: 0;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+}
+
+@font-face {
+  font-family: "Geist";
+  src: url("./fonts/Geist[wght].woff2") format("woff2");
+
+  font-weight: 100 900; /* Handles weights 100 through 900 */
+
+  font-style: normal;
+  font-display: swap; /* Prevents invisible text while loading */
+}
