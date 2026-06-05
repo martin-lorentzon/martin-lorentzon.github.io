@@ -1,3 +1,13 @@
+@font-face {
+  font-family: "Geist";
+  src: url("./fonts/Geist[wght].woff2") format("woff2");
+
+  font-weight: 100 900; /* Handles weights 100 through 900 */
+
+  font-style: normal;
+  font-display: swap; /* Prevents invisible text while loading */
+}
+
 /* Reset & Base Styles */
 * {
   margin: 0;
@@ -12,17 +22,28 @@ h2,
 h3 {
   font-weight: 700; /* Bold */
   letter-spacing: -0.01em;
+  margin-bottom: 0.5em;
+}
+
+h1 {
+  font-size: 3rem;
+}
+h2 {
+  font-size: 2rem;
+}
+h3 {
+  font-size: 1.5rem;
 }
 
 body {
   background-color: #f9f9f9;
   color: #333;
-  line-height: 1.6;
+  line-height: 1.5;
+  font-size: 1.25rem;
 }
 
 /* Sticky Navbar */
 .navbar {
-  position: -webkit-sticky; /* Support for Safari */
   position: sticky;
   top: 0;
   z-index: 1000; /* Keeps navbar on top of other content */
@@ -31,8 +52,9 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  white-space: nowrap;
   background-color: #fff;
-  padding: 30px 30px;
+  padding: 2rem;
 }
 
 /* Navbar Links */
@@ -43,7 +65,7 @@ body {
 }
 
 .nav-links a {
-  margin-left: 20px;
+  margin-left: 1.25rem;
 }
 
 .nav-links a:hover {
@@ -52,9 +74,7 @@ body {
 
 /* Content Area */
 .content {
-  padding: 40px 30px;
-  max-width: 800px;
-  margin: 0 auto;
+  padding: 2.5rem 2rem;
 }
 
 /* Hamburger button — hidden on desktop */
@@ -104,7 +124,7 @@ body {
     left: 0;
     right: 0;
     background-color: #fff;
-    padding: 12px 30px 20px;
+    padding: 0.75rem 2rem 1.25rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
   .nav-links.open {
@@ -113,17 +133,7 @@ body {
   }
   .nav-links a {
     margin-left: 0;
-    padding: 10px 0;
+    padding: 0.625rem 0;
     border-bottom: 1px solid #f0f0f0;
   }
-}
-
-@font-face {
-  font-family: "Geist";
-  src: url("./fonts/Geist[wght].woff2") format("woff2");
-
-  font-weight: 100 900; /* Handles weights 100 through 900 */
-
-  font-style: normal;
-  font-display: swap; /* Prevents invisible text while loading */
 }
