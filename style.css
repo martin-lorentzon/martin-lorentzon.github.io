@@ -1,5 +1,4 @@
 /* Fonts */
-/* geist-latin-wght-normal */
 @font-face {
   font-family: "Geist";
   font-style: normal;
@@ -9,7 +8,6 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-/* dm-sans-latin-wght-normal */
 @font-face {
   font-family: "DM Sans Variable";
   font-style: normal;
@@ -30,12 +28,11 @@
 body {
   font-family: "DM Sans Variable", system-ui, sans-serif;
   background-color: #f9f9f9;
-  color: #333;
+  color: #333333;
   line-height: 1.5;
   font-size: 1.25rem;
 }
 
-/* Paragraphs */
 p {
   margin-bottom: 1.75rem;
 }
@@ -44,26 +41,25 @@ p {
 h1,
 h2,
 h3 {
-  font-weight: 600; /* Semi-Bold */
+  font-weight: 600;
   letter-spacing: -0.01em;
   text-align: center;
-  margin-top: 5rem;
-  margin-bottom: 2.5rem;
-}
-
-/* remove top margin if the header is the first thing in the container */
-.content > :first-child {
   margin-top: 0;
 }
 
 h1 {
   font-size: 4rem;
+  margin-bottom: 2rem;
 }
+
 h2 {
   font-size: 3rem;
+  margin-bottom: 1.5rem;
 }
+
 h3 {
   font-size: 2rem;
+  margin-bottom: 1rem;
 }
 
 /* Sticky Navbar */
@@ -71,20 +67,38 @@ h3 {
   font-family: "Geist", system-ui, sans-serif;
   position: sticky;
   top: 0;
-  z-index: 1000; /* Keeps navbar on top of other content */
-
-  /* Navbar Styling */
+  z-index: 1000;
   display: flex;
   justify-content: center;
   align-items: center;
   white-space: nowrap;
-  background-color: #fff;
   padding: 2rem;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.98) 12%,
+    rgba(255, 255, 255, 0.92) 24%,
+    rgba(255, 255, 255, 0.82) 36%,
+    rgba(255, 255, 255, 0.68) 48%,
+    rgba(255, 255, 255, 0.52) 60%,
+    rgba(255, 255, 255, 0.35) 72%,
+    rgba(255, 255, 255, 0.18) 84%,
+    rgba(255, 255, 255, 0.05) 94%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-color: rgba(255, 255, 255, 1);
+  transition:
+    background-color 0.4s ease,
+    padding 0.4s ease;
 }
 
-/* Navbar Links */
+.navbar.scrolled {
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0);
+}
+
 .navbar a {
-  color: #333;
+  color: #333333;
   text-decoration: none;
   font-weight: 500;
 }
@@ -94,10 +108,10 @@ h3 {
 }
 
 .nav-links a:hover {
-  color: #007bff; /* Simple hover effect */
+  color: #007bff;
 }
 
-/* Hamburger button — hidden on desktop */
+/* Hamburger Button — hidden on desktop */
 .nav-toggle {
   display: none;
   flex-direction: column;
@@ -109,6 +123,7 @@ h3 {
   cursor: pointer;
   padding: 0;
 }
+
 .nav-toggle span {
   display: block;
   height: 2px;
@@ -119,7 +134,6 @@ h3 {
     opacity 0.25s;
 }
 
-/* Animate to × when active */
 .nav-toggle.active span:nth-child(1) {
   transform: translateY(8px) rotate(45deg);
 }
@@ -132,10 +146,18 @@ h3 {
 
 /* Content Area */
 .content {
-  padding: 3rem 2rem;
-  width: 100%;
   max-width: 65rem;
   margin: 0 auto;
+}
+
+section {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 5rem 2rem;
+}
+
+section:nth-child(odd) {
+  background-color: #f9f9f9;
 }
 
 /* Icons */
@@ -148,9 +170,7 @@ h3 {
   user-select: none;
 }
 
-/* ==========================================================================
-   Visual Effects & Utilities
-   ========================================================================== */
+/* Visual Effects */
 .gradient-text {
   background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), #ff007f, #7f00ff 50%, #000000);
   -webkit-background-clip: text;
@@ -161,9 +181,23 @@ h3 {
 /* ==========================================================================
    Media Queries
    ========================================================================== */
+
+/* Mobile Layout & Typography */
 @media (max-width: 600px) {
+  /* Typography Adjustments */
+  body {
+    font-size: 1.125rem;
+  }
+  h1 {
+    font-size: 3rem;
+  }
+  h2 {
+    font-size: 2.5rem;
+  }
+
+  /* Navbar Mobile Layout */
   .navbar {
-    justify-content: space-between; /* logo left, burger right */
+    justify-content: space-between;
   }
   .nav-toggle {
     display: flex;
@@ -171,10 +205,10 @@ h3 {
   .nav-links {
     display: none;
     position: absolute;
-    top: 100%; /* sits right below the sticky navbar */
+    top: 100%;
     left: 0;
     right: 0;
-    background-color: #fff;
+    background-color: #ffffff;
     padding: 1.5rem 2rem 2rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
@@ -185,6 +219,20 @@ h3 {
   .nav-links a {
     margin-left: 0;
     padding: 1rem 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f5f5f7;
+  }
+
+  section {
+    padding: 3rem 1.25rem;
+  }
+}
+
+/* Touch Device Fallback for Gradient Text */
+@media (pointer: coarse) and (hover: none) {
+  .gradient-text {
+    background: linear-gradient(135deg, #ff007f, #7f00ff, #000000);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 }

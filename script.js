@@ -28,3 +28,16 @@ window.addEventListener('mousemove', (e) => {
     el.style.setProperty('--y', `${((e.clientY - rect.top) / rect.height) * 100}%`);
   }
 });
+
+window.addEventListener('scroll', () => {
+  const navbar = document.querySelector('.navbar');
+  
+  // ADJUST THIS VALUE: Number of pixels scrolled before the gradient fades in
+  const scrollThreshold = 50; 
+
+  if (window.scrollY > scrollThreshold) {
+    navbar.classList.add('scrolled');
+  } else {
+    navbar.classList.remove('scrolled');
+  }
+});
