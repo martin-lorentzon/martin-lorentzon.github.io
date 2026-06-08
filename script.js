@@ -20,19 +20,29 @@ document.addEventListener("DOMContentLoaded", () => {
 // Track mouse cursor to update CSS variables for the radial text gradient
 const gradientTexts = document.querySelectorAll('.gradient-text');
 
-window.addEventListener('mousemove', (e) => {
+let lastMouseX = 0;
+let lastMouseY = 0;
+
+function updateGradients(clientX, clientY) {
   for (const el of gradientTexts) {
     const rect = el.getBoundingClientRect();
 
-    el.style.setProperty('--x', `${((e.clientX - rect.left) / rect.width) * 100}%`);
-    el.style.setProperty('--y', `${((e.clientY - rect.top) / rect.height) * 100}%`);
+    el.style.setProperty('--x', `${((clientX - rect.left) / rect.width) * 100}%`);
+    el.style.setProperty('--y', `${((clientY - rect.top) / rect.height) * 100}%`);
   }
+}
+
+window.addEventListener('mousemove', (e) => {
+  lastMouseX = e.clientX;
+  lastMouseY = e.clientY;
+  
+  updateGradients(lastMouseX, lastMouseY);
 });
 
 window.addEventListener('scroll', () => {
   const navbar = document.querySelector('.navbar');
   
-  // ADJUST THIS VALUE: Number of pixels scrolled before the gradient fades in
+  // ADJUST THIS VALUE: Number of pixels scrolled before the navbar fades
   const scrollThreshold = 50; 
 
   if (window.scrollY > scrollThreshold) {
@@ -40,4 +50,6 @@ window.addEventListener('scroll', () => {
   } else {
     navbar.classList.remove('scrolled');
   }
+
+  updateGradients(lastMouseX, lastMouseY);
 });
