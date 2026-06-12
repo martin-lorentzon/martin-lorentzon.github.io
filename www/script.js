@@ -53,3 +53,21 @@ window.addEventListener('scroll', () => {
 
   updateGradients(lastMouseX, lastMouseY);
 });
+
+const modelViewer = document.querySelector('#car-configurator-viewer');
+const backdropBtn = document.querySelector('#backdrop-toggle');
+const envImage = './environments/skidpan_2k.hdr';
+
+let isSkyboxActive = true; 
+
+backdropBtn.addEventListener('click', () => {
+  isSkyboxActive = !isSkyboxActive;
+
+  if (isSkyboxActive) {
+    modelViewer.setAttribute('skybox-image', envImage);
+    modelViewer.removeAttribute('environment-image');
+  } else {
+    modelViewer.setAttribute('environment-image', envImage);
+    modelViewer.removeAttribute('skybox-image');
+  }
+});

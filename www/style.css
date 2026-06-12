@@ -150,14 +150,35 @@ h3 {
   margin: 0 auto;
 }
 
+@media (max-width: 600px) {
+  .content.mobile-full-width {
+    max-width: 100%;
+  }
+}
+
 section {
   width: 100%;
   background-color: #ffffff;
   padding: 5rem 2rem;
 }
 
-section:nth-child(odd) {
+section.is-alternate {
   background-color: #f9f9f9;
+}
+
+@media (max-width: 600px) {
+  section.mobile-full-width {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+section.no-top {
+  padding-top: 0;
+}
+
+section.no-bottom {
+  padding-bottom: 0;
 }
 
 /* Icons */

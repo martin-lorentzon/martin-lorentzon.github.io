@@ -10,10 +10,13 @@
     <link rel="preload" href="https://cdn.jsdelivr.net/fontsource/fonts/dm-sans:vf@latest/latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,200..700,0,0" />
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="model-viewer.css" />
+    <link rel="stylesheet" href="configurator.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" />
     <link rel="alternate" hreflang="sv" href="https://martinlorentzon.se/" />
     <link rel="alternate" hreflang="en" href="https://martinlorentzon.se/index-en.html" />
     <link rel="alternate" hreflang="x-default" href="https://martinlorentzon.se/" />
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
     <script src="script.js" defer></script>
   </head>
 
@@ -30,7 +33,7 @@
     </nav>
 
     <main>
-      <section>
+      <section class="is-alternate no-bottom">
         <div class="content">
           <h2>Visa din produkt i <span class="gradient-text">interaktiv 3D</span><span class="material-symbols-outlined" aria-hidden="true">360</span></h2>
           <p>Ge kunden en ökad produktförståelse och stärk ditt varumärke med interaktiv 3D på webben.</p>
@@ -39,6 +42,41 @@
             ><span style="white-space: nowrap">(Augmented Reality)</span> är exempel på funktioner som enkelt kan integreras i 3D-vyn.
           </p>
           <p>3D-vyn fungerar direkt i webbläsaren utan någon app och skräddarsys för att bli en naturlig del av din befintliga hemsida.</p>
+        </div>
+      </section>
+      <section class="is-alternate mobile-full-width no-top">
+        <div class="content mobile-full-width configurator-container">
+          <model-viewer
+            id="car-configurator-viewer"
+            src="./models/cool-car.glb"
+            tone-mapping="aces"
+            skybox-image="./environments/skidpan_2k.hdr"
+            skybox-height="2m"
+            exposure="1"
+            shadow-intensity="1.5"
+            shadow-softness="0.65"
+            alt="Car Configurator"
+            camera-controls
+            min-camera-orbit="auto 30deg 6m"
+            max-camera-orbit="auto 90deg 6m"
+            camera-orbit="240deg 88deg 6m"
+            min-field-of-view="20deg"
+            max-field-of-view="50deg"
+            field-of-view="40deg"
+            orbit-sensitivity="0.5"
+            zoom-sensitivity="0.5"
+            disable-pan
+            disable-tap
+            interaction-prompt-style="basic"
+          >
+          </model-viewer>
+          <div class="configurator-controls-container" role="toolbar" aria-label="Configurator Options">
+            <div class="configurator-controls-row">
+              <button type="button" class="configurator-rect-btn"><span class="material-symbols-outlined" aria-hidden="true">key</span>Dörrar</button>
+              <button type="button" class="configurator-rect-btn"><span class="material-symbols-outlined" aria-hidden="true">mode_fan</span>Kylning</button>
+              <button type="button" id="backdrop-toggle" class="configurator-rect-btn">Bakgrund</button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -53,7 +91,7 @@
         </div>
       </section>
 
-      <section>
+      <section class="is-alternate">
         <div class="content">
           <h2>In-house-verktyg<span class="material-symbols-outlined" aria-hidden="true">conveyor_belt</span></h2>
           <p>
