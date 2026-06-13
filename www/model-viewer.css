@@ -21,4 +21,8 @@ model-viewer:hover {
   model-viewer {
     aspect-ratio: var(--mobile-ratio);
   }
+
+  .mobile-full-width model-viewer {
+    border-radius: 0;
+  }
 }

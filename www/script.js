@@ -71,3 +71,53 @@ backdropBtn.addEventListener('click', () => {
     modelViewer.removeAttribute('skybox-image');
   }
 });
+
+
+
+// Car Color Options
+const container = document.getElementById("car-color-options");
+const buttons = container.querySelectorAll(".configurator-square-btn");
+
+buttons.forEach(button => {
+  button.addEventListener("click", function() {
+    buttons.forEach(btn => btn.classList.remove("is-selected"));
+    this.classList.add("is-selected");
+  });
+});
+
+
+
+document.querySelectorAll('.color-controls').forEach(button => {
+  button.addEventListener('click', (event) => {
+    const material = modelViewer.model?.getMaterialByName("primal_car_paint.001");
+    if (!material) return;
+
+    // Use event.target to get the specific button clicked
+    const style = window.getComputedStyle(event.target);
+    const bgColor = style.backgroundColor;
+
+    const match = bgColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+    const target = match 
+      ? [
+          parseInt(match[1]) / 255, 
+          parseInt(match[2]) / 255, 
+          parseInt(match[3]) / 255, 
+          match[4] ? parseFloat(match[4]) : 1
+        ] 
+      : [1, 1, 1, 1];
+
+    const start = [...material.pbrMetallicRoughness.baseColorFactor];
+    const startTime = performance.now();
+    const duration = 1000;
+
+    const animate = (now) => {
+      const p = Math.min((now - startTime) / duration, 1);
+      const current = start.map((s, i) => s + (target[i] - s) * p);
+      
+      material.pbrMetallicRoughness.setBaseColorFactor(current);
+      if (p < 1) requestAnimationFrame(animate);
+    };
+
+    requestAnimationFrame(animate);
+  });
+});

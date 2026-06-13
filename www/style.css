@@ -26,7 +26,7 @@
 
 /* Global Styles */
 body {
-  font-family: "DM Sans Variable", system-ui, sans-serif;
+  font-family: "DM Sans Variable", sans-serif;
   background-color: #f9f9f9;
   color: #333333;
   line-height: 1.5;
@@ -64,7 +64,7 @@ h3 {
 
 /* Sticky Navbar */
 .navbar {
-  font-family: "Geist", system-ui, sans-serif;
+  font-family: "Geist", sans-serif;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -179,6 +179,10 @@ section.no-top {
 
 section.no-bottom {
   padding-bottom: 0;
+}
+
+button {
+  font-family: "Geist", serif;
 }
 
 /* Icons */

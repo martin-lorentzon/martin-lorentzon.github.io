@@ -45,7 +45,7 @@
         </div>
       </section>
       <section class="is-alternate mobile-full-width no-top">
-        <div class="content mobile-full-width configurator-container">
+        <div class="content mobile-full-width">
           <model-viewer
             id="car-configurator-viewer"
             src="./models/cool-car.glb"
@@ -71,10 +71,17 @@
           >
           </model-viewer>
           <div class="configurator-controls-container" role="toolbar" aria-label="Configurator Options">
-            <div class="configurator-controls-row">
-              <button type="button" class="configurator-rect-btn"><span class="material-symbols-outlined" aria-hidden="true">key</span>Dörrar</button>
-              <button type="button" class="configurator-rect-btn"><span class="material-symbols-outlined" aria-hidden="true">mode_fan</span>Kylning</button>
-              <button type="button" id="backdrop-toggle" class="configurator-rect-btn">Bakgrund</button>
+            <div class="configurator-controls-row" style="margin: -1px">
+              <button type="button" class="configurator-text-btn"><span class="material-symbols-outlined" aria-hidden="true">key</span>Dörrar</button>
+              <button type="button" class="configurator-text-btn"><span class="material-symbols-outlined" aria-hidden="true">mode_fan</span>Kylning</button>
+              <button type="button" id="backdrop-toggle" class="configurator-text-btn">Bakgrund</button>
+            </div>
+            <div id="car-color-options" class="configurator-controls-grid" style="grid-template-columns: repeat(5, 1fr); margin: 0.5rem">
+              <button type="button" class="configurator-square-btn color-controls" style="background-color: #b3b3b3"></button>
+              <button type="button" class="configurator-square-btn color-controls" style="background-color: #737e88"></button>
+              <button type="button" class="configurator-square-btn color-controls" style="background-color: #2c4853"></button>
+              <button type="button" class="configurator-square-btn color-controls" style="background-color: #354fa5"></button>
+              <button type="button" class="configurator-square-btn color-controls" style="background-color: #c90b0b"></button>
             </div>
           </div>
         </div>
