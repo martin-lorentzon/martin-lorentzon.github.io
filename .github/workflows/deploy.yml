@@ -3,7 +3,14 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - model-viewer  # This ensures the action only runs on this branch
+      - model-viewer
+
+# --- PERMISSIONS ---
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+# ----------------------
 
 jobs:
   deploy:
@@ -12,16 +19,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: model-viewer # Explicitly checkout the correct branch
-      
+          ref: model-viewer
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
-        
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './www' # Your subdirectory
-          
+          path: "./www"
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
