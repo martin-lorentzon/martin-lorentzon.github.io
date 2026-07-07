@@ -33,6 +33,10 @@ body {
   font-size: 1.25rem;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 p {
   margin-bottom: 1.75rem;
 }
@@ -45,6 +49,7 @@ h3 {
   letter-spacing: -0.01em;
   text-align: center;
   margin-top: 0;
+  scroll-margin-top: 6rem;
 }
 
 h1 {
