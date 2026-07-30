@@ -1,28 +1,18 @@
-model-viewer {
-  --desktop-ratio: 2 / 1;
-  --mobile-ratio: 16 / 9;
-  aspect-ratio: var(--desktop-ratio);
-
+/* ==========================================================================
+   Model Viewer Hero Wrapper
+   ========================================================================== */
+model-viewer.hero-shot {
+  display: block;
+  aspect-ratio: 2 / 1;
   width: 100%;
-  height: auto;
-  background: transparent;
-
-  border-radius: 8px;
-  outline: 1px solid rgba(0, 0, 0, 0.05);
-
-  transition: outline-color 0.3s ease;
+  height: 100%;
 }
 
-model-viewer:hover {
-  outline-color: rgba(0, 0, 0, 0.15);
-}
-
-@media (max-width: 600px) {
-  model-viewer {
-    aspect-ratio: var(--mobile-ratio);
-  }
-
-  .mobile-full-width model-viewer {
-    border-radius: 0;
+/* ------------------------------------
+      Mobile Layout
+   ------------------------------------ */
+@media (max-width: 768px) {
+  model-viewer.hero-shot {
+    aspect-ratio: 16 / 9;
   }
 }
