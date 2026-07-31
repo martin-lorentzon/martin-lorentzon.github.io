@@ -9,7 +9,7 @@
 
 .configurator-controls-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, auto));
+  grid-template-columns: repeat(auto-fit, minmax(150px, auto));
   justify-content: center;
   margin-bottom: 0.75em;
   gap: 0.75em;
@@ -19,6 +19,14 @@
   .configurator-controls-grid {
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   }
+}
+
+/* Container updated to support absolute positioning of the indicator */
+.configurator-container {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .configurator-text-btn {
@@ -66,19 +74,15 @@
   background: none;
   cursor: pointer;
 
-  outline: 0 black;
-  outline-offset: 0;
-
+  /* Removed direct outline properties since they are now handled by .selection-indicator */
   background-color: #333;
-  transition:
-    outline,
-    outline-offset 0.2s;
+  position: relative;
+  z-index: 2;
 }
 
+/* Updated to work seamlessly with the animated indicator */
 .configurator-square-btn.is-selected {
-  outline: 3px solid black;
-  outline-offset: 3px;
-  z-index: 100;
+  z-index: 2;
 }
 
 @media (max-width: 768px) {
@@ -86,19 +90,18 @@
     width: 3rem;
     height: 3rem;
   }
-
-  .configurator-square-btn.is-selected {
-    outline: 2px solid black;
-  }
 }
 
-.configurator-controls-label {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-
-  color: #000;
-  font-family: "Geist", serif;
-  font-size: 1rem;
-  text-wrap: nowrap;
+.selection-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  outline: 3px solid black;
+  outline-offset: 1px;
+  pointer-events: none; /* Allows clicks to pass through to buttons */
+  transition:
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.3s ease,
+    height 0.3s ease;
+  z-index: 100;
 }
