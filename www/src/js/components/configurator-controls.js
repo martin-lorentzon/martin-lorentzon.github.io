@@ -2,8 +2,8 @@
  * Initializes sliding outline indicator behaviors globally without needing a container class.
  */
 export function initConfiguratorControls() {
-    // Find all rows or groups that contain square buttons
-    const groups = document.querySelectorAll('.configurator-controls-row');
+    // Find all grids that contain square buttons
+    const groups = document.querySelectorAll('.configurator-controls-grid');
     if (groups.length === 0) return;
 
     for (const group of groups) {

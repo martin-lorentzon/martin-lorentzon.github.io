@@ -1,41 +1,48 @@
+/* ==========================================================================
+   Layout
+   ========================================================================== */
+/* To be removed? Can I use grids for all my configurator layout needs? */
 .configurator-controls-row {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  margin-bottom: 0.75em;
-  gap: 0.75em;
+  margin-bottom: 0.75rem;
+  gap: 0.75rem;
 }
 
 .configurator-controls-grid {
+  --min-width: 0px;
+  --max-width: max-content;
+  --mobile-min-width: 0px;
+  --mobile-max-width: max-content;
+
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, auto));
+  grid-template-columns: repeat(auto-fit, minmax(var(--min-width), var(--max-width)));
   justify-content: center;
-  margin-bottom: 0.75em;
-  gap: 0.75em;
+
+  margin-bottom: 0.75rem;
+  gap: 0.75rem;
 }
 
+/* ------------------------------------
+      Mobile Layout
+   ------------------------------------ */
 @media (max-width: 768px) {
   .configurator-controls-grid {
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(var(--mobile-min-width), var(--mobile-max-width)));
   }
 }
 
-/* Container updated to support absolute positioning of the indicator */
-.configurator-container {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
+/* ==========================================================================
+   Text Button
+   ========================================================================== */
 .configurator-text-btn {
   display: inline-flex;
   justify-content: center;
   align-items: center;
   padding: 0.75rem 1.5rem;
 
-  /* Reset Defaults */
   border: none;
   background: none;
   cursor: pointer;
@@ -43,7 +50,6 @@
   background-color: #000;
   color: #fff;
   font-size: 1.125rem;
-  text-wrap: nowrap;
 
   transition: background-color 0.2s;
 }
@@ -56,12 +62,19 @@
   background-color: hsl(0, 0%, 20%);
 }
 
+/* ------------------------------------
+      Mobile Text button
+   ------------------------------------ */
 @media (max-width: 768px) {
   .configurator-text-btn {
-    padding: 0.5rem 0.75rem;
+    padding-block: 0.75rem;
+    font-size: 1rem;
   }
 }
 
+/* ==========================================================================
+   Square Button Container (Touch Area & Layout Anchor)
+   ========================================================================== */
 .configurator-square-btn {
   display: inline-flex;
   justify-content: center;
@@ -69,22 +82,42 @@
   width: 3.25rem;
   height: 3.25rem;
 
-  /* Reset Defaults */
   border: none;
   background: none;
   cursor: pointer;
-
-  /* Removed direct outline properties since they are now handled by .selection-indicator */
-  background-color: #333;
+  padding: 0; /* Reset native button padding */
   position: relative;
-  z-index: 2;
 }
 
-/* Updated to work seamlessly with the animated indicator */
-.configurator-square-btn.is-selected {
-  z-index: 2;
+/* ==========================================================================
+   Square Button Visual Layer (Animation & Styling)
+   ========================================================================== */
+.configurator-square-btn-inner {
+  --btn-scale-selected: 1;
+  --btn-scale-deselected: 0.85;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+
+  background-color: currentColor; /* Reuse the color of the container in this case */
+
+  transition: transform 0.2s ease;
+  transform-origin: center center;
+
+  transform: scale(var(--btn-scale-selected));
 }
 
+.small-unselected .configurator-square-btn:not(.is-selected) .configurator-square-btn-inner {
+  /* Scale down visually while preserving the exact original layout footprint */
+  transform: scale(var(--btn-scale-deselected));
+}
+
+/* ------------------------------------
+      Mobile Square Button
+   ------------------------------------ */
 @media (max-width: 768px) {
   .configurator-square-btn {
     width: 3rem;
@@ -92,6 +125,9 @@
   }
 }
 
+/* ==========================================================================
+   Selection Indicator
+   ========================================================================== */
 .selection-indicator {
   position: absolute;
   top: 0;

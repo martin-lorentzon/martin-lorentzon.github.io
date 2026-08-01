@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Model Viewer Hero Wrapper
+   Hero Shot
    ========================================================================== */
 model-viewer.hero-shot {
   display: block;
@@ -9,7 +9,7 @@ model-viewer.hero-shot {
 }
 
 /* ------------------------------------
-      Mobile Layout
+      Mobile Hero Shot
    ------------------------------------ */
 @media (max-width: 768px) {
   model-viewer.hero-shot {

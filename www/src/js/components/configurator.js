@@ -1,21 +1,21 @@
 import { parseColorToFactor } from '../utils.js';
 
 /**
- * Initializes all car configurator behaviors (backdrop toggle and material color customisation).
+ * Initializes all configurator behaviors (backdrop toggle and material color customisation).
  */
-export function initCarConfigurator() {
-    initBackdropToggle();
-    initColorControls();
+export function initConfigurator() {
+    const modelViewer = document.getElementById("configurator-viewer");
+    initBackdropToggle(modelViewer);
+    initColorControls(modelViewer);
 }
 
 /**
  * Manages the background environment toggle for the model viewer (skybox vs environment image).
  */
-function initBackdropToggle() {
-    const modelViewer = document.querySelector('#car-configurator-viewer');
-    const backdropBtn = document.querySelector('#backdrop-toggle');
+function initBackdropToggle(targetModelViewer) {
+    const backdropBtn = document.getElementById("backdrop-toggle");
     
-    if (!modelViewer || !backdropBtn) return;
+    if (!targetModelViewer || !backdropBtn) return;
 
     const envImage = './environments/skidpan_2k.hdr';
     let isSkyboxActive = true; 
@@ -24,11 +24,11 @@ function initBackdropToggle() {
         isSkyboxActive = !isSkyboxActive;
 
         if (isSkyboxActive) {
-            modelViewer.setAttribute('skybox-image', envImage);
-            modelViewer.removeAttribute('environment-image');
+            targetModelViewer.setAttribute('skybox-image', envImage);
+            targetModelViewer.removeAttribute('environment-image');
         } else {
-            modelViewer.setAttribute('environment-image', envImage);
-            modelViewer.removeAttribute('skybox-image');
+            targetModelViewer.setAttribute('environment-image', envImage);
+            targetModelViewer.removeAttribute('skybox-image');
         }
     });
 }
@@ -36,14 +36,13 @@ function initBackdropToggle() {
 /**
  * Manages color selection highlights and smooth material color animations on the 3D model.
  */
-function initColorControls() {
-    const modelViewer = document.querySelector('#car-configurator-viewer');
-    const container = document.getElementById("car-color-options");
+function initColorControls(targetModelViewer) {
+    const container = document.getElementById("color-options");
     
-    if (!modelViewer || !container) return;
+    if (!targetModelViewer || !container) return;
 
     const buttons = container.querySelectorAll(".configurator-square-btn");
-    const colorControls = document.querySelectorAll('.color-controls');
+    const colorControls = document.querySelectorAll('.color-option'); //TODO: Reconsider element and variable naming to make it easier to reason about
 
     // Manage the 'is-selected' tag to highlight the active button
     for (const button of buttons) {
@@ -56,10 +55,10 @@ function initColorControls() {
     }
 
     /**
-     * Smoothly animates the material car paint color transition.
+     * Smoothly animates the material color transition.
      */
     function changeMaterialColor(targetElement, duration = 1000) {
-        const material = modelViewer.model?.getMaterialByName("primal_car_paint.001");
+        const material = targetModelViewer.model?.getMaterialByName("primal_car_paint.001");
         if (!material) return;
 
         const start = material.pbrMetallicRoughness.baseColorFactor;
@@ -82,8 +81,8 @@ function initColorControls() {
         });
     }
 
-    modelViewer.addEventListener('load', () => {
-        const selectedButton = document.querySelector('.color-controls.is-selected');
+    targetModelViewer.addEventListener('load', () => {
+        const selectedButton = document.querySelector('.color-option.is-selected');
         if (selectedButton) {
             changeMaterialColor(selectedButton, 0);
         }

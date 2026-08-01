@@ -8,7 +8,7 @@ export function parseColorToFactor(input) {
   if (typeof input === 'string') {
     bgColor = input;
   } else {
-    bgColor = window.getComputedStyle(input).backgroundColor;
+    bgColor = window.getComputedStyle(input).color;
   }
 
   const numbers = bgColor.match(/\d+/g);
