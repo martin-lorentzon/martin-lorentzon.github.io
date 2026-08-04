@@ -1,37 +1,15 @@
 /* ==========================================================================
    Layout
    ========================================================================== */
-/* To be removed? Can I use grids for all my configurator layout needs? */
-.configurator-controls-row {
+.configurator-row {
+  position: relative;
   display: flex;
+  margin-bottom: 0.75rem;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  margin-bottom: 0.75rem;
+
   gap: 0.75rem;
-}
-
-.configurator-controls-grid {
-  --min-width: 0px;
-  --max-width: max-content;
-  --mobile-min-width: 0px;
-  --mobile-max-width: max-content;
-
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(var(--min-width), var(--max-width)));
-  justify-content: center;
-
-  margin-bottom: 0.75rem;
-  gap: 0.75rem;
-}
-
-/* ------------------------------------
-      Mobile Layout
-   ------------------------------------ */
-@media (max-width: 768px) {
-  .configurator-controls-grid {
-    grid-template-columns: repeat(auto-fit, minmax(var(--mobile-min-width), var(--mobile-max-width)));
-  }
 }
 
 /* ==========================================================================
@@ -39,19 +17,18 @@
    ========================================================================== */
 .configurator-text-btn {
   display: inline-flex;
-  justify-content: center;
+  padding: 0.75rem 2rem;
+  flex: 1;
   align-items: center;
-  padding: 0.75rem 1.5rem;
+  justify-content: center;
 
-  border: none;
-  background: none;
-  cursor: pointer;
-
-  background-color: #000;
   color: #fff;
   font-size: 1.125rem;
+  background-color: #000;
+  border: none;
 
   transition: background-color 0.2s;
+  cursor: pointer;
 }
 
 .configurator-text-btn:hover {
@@ -67,7 +44,7 @@
    ------------------------------------ */
 @media (max-width: 768px) {
   .configurator-text-btn {
-    padding-block: 0.75rem;
+    padding-inline: 0px;
     font-size: 1rem;
   }
 }
@@ -77,42 +54,16 @@
    ========================================================================== */
 .configurator-square-btn {
   display: inline-flex;
-  justify-content: center;
-  align-items: center;
   width: 3.25rem;
   height: 3.25rem;
+  padding: 0; /* Reset native button padding */
+  align-items: center;
+  justify-content: center;
+
+  background: none;
 
   border: none;
-  background: none;
   cursor: pointer;
-  padding: 0; /* Reset native button padding */
-  position: relative;
-}
-
-/* ==========================================================================
-   Square Button Visual Layer (Animation & Styling)
-   ========================================================================== */
-.configurator-square-btn-inner {
-  --btn-scale-selected: 1;
-  --btn-scale-deselected: 0.85;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-
-  background-color: currentColor; /* Reuse the color of the container in this case */
-
-  transition: transform 0.2s ease;
-  transform-origin: center center;
-
-  transform: scale(var(--btn-scale-selected));
-}
-
-.small-unselected .configurator-square-btn:not(.is-selected) .configurator-square-btn-inner {
-  /* Scale down visually while preserving the exact original layout footprint */
-  transform: scale(var(--btn-scale-deselected));
 }
 
 /* ------------------------------------
@@ -126,18 +77,45 @@
 }
 
 /* ==========================================================================
+   Square Button Visual Layer (Animation & Styling)
+   ========================================================================== */
+.configurator-square-btn-inner {
+  --btn-scale-deselected: 0.85;
+
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+
+  background-color: currentColor; /* Reuse the color of the container in this case */
+
+  transform: scale(1);
+  transform-origin: center center;
+
+  transition: transform 0.2s ease;
+}
+
+.configurator-square-btn:not(.is-selected) .configurator-square-btn-inner.small-unselected {
+  /* Scale down visually while preserving the exact original layout footprint */
+  transform: scale(var(--btn-scale-deselected));
+}
+
+/* ==========================================================================
    Selection Indicator
    ========================================================================== */
 .selection-indicator {
   position: absolute;
   top: 0;
   left: 0;
+
+  z-index: 100;
   outline: 3px solid black;
   outline-offset: 1px;
-  pointer-events: none; /* Allows clicks to pass through to buttons */
+
   transition:
     transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
     width 0.3s ease,
     height 0.3s ease;
-  z-index: 100;
+  pointer-events: none; /* Allows clicks to pass through to buttons */
 }

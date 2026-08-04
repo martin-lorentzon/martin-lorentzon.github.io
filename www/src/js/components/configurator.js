@@ -1,4 +1,4 @@
-import { parseColorToFactor } from '../utils.js';
+import { parseColorToFactor } from '../utilities.js';
 
 /**
  * Initializes all configurator behaviors (backdrop toggle and material color customisation).
@@ -37,12 +37,12 @@ function initBackdropToggle(targetModelViewer) {
  * Manages color selection highlights and smooth material color animations on the 3D model.
  */
 function initColorControls(targetModelViewer) {
-    const container = document.getElementById("color-options");
+    const container = document.getElementById("color-swatches");
     
     if (!targetModelViewer || !container) return;
 
     const buttons = container.querySelectorAll(".configurator-square-btn");
-    const colorControls = document.querySelectorAll('.color-option'); //TODO: Reconsider element and variable naming to make it easier to reason about
+    const colorControls = document.querySelectorAll('.color-swatch');
 
     // Manage the 'is-selected' tag to highlight the active button
     for (const button of buttons) {

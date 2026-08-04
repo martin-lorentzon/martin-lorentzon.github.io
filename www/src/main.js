@@ -1,12 +1,12 @@
-import { initNavigation } from './js/components/navigation.js';
+import { initNavbar } from './js/components/navbar.js';
 import { initEffects } from './js/components/effects.js';
-import { initConfiguratorControls } from './js/components/configurator-controls.js';
+import { initConfiguratorUI } from './js/components/configurator-ui.js';
 import { initConfigurator } from './js/components/configurator.js';
 
 document.addEventListener("DOMContentLoaded", () => {
-    initNavigation();
+    initNavbar();
     initEffects();
-    initConfiguratorControls();
+    initConfiguratorUI();
     initConfigurator();
 });
 

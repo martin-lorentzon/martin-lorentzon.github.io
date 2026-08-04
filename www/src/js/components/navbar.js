@@ -1,7 +1,7 @@
 /**
  * Initializes all navigation-related behaviors (mobile menu toggle and scroll fade).
  */
-export function initNavigation() {
+export function initNavbar() {
     initMobileMenu();
     initNavbarScroll();
 }
