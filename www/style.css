@@ -133,7 +133,7 @@ button {
    Gradient Text
    ========================================================================== */
 .gradient-text {
-  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), #ff007f, #7f00ff 50%, #000000);
+  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), #ff007f, #7f00ff 50%, #333);
   background-clip: text;
   /* Compatibility with Webkit-based browsers like Safari, Chrome, and newer mobile browsers. */
   -webkit-background-clip: text;
@@ -145,7 +145,7 @@ button {
    ------------------------------------ */
 @media (pointer: coarse) and (hover: none) {
   .gradient-text {
-    background: linear-gradient(135deg, #ff007f, #7f00ff, #000000);
+    background: linear-gradient(135deg, #ff007f, #7f00ff, #333);
     background-clip: text;
     /* Compatibility with Webkit-based browsers like Safari, Chrome, and newer mobile browsers. */
     -webkit-background-clip: text;
