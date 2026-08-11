@@ -67,6 +67,10 @@ li {
   padding-left: 1rem;
 }
 
+li:last-child {
+  margin-bottom: 1.75rem;
+}
+
 h1,
 h2,
 h3 {
@@ -124,6 +128,11 @@ section {
 
 .container--wide {
   max-width: 85rem;
+}
+
+.container--edge {
+  max-width: none;
+  padding-inline: 0;
 }
 
 button {
