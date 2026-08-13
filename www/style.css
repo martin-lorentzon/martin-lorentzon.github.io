@@ -19,6 +19,12 @@
   src: url(https://cdn.jsdelivr.net/fontsource/fonts/dm-sans:vf@latest/latin-wght-normal.woff2) format("woff2");
 }
 
+:root {
+  --font-geist: "Geist", sans-serif;
+  --font-dm-sans: "DM Sans", sans-serif;
+  --font-material-symbols-outlined: "Material Symbols Outlined", sans-serif;
+}
+
 /* ==========================================================================
    Remove Browser Defaults
    ========================================================================== */
@@ -44,7 +50,7 @@ html {
 body {
   color: #333;
   font-size: 1.125rem;
-  font-family: "DM Sans", sans-serif;
+  font-family: var(--font-dm-sans);
   line-height: 1.5;
   background-color: #f9f9f9;
 }
@@ -101,7 +107,7 @@ section {
 }
 
 .is-alternate {
-  background-color: hsl(0, 0%, 97.7%);
+  background-color: hsl(0, 0%, 97.5%);
 }
 
 .no-top {
@@ -136,7 +142,7 @@ section {
 }
 
 button {
-  font-family: "Geist", sans-serif;
+  font-family: var(--font-geist);
 }
 
 /* ==========================================================================
@@ -147,6 +153,7 @@ button {
   padding: 0 0.25em;
   font-weight: 300;
   font-size: 1.5em;
+  font-family: var(--font-material-symbols-outlined);
   vertical-align: -0.25em;
   user-select: none;
 }

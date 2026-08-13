@@ -12,7 +12,7 @@
   align-items: center;
   justify-content: center;
 
-  font-family: "Geist", sans-serif;
+  font-family: var(--font-geist);
   white-space: nowrap;
   background-image: linear-gradient(
     to bottom,
