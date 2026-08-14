@@ -52,7 +52,7 @@ body {
   font-size: 1.125rem;
   font-family: var(--font-dm-sans);
   line-height: 1.5;
-  background-color: #f9f9f9;
+  background-color: #ffffff;
 }
 
 p {
@@ -102,6 +102,7 @@ h3 {
 }
 
 section {
+  display: flow-root;
   padding-block: 1.5rem;
   background-color: #ffffff;
 }
