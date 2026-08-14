@@ -3,6 +3,7 @@
  */
 export function initEffects() {
     initGradientText();
+    initScrollFadeIn();
 }
 
 /**
@@ -33,4 +34,27 @@ function initGradientText() {
     window.addEventListener('scroll', () => {
         updateGradients(lastMouseX, lastMouseY);
     });
+}
+
+/**
+ * Observes elements with the fade-in class and reveals them on scroll.
+ */
+function initScrollFadeIn() {
+    const fadeElements = document.querySelectorAll('.scroll-fade');
+    if (fadeElements.length === 0) return;
+
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        root: null,
+        rootMargin: '0px 0px -20px 0px',
+        threshold: 0.1
+    });
+
+    fadeElements.forEach(element => observer.observe(element));
 }
