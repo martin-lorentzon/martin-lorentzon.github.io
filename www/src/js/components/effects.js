@@ -20,8 +20,8 @@ function initGradientText() {
         for (const el of gradientTexts) {
             const rect = el.getBoundingClientRect();
 
-            el.style.setProperty('--x', `${((clientX - rect.left) / rect.width) * 100}%`);
-            el.style.setProperty('--y', `${((clientY - rect.top) / rect.height) * 100}%`);
+            el.style.setProperty('--gt-x', `${((clientX - rect.left) / rect.width) * 100}%`);
+            el.style.setProperty('--gt-y', `${((clientY - rect.top) / rect.height) * 100}%`);
         }
     }
 

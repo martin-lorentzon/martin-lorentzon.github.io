@@ -1,0 +1,42 @@
+/* ==========================================================================
+   Gradient Text
+   ========================================================================== */
+.gradient-text {
+  --gt-shape: radial-gradient(circle at var(--gt-x, 50%) var(--gt-y, 50%), var(--gt-stops, #ff007f, #7f00ff 50%, #333));
+  --gt-touch-shape: linear-gradient(135deg, var(--gt-touch-stops, var(--gt-stops, #ff007f, #7f00ff, #333)));
+
+  background: var(--gt-shape);
+  background-clip: text;
+  /* Compatibility with Webkit-based browsers like Safari, Chrome, and newer mobile browsers. */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ------------------------------------
+      Touch Device Fallback
+   ------------------------------------ */
+@media (pointer: coarse) and (hover: none) {
+  .gradient-text {
+    background: var(--gt-touch-shape);
+    background-clip: text;
+    /* Compatibility with Webkit-based browsers like Safari, Chrome, and newer mobile browsers. */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* ==========================================================================
+   Scroll Fade
+   ========================================================================== */
+.scroll-fade {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
+}
+
+.scroll-fade.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
