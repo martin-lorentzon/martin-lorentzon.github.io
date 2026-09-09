@@ -1,0 +1,15 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes:
+    pastel --default,
+    black;
+}
+@plugin "daisyui/theme" {
+  name: "pastel";
+  default: true;
+  --color-neutral: oklch(87% 0 0);
+  --color-neutral-content: oklch(20% 0 0);
+  --radius-selector: 0rem;
+  --radius-field: 0rem;
+  --radius-box: 0rem;
+}
