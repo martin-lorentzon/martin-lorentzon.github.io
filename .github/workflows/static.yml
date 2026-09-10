@@ -2,9 +2,10 @@
 name: Deploy static content to Pages
 
 on:
-  # Runs on pushes targeting the default branch
+  # Runs on pushes to any branch; the deploy job checks deploy-branch.txt
+  # to decide whether the pushed branch is actually the one to deploy.
   push:
-    branches: ["main"]
+    branches: ["**"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -31,24 +32,43 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Check deploy branch
+        id: branch_check
+        run: |
+          DEPLOY_BRANCH=$(grep -v '^#' deploy-branch.txt | grep -v '^[[:space:]]*$' | head -n1 | tr -d '[:space:]')
+          echo "Configured deploy branch: $DEPLOY_BRANCH"
+          echo "Pushed branch: ${{ github.ref_name }}"
+          if [ "$DEPLOY_BRANCH" = "${{ github.ref_name }}" ]; then
+            echo "proceed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping deploy: pushed branch does not match deploy-branch.txt"
+          fi
       - name: Setup Node
+        if: steps.branch_check.outputs.proceed == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
       - name: Install dependencies
+        if: steps.branch_check.outputs.proceed == 'true'
         run: npm ci
       - name: Build CSS
+        if: steps.branch_check.outputs.proceed == 'true'
         run: npm run build
       - name: Remove dev dependencies before upload
+        if: steps.branch_check.outputs.proceed == 'true'
         run: rm -rf node_modules
       - name: Setup Pages
+        if: steps.branch_check.outputs.proceed == 'true'
         uses: actions/configure-pages@v5
       - name: Upload artifact
+        if: steps.branch_check.outputs.proceed == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository (index.html, dist/, vendor/, etc.)
           path: "."
       - name: Deploy to GitHub Pages
         id: deployment
+        if: steps.branch_check.outputs.proceed == 'true'
         uses: actions/deploy-pages@v5
