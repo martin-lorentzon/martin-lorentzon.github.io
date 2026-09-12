@@ -53,8 +53,11 @@
             </label>
           </div>
         </header>
-        <div id="hero" class="relative overflow-hidden h-[calc(100dvh_-_var(--navbar-height,4rem))]">
-          <canvas id="hero-canvas" class="absolute inset-0 z-0 pointer-events-none" aria-hidden="true"></canvas>
+        <div id="hero" class="relative overflow-hidden cursor-none h-[calc(100svh_-_var(--navbar-height,4rem))]">
+          <canvas id="hero-canvas" class="absolute inset-0 z-0 h-full w-full pointer-events-none" aria-hidden="true"></canvas>
+          <h1 id="hero-heading" class="pointer-events-none absolute bottom-0 left-0 z-10 p-8 text-5xl leading-tight font-bold sm:p-12 sm:text-6xl md:text-7xl lg:text-8xl">
+            Martin<br />Teknisk 3D-visualisering
+          </h1>
         </div>
         <script>
           (function () {
