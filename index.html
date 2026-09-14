@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>daisyUI Demo</title>
     <link rel="stylesheet" href="dist/output.css" />
+    <script type="importmap">
+      { "imports": { "three": "./vendor/three/three.module.js" } }
+    </script>
   </head>
   <body class="bg-base-200 min-h-screen">
     <div class="drawer">
@@ -54,6 +57,29 @@
           </div>
         </header>
         <main>
+          <!-- 72px = the sticky navbar's rendered height (stacks above this section in flow);
+               keep in sync if the navbar's content/padding ever changes its height. -->
+          <section
+            id="hero"
+            class="relative flex min-h-[calc(100dvh-72px)] flex-col items-center justify-center overflow-hidden px-8 text-center sm:px-12"
+          >
+            <div id="hero-canvas" class="absolute inset-0" aria-hidden="true"></div>
+            <div class="relative z-10 max-w-2xl">
+              <h1 class="text-4xl font-bold sm:text-6xl">
+                Låt din idé
+                <span class="bg-gradient-to-r from-amber-400 to-orange-600 bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]">poppa</span>
+              </h1>
+              <p class="mt-4 text-lg text-base-content/70">Interaktiv 3D, animation och verktyg som får ditt varumärke att synas.</p>
+              <a href="#tjanster" class="btn btn-primary mt-8 shadow-none">Se tjänster</a>
+            </div>
+            <a
+              href="#tjanster"
+              class="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 text-base-content/50"
+              aria-label="Scrolla till tjänster"
+            >
+              <i data-lucide="chevron-down" class="h-6 w-6 motion-safe:animate-bounce"></i>
+            </a>
+          </section>
           <section id="tjanster" class="mx-auto py-20 max-w-5xl px-8 sm:px-12">
             <h2 class="flex flex-wrap items-center gap-3 text-4xl font-bold sm:text-5xl">
               Visa din produkt i
@@ -233,5 +259,6 @@
     <script>
       lucide.createIcons();
     </script>
+    <script type="module" src="src/hero.js"></script>
   </body>
 </html>
