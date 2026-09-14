@@ -34,8 +34,9 @@ function initPopcornHero(container) {
   const FRESNEL_POWER = 3.0; // higher = thinner, sharper rim
   const GLOW_RIM_FRACTION = 0.66;
   
-  const GLOW_PULSE_PERIOD = 4; // seconds per dim-bright-dim cycle (dark theme only)
-  const GLOW_PULSE_PEAK_FRACTION = 0.5; // fraction of the theme's glow ceiling reached at the pulse's brightest
+  const GLOW_PULSE_BRIGHT_DURATION = 1; // seconds spent on the quick smooth rise+fall blip (dark theme only)
+  const GLOW_PULSE_DARK_DURATION = 2; // seconds spent flat/dark between blips
+  const GLOW_PULSE_PEAK_FRACTION = 0.3; // fraction of the theme's glow ceiling reached at the pulse's brightest
 
   const SPAWN_RADIUS_FRACTION = 1; // spawn disk radius, as a fraction of the smaller viewport half-dimension
   const INITIAL_SPEED_SPREAD = 1.6;
@@ -248,7 +249,7 @@ function initPopcornHero(container) {
           : new THREE.Vector3(randomSpread(INITIAL_SPIN_SPREAD), randomSpread(INITIAL_SPIN_SPREAD), randomSpread(INITIAL_SPIN_SPREAD)),
         glow: 0,
         glowUniforms: null,
-        pulsePhase: Math.random() * Math.PI * 2,
+        pulsePhase: Math.random() * (GLOW_PULSE_BRIGHT_DURATION + GLOW_PULSE_DARK_DURATION),
         popped: startsPopped,
         willPop,
         popAt: willPop ? POP_DELAY_MIN + Math.random() * (POP_DELAY_MAX - POP_DELAY_MIN) : undefined,
@@ -333,10 +334,20 @@ function initPopcornHero(container) {
 
       p.glow += (glowTarget - p.glow) * Math.min(1, dt * GLOW_RAMP_SPEED);
 
+      // Quick smooth rise+fall blip, then a flat dark hold for the rest of the cycle
+      // (dark more often than bright), fully smooth including where it meets the hold.
       let pulseGlow = 0;
       if (isDarkTheme && !prefersReducedMotion) {
-        const cycle = (elapsed / GLOW_PULSE_PERIOD) * Math.PI * 2 + p.pulsePhase;
-        pulseGlow = (0.5 - 0.5 * Math.cos(cycle)) * GLOW_PULSE_PEAK_FRACTION;
+        const period = GLOW_PULSE_BRIGHT_DURATION + GLOW_PULSE_DARK_DURATION;
+        const halfBright = GLOW_PULSE_BRIGHT_DURATION / 2;
+        const t = (((elapsed + p.pulsePhase) % period) + period) % period;
+
+        if (t < halfBright) {
+          pulseGlow = (0.5 - 0.5 * Math.cos((t / halfBright) * Math.PI)) * GLOW_PULSE_PEAK_FRACTION;
+        } else if (t < GLOW_PULSE_BRIGHT_DURATION) {
+          const tf = t - halfBright;
+          pulseGlow = (0.5 + 0.5 * Math.cos((tf / halfBright) * Math.PI)) * GLOW_PULSE_PEAK_FRACTION;
+        }
       }
 
       if (p.glowUniforms) p.glowUniforms.uGlow.value = Math.max(p.glow, pulseGlow);
