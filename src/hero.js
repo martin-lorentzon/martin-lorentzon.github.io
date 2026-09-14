@@ -37,7 +37,7 @@ function initPopcornHero(container) {
   const GLOW_PULSE_PERIOD = 4; // seconds per dim-bright-dim cycle (dark theme only)
   const GLOW_PULSE_PEAK_FRACTION = 0.5; // fraction of the theme's glow ceiling reached at the pulse's brightest
 
-  const SPAWN_AREA_FRACTION = 1.4;
+  const SPAWN_RADIUS_FRACTION = 1; // spawn disk radius, as a fraction of the smaller viewport half-dimension
   const INITIAL_SPEED_SPREAD = 1.6;
   const INITIAL_SPIN_SPREAD = 0.6;
   const MAX_TIMESTEP = 1 / 30;
@@ -221,7 +221,10 @@ function initPopcornHero(container) {
       const mesh = visualSource.clone();
       mesh.material = visualSource.material.clone();
 
-      mesh.position.set(randomSpread(halfWidth * SPAWN_AREA_FRACTION), randomSpread(halfHeight * SPAWN_AREA_FRACTION), 0);
+      const spawnRadius = Math.min(halfWidth, halfHeight) * SPAWN_RADIUS_FRACTION;
+      const spawnAngle = Math.random() * Math.PI * 2;
+      const spawnDist = spawnRadius * Math.sqrt(Math.random()); // sqrt: uniform over the disk's area, not its radius
+      mesh.position.set(spawnDist * Math.cos(spawnAngle), spawnDist * Math.sin(spawnAngle), 0);
       mesh.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
       scene.add(mesh);
 
