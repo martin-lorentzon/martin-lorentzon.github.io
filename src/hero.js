@@ -22,6 +22,9 @@ function initPopcornHero(container) {
   const GLOW_RAMP_SPEED = 6;
   const FRESNEL_POWER = 3.0; // higher = thinner, sharper rim
   const GLOW_RIM_FRACTION = 0.66;
+  
+  const GLOW_PULSE_PERIOD = 4; // seconds per dim-bright-dim cycle (dark theme only)
+  const GLOW_PULSE_PEAK_FRACTION = 0.5; // fraction of the theme's glow ceiling reached at the pulse's brightest
 
   const SPAWN_AREA_FRACTION = 1.4;
   const INITIAL_SPEED_SPREAD = 1.6;
@@ -181,6 +184,7 @@ function initPopcornHero(container) {
           : new THREE.Vector3(randomSpread(INITIAL_SPIN_SPREAD), randomSpread(INITIAL_SPIN_SPREAD), randomSpread(INITIAL_SPIN_SPREAD)),
         glow: 0,
         glowUniforms: null,
+        pulsePhase: Math.random() * Math.PI * 2,
       };
 
       // Fresnel-rim glow: mostly driven by grazing-angle edges (GLOW_RIM_FRACTION), with a
@@ -254,7 +258,7 @@ function initPopcornHero(container) {
   const _relVel = new THREE.Vector3();
   const _torque = new THREE.Vector3();
 
-  function step(dt) {
+  function step(dt, elapsed) {
     for (const p of popcorns) {
       let glowTarget = 0;
 
@@ -272,7 +276,14 @@ function initPopcornHero(container) {
       }
 
       p.glow += (glowTarget - p.glow) * Math.min(1, dt * GLOW_RAMP_SPEED);
-      if (p.glowUniforms) p.glowUniforms.uGlow.value = p.glow;
+
+      let pulseGlow = 0;
+      if (isDarkTheme && !prefersReducedMotion) {
+        const cycle = (elapsed / GLOW_PULSE_PERIOD) * Math.PI * 2 + p.pulsePhase;
+        pulseGlow = (0.5 - 0.5 * Math.cos(cycle)) * GLOW_PULSE_PEAK_FRACTION;
+      }
+
+      if (p.glowUniforms) p.glowUniforms.uGlow.value = Math.max(p.glow, pulseGlow);
 
       if (p.velocity.length() > MAX_LINEAR_SPEED) p.velocity.setLength(MAX_LINEAR_SPEED);
       p.mesh.position.addScaledVector(p.velocity, dt);
@@ -337,7 +348,7 @@ function initPopcornHero(container) {
     if (!running) { loopActive = false; return; }
     timer.update();
     const dt = Math.min(timer.getDelta(), MAX_TIMESTEP);
-    step(dt);
+    step(dt, timer.getElapsed());
     renderer.render(scene, camera);
     requestAnimationFrame(frame);
   }
