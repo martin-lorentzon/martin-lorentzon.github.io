@@ -13,44 +13,41 @@ function initPopcornHero(container) {
   const PIXEL_RATIO_CAP = isCompact ? 1.5 : 2;
   const CAMERA_Z = 12;
   const FOV = 50;
-  const TONE_MAPPING_EXPOSURE = 2;
 
-  const GLOW_RADIUS = 3.6; // distance at which cursor proximity starts triggering glow
-  const ATTRACT_RADIUS = 7; // distance at which the cursor starts pulling popcorns in
-  const ATTRACT_STRENGTH = prefersReducedMotion ? 0 : 10; // magnet pull acceleration
-  const MAX_SPEED = 3.2; // speed cap applied to every popcorn, attracted or not
-  const GLOW_LERP_SPEED = 6; // how fast each popcorn's glow ramps toward its target
-  const FRESNEL_POWER = 3.0; // rim tightness: higher = thinner, sharper edge glow
-  const GLOW_RIM_MIX = 0.5; // fraction of glow driven by the fresnel rim vs a flat base
+  const CURSOR_GLOW_RADIUS = 3.6;
+  const CURSOR_ATTRACT_RADIUS = 7;
+  const CURSOR_ATTRACT_ACCELERATION = prefersReducedMotion ? 0 : 10;
+  const MAX_LINEAR_SPEED = 3.2;
+  const MAX_ANGULAR_SPEED = 6;
+  const GLOW_RAMP_SPEED = 6;
+  const FRESNEL_POWER = 3.0; // higher = thinner, sharper rim
+  const GLOW_RIM_FRACTION = 0.66;
 
-  const SPAWN_SPREAD = 1.4; // fraction of the viewport half-size popcorns can spawn across
-  const INITIAL_SPEED = 1.6; // spread of each popcorn's random initial linear velocity
-  const INITIAL_SPIN = 0.6; // spread of each popcorn's random initial angular velocity
-  const MAX_DT = 1 / 30; // clamp on the simulation timestep to avoid big jumps after a stall
+  const SPAWN_AREA_FRACTION = 1.4;
+  const INITIAL_SPEED_SPREAD = 1.6;
+  const INITIAL_SPIN_SPREAD = 0.6;
+  const MAX_TIMESTEP = 1 / 30;
+  const COLLISION_SPIN_TRANSFER = 0.15;
+  const ANGULAR_DAMPING_PER_SECOND = 0.25;
 
-  const THEMES = {
-    light: {
-      ambient: { color: 0xfff3e2, intensity: 0.95 },
-      key: { color: 0xffffff, intensity: 1.1 },
-      fill: { color: 0xffd9a0, intensity: 0.35 },
-      glow: { color: 0xff9142, max: 1.6, multiply: 1 },
-    },
-    dark: {
-      ambient: { color: 0x4A527A, intensity: 0.55 },
-      key: { color: 0xcdd8ff, intensity: 0.85 },
-      fill: { color: 0xff8a3d, intensity: 0.4 },
-      glow: { color: 0xffb066, max: 2.4, multiply: 0.25 },
-    },
+  const LIGHT_THEME = {
+    ambient: { color: 0xfff3e2, intensity: 0.95 },
+    key: { color: 0xffffff, intensity: 1.1 },
+    fill: { color: 0xffd9a0, intensity: 0.35 },
+    glow: { color: 0xff9142, intensity: 1.6 },
+    exposure: 2,
+  };
+  const DARK_THEME = {
+    ambient: { color: 0x2e3452, intensity: 0.5 },
+    key: { color: 0x89a8ff, intensity: 1.5 }, // vivid moonlight
+    fill: { color: 0xcf946e, intensity: 0.35 },
+    glow: { color: 0xffb066, intensity: 0.7 },
+    exposure: 1.05,
   };
 
-  // Effective glow ceiling for a theme: max * multiply, so multiply is a quick per-theme
-  // dial without needing to recompute the tuned max value.
-  function themeGlowMax(t) {
-    return t.glow.max * t.glow.multiply;
-  }
-
   const themeCheckbox = document.querySelector('.theme-controller');
-  let theme = THEMES[themeCheckbox && themeCheckbox.checked ? 'dark' : 'light'];
+  let isDarkTheme = !!(themeCheckbox && themeCheckbox.checked);
+  let theme = isDarkTheme ? DARK_THEME : LIGHT_THEME;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 100);
@@ -60,7 +57,7 @@ function initPopcornHero(container) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, PIXEL_RATIO_CAP));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = TONE_MAPPING_EXPOSURE;
+  renderer.toneMappingExposure = theme.exposure;
   renderer.domElement.classList.add('h-full', 'w-full', 'block');
   renderer.domElement.setAttribute('aria-hidden', 'true');
   container.appendChild(renderer.domElement);
@@ -72,25 +69,27 @@ function initPopcornHero(container) {
   fillLight.position.set(-6, -2, 4);
   scene.add(ambientLight, keyLight, fillLight);
 
-  function applyTheme(next) {
-    theme = next;
+  function applyTheme(isDark) {
+    isDarkTheme = isDark;
+    theme = isDarkTheme ? DARK_THEME : LIGHT_THEME;
     ambientLight.color.setHex(theme.ambient.color);
     ambientLight.intensity = theme.ambient.intensity;
     keyLight.color.setHex(theme.key.color);
     keyLight.intensity = theme.key.intensity;
     fillLight.color.setHex(theme.fill.color);
     fillLight.intensity = theme.fill.intensity;
+    renderer.toneMappingExposure = theme.exposure;
     for (const p of popcorns) {
       if (p.glowUniforms) {
         p.glowUniforms.uGlowColor.value.setHex(theme.glow.color);
-        p.glowUniforms.uGlowMax.value = themeGlowMax(theme);
+        p.glowUniforms.uGlowMax.value = theme.glow.intensity;
       }
     }
   }
 
   if (themeCheckbox) {
     themeCheckbox.addEventListener('change', () => {
-      applyTheme(THEMES[themeCheckbox.checked ? 'dark' : 'light']);
+      applyTheme(themeCheckbox.checked);
     });
   }
 
@@ -160,7 +159,7 @@ function initPopcornHero(container) {
       const mesh = source.clone();
       mesh.material = source.material.clone();
 
-      mesh.position.set(randomSpread(halfWidth * SPAWN_SPREAD), randomSpread(halfHeight * SPAWN_SPREAD), 0);
+      mesh.position.set(randomSpread(halfWidth * SPAWN_AREA_FRACTION), randomSpread(halfHeight * SPAWN_AREA_FRACTION), 0);
       mesh.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
       scene.add(mesh);
 
@@ -176,20 +175,20 @@ function initPopcornHero(container) {
         ),
         velocity: prefersReducedMotion
           ? new THREE.Vector3()
-          : new THREE.Vector3(randomSpread(INITIAL_SPEED), randomSpread(INITIAL_SPEED), 0),
+          : new THREE.Vector3(randomSpread(INITIAL_SPEED_SPREAD), randomSpread(INITIAL_SPEED_SPREAD), 0),
         angularVelocity: prefersReducedMotion
           ? new THREE.Vector3()
-          : new THREE.Vector3(randomSpread(INITIAL_SPIN), randomSpread(INITIAL_SPIN), randomSpread(INITIAL_SPIN)),
+          : new THREE.Vector3(randomSpread(INITIAL_SPIN_SPREAD), randomSpread(INITIAL_SPIN_SPREAD), randomSpread(INITIAL_SPIN_SPREAD)),
         glow: 0,
         glowUniforms: null,
       };
 
-      // Fresnel-rim glow: mostly driven by grazing-angle edges (GLOW_RIM_MIX), with a
+      // Fresnel-rim glow: mostly driven by grazing-angle edges (GLOW_RIM_FRACTION), with a
       // faint flat base so the piece doesn't look unlit when viewed face-on.
       mesh.material.onBeforeCompile = (shader) => {
         shader.uniforms.uGlow = { value: 0 };
         shader.uniforms.uGlowColor = { value: new THREE.Color(theme.glow.color) };
-        shader.uniforms.uGlowMax = { value: themeGlowMax(theme) };
+        shader.uniforms.uGlowMax = { value: theme.glow.intensity };
         shader.uniforms.uFresnelPower = { value: FRESNEL_POWER };
 
         shader.fragmentShader = shader.fragmentShader
@@ -209,7 +208,7 @@ function initPopcornHero(container) {
           .replace(
             '#include <emissivemap_fragment>',
             `#include <emissivemap_fragment>
-            totalEmissiveRadiance += uGlowColor * (uGlow * uGlowMax * (vFresnel * ${GLOW_RIM_MIX.toFixed(2)} + ${(1 - GLOW_RIM_MIX).toFixed(2)}));`,
+            totalEmissiveRadiance += uGlowColor * (uGlow * uGlowMax * (vFresnel * ${GLOW_RIM_FRACTION.toFixed(2)} + ${(1 - GLOW_RIM_FRACTION).toFixed(2)}));`,
           );
 
         popcorn.glowUniforms = shader.uniforms;
@@ -252,6 +251,8 @@ function initPopcornHero(container) {
   container.addEventListener('touchend', () => { cursorActive = false; });
 
   const scratch = new THREE.Vector3();
+  const _relVel = new THREE.Vector3();
+  const _torque = new THREE.Vector3();
 
   function step(dt) {
     for (const p of popcorns) {
@@ -262,27 +263,28 @@ function initPopcornHero(container) {
         scratch.z = 0;
         const dist = scratch.length();
 
-        if (dist < GLOW_RADIUS) glowTarget = 1 - dist / GLOW_RADIUS;
+        if (dist < CURSOR_GLOW_RADIUS) glowTarget = 1 - dist / CURSOR_GLOW_RADIUS;
 
-        if (ATTRACT_STRENGTH > 0 && dist > 0.001 && dist < ATTRACT_RADIUS) {
-          const pull = (1 - dist / ATTRACT_RADIUS) * ATTRACT_STRENGTH;
+        if (CURSOR_ATTRACT_ACCELERATION > 0 && dist > 0.001 && dist < CURSOR_ATTRACT_RADIUS) {
+          const pull = (1 - dist / CURSOR_ATTRACT_RADIUS) * CURSOR_ATTRACT_ACCELERATION;
           p.velocity.addScaledVector(scratch.normalize(), pull * dt);
         }
       }
 
-      p.glow += (glowTarget - p.glow) * Math.min(1, dt * GLOW_LERP_SPEED);
+      p.glow += (glowTarget - p.glow) * Math.min(1, dt * GLOW_RAMP_SPEED);
       if (p.glowUniforms) p.glowUniforms.uGlow.value = p.glow;
 
-      if (p.velocity.length() > MAX_SPEED) p.velocity.setLength(MAX_SPEED);
+      if (p.velocity.length() > MAX_LINEAR_SPEED) p.velocity.setLength(MAX_LINEAR_SPEED);
       p.mesh.position.addScaledVector(p.velocity, dt);
       p.mesh.position.z = 0;
 
+      p.angularVelocity.multiplyScalar(Math.max(0, 1 - ANGULAR_DAMPING_PER_SECOND * dt));
+      if (p.angularVelocity.length() > MAX_ANGULAR_SPEED) p.angularVelocity.setLength(MAX_ANGULAR_SPEED);
       p.mesh.rotation.x += p.angularVelocity.x * dt;
       p.mesh.rotation.y += p.angularVelocity.y * dt;
       p.mesh.rotation.z += p.angularVelocity.z * dt;
-    }
 
-    for (const p of popcorns) {
+      // Bounce off the viewport edges using this popcorn's just-updated position/rotation.
       const pos = p.mesh.position;
       const rx = ellipsoidRadius(p, WORLD_X);
       const ry = ellipsoidRadius(p, WORLD_Y);
@@ -312,6 +314,13 @@ function initPopcornHero(container) {
             if (relVel < 0) {
               a.velocity.addScaledVector(normal, -relVel);
               b.velocity.addScaledVector(normal, relVel);
+
+              // Convincing-enough spin: torque from the collision normal crossed with
+              // the full relative velocity, applied equal-and-opposite to each piece.
+              _relVel.copy(a.velocity).sub(b.velocity);
+              _torque.crossVectors(normal, _relVel).multiplyScalar(COLLISION_SPIN_TRANSFER);
+              a.angularVelocity.add(_torque);
+              b.angularVelocity.sub(_torque);
             }
           }
         }
@@ -327,7 +336,7 @@ function initPopcornHero(container) {
   function frame() {
     if (!running) { loopActive = false; return; }
     timer.update();
-    const dt = Math.min(timer.getDelta(), MAX_DT);
+    const dt = Math.min(timer.getDelta(), MAX_TIMESTEP);
     step(dt);
     renderer.render(scene, camera);
     requestAnimationFrame(frame);
