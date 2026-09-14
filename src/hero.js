@@ -11,6 +11,17 @@ function initPopcornHero(container) {
 
   const POPCORN_COUNT = isCompact ? 7 : 14;
   const PIXEL_RATIO_CAP = isCompact ? 1.5 : 2;
+  const UNPOPPED_MESH_NAMES = ['SM_Popcorn_007', 'SM_Popcorn_008'];
+  const POPPED_MESH_NAMES = [
+    'SM_Popcorn_001',
+    'SM_Popcorn_002',
+    'SM_Popcorn_003',
+    'SM_Popcorn_004',
+    'SM_Popcorn_005',
+    'SM_Popcorn_006',
+    'SM_Popcorn_009',
+    'SM_Popcorn_010',
+  ];
   const CAMERA_Z = 12;
   const FOV = 50;
 
@@ -32,6 +43,12 @@ function initPopcornHero(container) {
   const MAX_TIMESTEP = 1 / 30;
   const COLLISION_SPIN_TRANSFER = 0.15;
   const ANGULAR_DAMPING_PER_SECOND = 0.25;
+
+  const POP_DELAY_MIN = 1; // seconds before an unpopped kernel pops
+  const POP_DELAY_MAX = 8;
+  const INITIAL_POPPED_FRACTION = 0.3; // fraction (0-1) of popcorns that start already popped on load
+  const NEVER_POPS_FRACTION = 0.15; // of the popcorns that start as kernels, fraction (0-1) that never pop
+  // (their collider is sized to their own kernel shape, since that's their permanent final shape)
 
   const LIGHT_THEME = {
     ambient: { color: 0xfff3e2, intensity: 0.95 },
@@ -145,29 +162,73 @@ function initPopcornHero(container) {
     return (Math.random() - 0.5) * scale;
   }
 
+  // Fresnel-rim glow: mostly driven by grazing-angle edges (GLOW_RIM_FRACTION), with a
+  // faint flat base so the piece doesn't look unlit when viewed face-on. Attached to
+  // whatever material the popcorn currently has, so it can be reattached after a pop swap.
+  function attachGlowShader(popcorn) {
+    popcorn.glowUniforms = null;
+    popcorn.mesh.material.onBeforeCompile = (shader) => {
+      shader.uniforms.uGlow = { value: 0 };
+      shader.uniforms.uGlowColor = { value: new THREE.Color(theme.glow.color) };
+      shader.uniforms.uGlowMax = { value: theme.glow.intensity };
+      shader.uniforms.uFresnelPower = { value: FRESNEL_POWER };
+
+      shader.fragmentShader = shader.fragmentShader
+        .replace(
+          '#include <common>',
+          `#include <common>
+          uniform float uGlow;
+          uniform vec3 uGlowColor;
+          uniform float uGlowMax;
+          uniform float uFresnelPower;`,
+        )
+        .replace(
+          '#include <normal_fragment_maps>',
+          `#include <normal_fragment_maps>
+          float vFresnel = pow(clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0), uFresnelPower);`,
+        )
+        .replace(
+          '#include <emissivemap_fragment>',
+          `#include <emissivemap_fragment>
+          totalEmissiveRadiance += uGlowColor * (uGlow * uGlowMax * (vFresnel * ${GLOW_RIM_FRACTION.toFixed(2)} + ${(1 - GLOW_RIM_FRACTION).toFixed(2)}));`,
+        );
+
+      popcorn.glowUniforms = shader.uniforms;
+    };
+  }
+
+  let meshByName = null;
+  function pickRandomMesh(names) {
+    return meshByName.get(names[Math.floor(Math.random() * names.length)]);
+  }
+
   const loader = new GLTFLoader();
   const dracoLoader = new DRACOLoader();
   dracoLoader.setDecoderPath('vendor/three/libs/draco/gltf/');
   loader.setDRACOLoader(dracoLoader);
 
   loader.load('gltf/Popcorn.glb', (gltf) => {
-    const sourceMeshes = gltf.scene.children.filter((child) => child.isMesh);
-    for (let i = sourceMeshes.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [sourceMeshes[i], sourceMeshes[j]] = [sourceMeshes[j], sourceMeshes[i]];
-    }
+    meshByName = new Map(
+      gltf.scene.children.filter((child) => child.isMesh).map((mesh) => [mesh.name, mesh]),
+    );
 
     for (let i = 0; i < POPCORN_COUNT; i++) {
-      const source = sourceMeshes[i % sourceMeshes.length];
-      const mesh = source.clone();
-      mesh.material = source.material.clone();
+      const startsPopped = Math.random() < INITIAL_POPPED_FRACTION;
+      const kernelSource = pickRandomMesh(UNPOPPED_MESH_NAMES);
+      const visualSource = startsPopped ? pickRandomMesh(POPPED_MESH_NAMES) : kernelSource;
+      const willPop = !startsPopped && Math.random() >= NEVER_POPS_FRACTION;
+
+      const mesh = visualSource.clone();
+      mesh.material = visualSource.material.clone();
 
       mesh.position.set(randomSpread(halfWidth * SPAWN_AREA_FRACTION), randomSpread(halfHeight * SPAWN_AREA_FRACTION), 0);
       mesh.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
       scene.add(mesh);
 
-      if (!source.geometry.boundingBox) source.geometry.computeBoundingBox();
-      const box = source.geometry.boundingBox;
+      // Collider matches whatever shape is currently displayed; a pop recalculates
+      // it from the newly-chosen popped mesh at that moment instead of pre-guessing it.
+      if (!visualSource.geometry.boundingBox) visualSource.geometry.computeBoundingBox();
+      const box = visualSource.geometry.boundingBox;
 
       const popcorn = {
         mesh,
@@ -185,39 +246,12 @@ function initPopcornHero(container) {
         glow: 0,
         glowUniforms: null,
         pulsePhase: Math.random() * Math.PI * 2,
+        popped: startsPopped,
+        willPop,
+        popAt: willPop ? POP_DELAY_MIN + Math.random() * (POP_DELAY_MAX - POP_DELAY_MIN) : undefined,
       };
 
-      // Fresnel-rim glow: mostly driven by grazing-angle edges (GLOW_RIM_FRACTION), with a
-      // faint flat base so the piece doesn't look unlit when viewed face-on.
-      mesh.material.onBeforeCompile = (shader) => {
-        shader.uniforms.uGlow = { value: 0 };
-        shader.uniforms.uGlowColor = { value: new THREE.Color(theme.glow.color) };
-        shader.uniforms.uGlowMax = { value: theme.glow.intensity };
-        shader.uniforms.uFresnelPower = { value: FRESNEL_POWER };
-
-        shader.fragmentShader = shader.fragmentShader
-          .replace(
-            '#include <common>',
-            `#include <common>
-            uniform float uGlow;
-            uniform vec3 uGlowColor;
-            uniform float uGlowMax;
-            uniform float uFresnelPower;`,
-          )
-          .replace(
-            '#include <normal_fragment_maps>',
-            `#include <normal_fragment_maps>
-            float vFresnel = pow(clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0), uFresnelPower);`,
-          )
-          .replace(
-            '#include <emissivemap_fragment>',
-            `#include <emissivemap_fragment>
-            totalEmissiveRadiance += uGlowColor * (uGlow * uGlowMax * (vFresnel * ${GLOW_RIM_FRACTION.toFixed(2)} + ${(1 - GLOW_RIM_FRACTION).toFixed(2)}));`,
-          );
-
-        popcorn.glowUniforms = shader.uniforms;
-      };
-
+      attachGlowShader(popcorn);
       popcorns.push(popcorn);
     }
 
@@ -260,6 +294,25 @@ function initPopcornHero(container) {
 
   function step(dt, elapsed) {
     for (const p of popcorns) {
+      if (p.willPop && !p.popped && elapsed >= p.popAt) {
+        p.popped = true;
+
+        const poppedSource = pickRandomMesh(POPPED_MESH_NAMES);
+        p.mesh.geometry = poppedSource.geometry;
+        p.mesh.material = poppedSource.material.clone();
+        attachGlowShader(p);
+
+        if (!poppedSource.geometry.boundingBox) poppedSource.geometry.computeBoundingBox();
+        const box = poppedSource.geometry.boundingBox;
+        p.halfExtents.set(
+          (box.max.x - box.min.x) / 2,
+          (box.max.y - box.min.y) / 2,
+          (box.max.z - box.min.z) / 2,
+        );
+
+        p.angularVelocity.set(randomSpread(1), randomSpread(1), randomSpread(1)).setLength(MAX_ANGULAR_SPEED);
+      }
+
       let glowTarget = 0;
 
       if (cursorActive) {
