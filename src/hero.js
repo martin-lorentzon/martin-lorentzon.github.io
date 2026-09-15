@@ -9,7 +9,7 @@ function initPopcornHero(container) {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isCompact = window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(pointer: coarse)').matches;
 
-  const POPCORN_COUNT = isCompact ? 7 : 14;
+  const POPCORN_COUNT = isCompact ? 8 : 14;
   const PIXEL_RATIO_CAP = isCompact ? 1.5 : 2;
   const UNPOPPED_MESH_NAMES = ['SM_Popcorn_007', 'SM_Popcorn_008'];
   const POPPED_MESH_NAMES = [
@@ -22,6 +22,7 @@ function initPopcornHero(container) {
     'SM_Popcorn_009',
     'SM_Popcorn_010',
   ];
+  const LAST_POPPED_MESH_NAMES = ['SM_Popcorn_006']; // the last kernel to pop only becomes one of these
   const CAMERA_Z = 12;
   const FOV = 50;
 
@@ -45,11 +46,13 @@ function initPopcornHero(container) {
   const COLLISION_SPIN_TRANSFER = 0.15;
   const ANGULAR_DAMPING_PER_SECOND = 0.25;
 
-  const POP_DELAY_MIN = 1; // seconds before an unpopped kernel pops
-  const POP_DELAY_MAX = 8;
-  const INITIAL_POPPED_FRACTION = 0.3; // fraction (0-1) of popcorns that start already popped on load
-  const NEVER_POPS_FRACTION = 0.15; // of the popcorns that start as kernels, fraction (0-1) that never pop
-  // (their collider is sized to their own kernel shape, since that's their permanent final shape)
+  const INITIAL_POPPED_FRACTION = 0; // fraction (0-1) of popcorns that start already popped on load
+  const NEVER_POPS_FRACTION = 0; // of the popcorns that start as kernels, fraction (0-1) that never pop
+
+  const FIRST_POP_DELAY = isCompact ? 1 : 2; // seconds from load until the first kernel in the pop sequence pops
+  const POP_INTERVAL = { min: 0.2, max: 0.5 }; // seconds between each subsequent pop, randomized per gap
+  const LAST_POP_INTERVAL = { min: 3, max: 4 }; // gap before the last pop (after the second-to-last)
+
 
   const LIGHT_THEME = {
     ambient: { color: 0xfff3e2, intensity: 0.95 },
@@ -62,7 +65,7 @@ function initPopcornHero(container) {
     ambient: { color: 0x2e3452, intensity: 0.5 },
     key: { color: 0x89a8ff, intensity: 1.5 }, // vivid moonlight
     fill: { color: 0xcf946e, intensity: 0.35 },
-    glow: { color: 0xffb066, intensity: 0.7 },
+    glow: { color: 0xffb066, intensity: 0.6 },
     exposure: 1.05,
   };
 
@@ -163,6 +166,10 @@ function initPopcornHero(container) {
     return (Math.random() - 0.5) * scale;
   }
 
+  function randomInRange(range) {
+    return range.min + Math.random() * (range.max - range.min);
+  }
+
   // Fresnel-rim glow: mostly driven by grazing-angle edges (GLOW_RIM_FRACTION), with a
   // faint flat base so the piece doesn't look unlit when viewed face-on. Attached to
   // whatever material the popcorn currently has, so it can be reattached after a pop swap.
@@ -252,12 +259,28 @@ function initPopcornHero(container) {
         pulsePhase: Math.random() * (GLOW_PULSE_BRIGHT_DURATION + GLOW_PULSE_DARK_DURATION),
         popped: startsPopped,
         willPop,
-        popAt: willPop ? POP_DELAY_MIN + Math.random() * (POP_DELAY_MAX - POP_DELAY_MIN) : undefined,
+        popAt: undefined, // assigned below, once every popcorn's willPop status is known
       };
 
       attachGlowShader(popcorn);
       popcorns.push(popcorn);
     }
+
+    // Kernels that will pop don't do so independently at random — they pop one after
+    // another in a shuffled order, spaced by POP_INTERVAL (LAST_POP_INTERVAL for the
+    // final gap, after the second-to-last popper).
+    const poppers = popcorns.filter((p) => p.willPop);
+    for (let i = poppers.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [poppers[i], poppers[j]] = [poppers[j], poppers[i]];
+    }
+    let nextPopAt = FIRST_POP_DELAY;
+    poppers.forEach((p, index) => {
+      p.popAt = nextPopAt;
+      p.isLastPopper = index === poppers.length - 1;
+      const nextGapIsLast = index === poppers.length - 2;
+      nextPopAt += randomInRange(nextGapIsLast ? LAST_POP_INTERVAL : POP_INTERVAL);
+    });
 
     resizeRendererToDisplaySize();
     startLoop();
@@ -301,7 +324,7 @@ function initPopcornHero(container) {
       if (p.willPop && !p.popped && elapsed >= p.popAt) {
         p.popped = true;
 
-        const poppedSource = pickRandomMesh(POPPED_MESH_NAMES);
+        const poppedSource = pickRandomMesh(p.isLastPopper ? LAST_POPPED_MESH_NAMES : POPPED_MESH_NAMES);
         p.mesh.geometry = poppedSource.geometry;
         p.mesh.material = poppedSource.material.clone();
         attachGlowShader(p);
