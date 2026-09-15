@@ -214,8 +214,12 @@ function initPopcornHero(container) {
   const dracoLoader = new DRACOLoader();
   dracoLoader.setDecoderPath('vendor/three/libs/draco/gltf/');
   loader.setDRACOLoader(dracoLoader);
+  // Start fetching/compiling the Draco decoder immediately instead of waiting until
+  // GLTFLoader reaches the compressed primitive (which happens only after the whole
+  // .glb has already downloaded and been parsed) — lets the two fetches overlap.
+  dracoLoader.preload();
 
-  loader.load('gltf/Popcorn.glb', (gltf) => {
+  loader.load('gltf/Popcorn.optimized.glb', (gltf) => {
     meshByName = new Map(
       gltf.scene.children.filter((child) => child.isMesh).map((mesh) => [mesh.name, mesh]),
     );

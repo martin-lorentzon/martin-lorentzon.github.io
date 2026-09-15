@@ -58,8 +58,10 @@
         </header>
         <main>
           <!-- 72px = the sticky navbar's rendered height (stacks above this section in flow);
-               keep in sync if the navbar's content/padding ever changes its height. -->
-          <section id="hero" class="relative flex min-h-[calc(100dvh-72px)] flex-col items-center justify-center overflow-hidden px-8 text-center sm:px-12">
+               keep in sync if the navbar's content/padding ever changes its height.
+               svh (not dvh) so the mobile browser toolbar hiding/showing on scroll doesn't
+               resize this section and shove the content below it. -->
+          <section id="hero" class="relative flex min-h-[calc(100svh-72px)] flex-col items-center justify-center overflow-hidden px-8 text-center sm:px-12">
             <div id="hero-canvas" class="absolute inset-0" aria-hidden="true"></div>
             <div class="relative z-10 max-w-2xl select-none">
               <h1 class="text-4xl font-bold sm:text-6xl">
