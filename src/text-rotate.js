@@ -1,6 +1,6 @@
 const HOLD_DURATION = 2200; // ms each word stays fully visible
-const SWAP_DURATION = 320; // ms for each word's own blur/slide transition
-const OVERLAP_DELAY = 180; // ms after the outgoing word starts before the incoming one follows
+const SWAP_DURATION = 300; // ms for each word's own blur/slide transition
+const OVERLAP_DELAY = 200; // ms after the outgoing word starts before the incoming one follows
 
 const el = document.querySelector('[data-text-rotate]');
 if (el) initTextRotate(el);
