@@ -1,10 +1,13 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>daisyUI Demo</title>
     <link rel="stylesheet" href="dist/output.css" />
+    <script type="importmap">
+      { "imports": { "three": "./vendor/three/three.module.js" } }
+    </script>
   </head>
   <body class="bg-base-200 min-h-screen">
     <div class="drawer">
@@ -54,6 +57,32 @@
           </div>
         </header>
         <main>
+          <!-- 72px = the sticky navbar's rendered height (stacks above this section in flow);
+               keep in sync if the navbar's content/padding ever changes its height.
+               svh (not dvh) so the mobile browser toolbar hiding/showing on scroll doesn't
+               resize this section and shove the content below it. -->
+          <section id="hero" class="relative flex min-h-[calc(100svh-72px)] flex-col items-center justify-center overflow-hidden px-8 text-center sm:px-12">
+            <div id="hero-canvas" class="absolute inset-0" aria-hidden="true"></div>
+            <div class="relative z-10 max-w-2xl select-none">
+              <h1 class="text-4xl font-bold sm:text-6xl">
+                Låt din idé
+                <span class="bg-gradient-to-r from-amber-400 to-orange-600 bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]">poppa</span>
+              </h1>
+              <p
+                class="mx-auto mt-4 flex w-fit max-w-full items-center justify-center gap-x-1.5 whitespace-nowrap rounded-full border border-base-300 bg-base-200/60 px-7 py-2 text-sm text-base-content/70 sm:text-lg"
+              >
+                <span>med hjälp av</span>
+                <span data-text-rotate data-text-rotate-words="interaktivitet|3D-animation|3D-pipelines" class="inline-block text-left font-medium text-base-content"></span>
+              </p>
+            </div>
+            <script src="src/text-rotate.js"></script>
+            <div class="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-4">
+              <a href="#tjanster" data-scroll-instant class="btn btn-primary shadow-none">Se tjänster</a>
+              <a href="#tjanster" class="text-base-content/50" aria-label="Scrolla till tjänster">
+                <i data-lucide="chevron-down" class="h-6 w-6 motion-safe:animate-bounce"></i>
+              </a>
+            </div>
+          </section>
           <section id="tjanster" class="mx-auto py-20 max-w-5xl px-8 sm:px-12">
             <h2 class="flex flex-wrap items-center gap-3 text-4xl font-bold sm:text-5xl">
               Visa din produkt i
@@ -232,6 +261,16 @@
     <script src="vendor/lucide.min.js"></script>
     <script>
       lucide.createIcons();
+
+      document.querySelectorAll("[data-scroll-instant]").forEach((link) => {
+        link.addEventListener("click", (event) => {
+          const target = document.querySelector(link.getAttribute("href"));
+          if (!target) return;
+          event.preventDefault();
+          target.scrollIntoView({ behavior: "instant" });
+        });
+      });
     </script>
+    <script type="module" src="src/hero.js"></script>
   </body>
 </html>
