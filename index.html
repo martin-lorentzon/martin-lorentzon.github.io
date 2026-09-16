@@ -40,14 +40,8 @@
           <div class="navbar-end gap-2">
             <label class="swap swap-rotate btn btn-ghost btn-circle" aria-label="Toggle dark mode">
               <input type="checkbox" class="theme-controller" value="black" />
-              <svg class="swap-off h-6 w-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path
-                  d="M12 4a1 1 0 0 1-1-1V1a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1Zm0 20a1 1 0 0 1-1-1v-2a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1ZM4.93 6.34a1 1 0 0 1-.71-.29L2.81 4.63a1 1 0 1 1 1.42-1.42l1.41 1.42a1 1 0 0 1 0 1.41 1 1 0 0 1-.71.3Zm14.85 14.85a1 1 0 0 1-.71-.29l-1.41-1.42a1 1 0 0 1 1.41-1.41l1.42 1.41a1 1 0 0 1 0 1.42 1 1 0 0 1-.71.29ZM3 13H1a1 1 0 0 1 0-2h2a1 1 0 0 1 0 2Zm20 0h-2a1 1 0 0 1 0-2h2a1 1 0 0 1 0 2ZM3.51 20.49a1 1 0 0 1-.71-1.71l1.41-1.42a1 1 0 1 1 1.42 1.42l-1.41 1.41a1 1 0 0 1-.71.3Zm15.56-15.56a1 1 0 0 1-.71-1.71l1.42-1.41a1 1 0 1 1 1.41 1.41l-1.41 1.42a1 1 0 0 1-.71.29ZM12 18a6 6 0 1 1 6-6 6 6 0 0 1-6 6Z"
-                />
-              </svg>
-              <svg class="swap-on h-6 w-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M21.64 13.65a1 1 0 0 0-1.05-.14 8.05 8.05 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2 1 1 0 0 0-1.33-1.18A10.14 10.14 0 1 0 21.94 14.7a1 1 0 0 0-.3-1.05Z" />
-              </svg>
+              <i data-lucide="sun" class="swap-off h-6 w-6" aria-hidden="true"></i>
+              <i data-lucide="moon" class="swap-on h-6 w-6" aria-hidden="true"></i>
             </label>
             <label for="mobile-menu" aria-label="Open menu" class="btn btn-ghost btn-square lg:hidden">
               <i data-lucide="menu" class="h-6 w-6" aria-hidden="true"></i>
@@ -82,49 +76,42 @@
             </div>
           </section>
           <section id="tjanster" class="mx-auto py-20 max-w-5xl px-8 sm:px-12">
-            <h2 class="flex flex-wrap items-center gap-3 text-4xl font-bold sm:text-5xl">
-              Visa din produkt i
-              <span class="bg-gradient-to-r from-violet-600 to-fuchsia-500 bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]">interaktiv 3D</span>
-              <i data-lucide="rotate-3d" class="h-8 w-8 sm:h-10 sm:w-10" aria-hidden="true"></i>
+            <h2 class="text-4xl font-bold sm:text-5xl">
+              Visa din produkt i interaktiv <span class="whitespace-nowrap">3D<i data-lucide="rotate-3d" class="ml-2 inline-block h-8 w-8 align-middle sm:h-10 sm:w-10" aria-hidden="true"></i></span>
             </h2>
             <div class="mt-8 space-y-5 text-base-content/80 sm:text-lg">
-              <p>Ge kunden en ökad produktförståelse och stärk ditt varumärke med interaktiv 3D på webben.</p>
+              <p>Ge dina kunder en djupare produktförståelse och stärk ditt varumärke med interaktiv 3D på webben.</p>
               <p>
                 Konfigurationer, intressepunkter, rörliga delar och AR-läge
                 <i data-lucide="scan-box" class="inline h-5 w-5 align-text-bottom" aria-hidden="true"></i>
-                (Augmented Reality) är exempel på funktioner som enkelt kan integreras i 3D-vyn.
+                (Augmented Reality) är exempel på funktioner som enkelt integreras i 3D-vyn.
               </p>
               <p>3D-vyn fungerar direkt i webbläsaren utan någon app och skräddarsys för att bli en naturlig del av din befintliga hemsida.</p>
             </div>
           </section>
           <section id="infografik" class="mx-auto py-20 max-w-5xl px-8 sm:px-12">
-            <h2 class="flex flex-wrap items-center gap-3 text-4xl font-bold sm:text-5xl">
-              Infografik &amp;
-              <span class="bg-gradient-to-r from-cyan-500 to-blue-600 bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]">animation</span>
-              <i data-lucide="circle-play" class="h-8 w-8 sm:h-10 sm:w-10" aria-hidden="true"></i>
+            <h2 class="text-4xl font-bold sm:text-5xl">
+              Infografik &amp; <span class="whitespace-nowrap">animation<i data-lucide="clapperboard" class="ml-2 inline-block h-8 w-8 align-middle sm:h-10 sm:w-10" aria-hidden="true"></i></span>
             </h2>
             <div class="mt-8 space-y-5 text-base-content/80 sm:text-lg">
               <h3 class="text-2xl font-semibold text-base-content">Produkter</h3>
-              <p>Marknadsför din produkt med hjälp av produktanimation som förmedlar utseende, känsla och funktion i tidigt skede.</p>
+              <p>Förmedla utseende, känsla och funktion innan du har en prototyp.</p>
               <p>
-                Utifrån dina CAD-filer eller underlag tar jag fram färdiga produktfilmer och stillbilder. Under processen testar vi olika koncept för att hitta det visuella spår som lyfter din produkt
-                på bästa sätt.
+                Utifrån dina CAD-filer eller annat underlag tar jag fram färdiga produktfilmer och stillbilder. Under processen testar vi olika koncept för att hitta det visuella spår som lyfter din
+                produkt på bästa sätt.
               </p>
               <p>I fall av större projekt (exempelvis en serie av produkter) kan miljöer och digital studiobelysning återanvändas för att minimera ledtiden och kostnaden.</p>
               <h3 class="pt-2 text-2xl font-semibold text-base-content">Utbildning &amp; medicin</h3>
               <p>
-                Höj engagemanget och förståelsen för ditt ämne med stiliserad film eller teknisk animation. Vi är visuella i vår inlärning och 3D-animation lämpar sig extremt bra till att skapa
-                intuitiva förklaringar som är lätta att ta in och sätter sig på minnet.
+                Höj engagemanget och den allmänna förståelsen för ditt ämne med stiliserad film eller teknisk animation. Vi människor är visuella i vår inlärning, berättande med hjälp av 3D-animation
+                lämpar sig extremt bra till att skapa intuitiva förklaringar som är lätta att ta in och sätter sig på minnet.
               </p>
             </div>
           </section>
           <section id="verktyg" class="mx-auto py-20 max-w-5xl px-8 sm:px-12">
-            <h2 class="flex flex-wrap items-center gap-3 text-4xl font-bold sm:text-5xl">
+            <h2 class="text-4xl font-bold sm:text-5xl">
               Skapa smarta
-              <span class="bg-gradient-to-r from-emerald-500 to-teal-600 bg-clip-text leading-normal text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]"
-                >in-house-verktyg</span
-              >
-              <i data-lucide="drafting-compass" class="h-8 w-8 sm:h-10 sm:w-10" aria-hidden="true"></i>
+              <span class="whitespace-nowrap">in&#8209;house&#8209;verktyg<i data-lucide="spline-pointer" class="ml-2 inline-block h-8 w-8 align-middle sm:h-10 sm:w-10" aria-hidden="true"></i></span>
             </h2>
             <div class="mt-8 space-y-5 text-base-content/80 sm:text-lg">
               <p>
@@ -132,10 +119,10 @@
                 handla om att
               </p>
               <ul class="list-disc space-y-2 pl-6">
-                <li>Automatisera en lång och krånglig process</li>
-                <li>Generera parametriska 3D-modeller</li>
-                <li>Förenkla distribution av digitala tillgångar</li>
-                <li>Skapa återanvändbara komponenter för nuvarande och framtida projekt</li>
+                <li>automatisera en lång och krånglig process</li>
+                <li>generera parametriska 3D-modeller</li>
+                <li>förenkla distribution av digitala tillgångar</li>
+                <li>skapa återanvändbara komponenter för nuvarande och framtida projekt</li>
               </ul>
             </div>
           </section>
@@ -156,14 +143,13 @@
             </div>
           </section>
           <section id="kontakt" class="mx-auto py-20 max-w-5xl px-8 text-center sm:px-12">
-            <h2 class="flex flex-wrap items-center justify-center gap-3 text-4xl font-bold sm:text-5xl">
-              Kontakt
-              <i data-lucide="mail" class="h-8 w-8 sm:h-10 sm:w-10" aria-hidden="true"></i>
+            <h2 class="text-4xl font-bold sm:text-5xl">
+              <span class="whitespace-nowrap">Kontakt<i data-lucide="mail" class="ml-2 inline-block h-8 w-8 align-middle sm:h-10 sm:w-10" aria-hidden="true"></i></span>
             </h2>
             <div class="mt-8 space-y-2">
-              <h3 class="text-2xl font-semibold text-base-content break-words">contact@martinlorentzon.se</h3>
+              <h3 class="text-2xl font-semibold text-base-content break-words">contact@<wbr />martinlorentzon<wbr />.se</h3>
               <h3 class="text-2xl font-semibold text-base-content">+46 70 920 14 81</h3>
-              <h3 class="text-xl font-semibold text-base-content">Jag nås helst via sms eller e-post.</h3>
+              <h3 class="text-xl font-semibold text-base-content">Jag nås helst via sms eller e&#8209;post.</h3>
               <h3 class="text-2xl font-semibold text-base-content">Göteborg, Sverige</h3>
             </div>
           </section>
@@ -210,13 +196,15 @@
                   <ul class="flex flex-col gap-2 text-base-content/80">
                     <li><a href="#tjanster" class="link link-hover">Interaktiv 3D</a></li>
                     <li><a href="#infografik" class="link link-hover">Infografik &amp; animation</a></li>
-                    <li><a href="#verktyg" class="link link-hover">In-house-verktyg</a></li>
+                    <li><a href="#verktyg" class="link link-hover">In&#8209;house&#8209;verktyg</a></li>
                   </ul>
                 </div>
                 <div>
                   <h3 class="footer-title">Kontakt</h3>
                   <ul class="flex flex-col gap-2 text-base-content/80">
-                    <li><a href="mailto:contact@martinlorentzon.se" class="link link-hover break-words">contact@martinlorentzon.se</a></li>
+                    <li>
+                      <a href="mailto:contact@martinlorentzon.se" class="link link-hover break-words">contact@<wbr />martinlorentzon<wbr />.se</a>
+                    </li>
                     <li><a href="tel:+46709201481" class="link link-hover">+46 70 920 14 81</a></li>
                   </ul>
                 </div>
