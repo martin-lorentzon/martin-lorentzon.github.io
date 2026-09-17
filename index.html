@@ -13,6 +13,9 @@
     <div class="drawer">
       <input id="mobile-menu" type="checkbox" class="drawer-toggle" />
       <div class="drawer-content flex min-h-screen flex-col">
+        <!-- ================================================================== -->
+        <!-- HEADER / NAVBAR                                                    -->
+        <!-- ================================================================== -->
         <header class="navbar bg-base-100 sticky top-0 z-30 px-4">
           <div class="navbar-start">
             <ul class="menu menu-horizontal px-1">
@@ -50,6 +53,9 @@
           </div>
         </header>
         <main>
+          <!-- ================================================================== -->
+          <!-- HERO                                                               -->
+          <!-- ================================================================== -->
           <!-- 72px = the sticky navbar's rendered height (stacks above this section in flow);
                keep in sync if the navbar's content/padding ever changes its height.
                svh (not dvh) so the mobile browser toolbar hiding/showing on scroll doesn't
@@ -76,6 +82,9 @@
               </a>
             </div>
           </section>
+          <!-- ================================================================== -->
+          <!-- TJÄNSTER (interaktiv 3D)                                          -->
+          <!-- ================================================================== -->
           <section id="tjanster" class="mx-auto py-20 max-w-5xl px-8 sm:px-12">
             <h2 class="text-4xl font-bold sm:text-5xl">
               Visa din produkt i interaktiv <span class="whitespace-nowrap">3D<i data-lucide="rotate-3d" class="ml-2 inline-block h-8 w-8 align-middle sm:h-10 sm:w-10" aria-hidden="true"></i></span>
@@ -90,6 +99,9 @@
               <p>3D-vyn fungerar direkt i webbläsaren utan någon app och skräddarsys för att bli en naturlig del av din befintliga hemsida.</p>
             </div>
           </section>
+          <!-- ================================================================== -->
+          <!-- INFOGRAFIK & ANIMATION                                            -->
+          <!-- ================================================================== -->
           <section id="infografik" class="mx-auto py-20 max-w-5xl px-8 sm:px-12">
             <h2 class="text-4xl font-bold sm:text-5xl">
               Infografik &amp; <span class="whitespace-nowrap">animation<i data-lucide="clapperboard" class="ml-2 inline-block h-8 w-8 align-middle sm:h-10 sm:w-10" aria-hidden="true"></i></span>
@@ -109,6 +121,9 @@
               </p>
             </div>
           </section>
+          <!-- ================================================================== -->
+          <!-- VERKTYG (in-house-verktyg)                                        -->
+          <!-- ================================================================== -->
           <section id="verktyg" class="mx-auto py-20 max-w-5xl px-8 sm:px-12">
             <h2 class="text-4xl font-bold sm:text-5xl">
               Skapa smarta
@@ -127,6 +142,9 @@
               </ul>
             </div>
           </section>
+          <!-- ================================================================== -->
+          <!-- OM MIG                                                            -->
+          <!-- ================================================================== -->
           <section id="om-mig" class="mx-auto py-20 max-w-5xl px-8 sm:px-12">
             <h2 class="text-center text-4xl font-bold sm:text-5xl">Martin Lorentzon</h2>
             <div class="mt-8 flex flex-col items-center gap-8 sm:flex-row sm:items-start sm:gap-12">
@@ -143,6 +161,9 @@
               </div>
             </div>
           </section>
+          <!-- ================================================================== -->
+          <!-- KONTAKT                                                           -->
+          <!-- ================================================================== -->
           <section id="kontakt" class="mx-auto py-20 max-w-5xl px-8 text-center sm:px-12">
             <h2 class="text-4xl font-bold sm:text-5xl">
               <span class="whitespace-nowrap">Kontakt<i data-lucide="mail" class="ml-2 inline-block h-8 w-8 align-middle sm:h-10 sm:w-10" aria-hidden="true"></i></span>
@@ -155,6 +176,9 @@
             </div>
           </section>
         </main>
+        <!-- ================================================================== -->
+        <!-- FOOTER (FAQ + länkar)                                              -->
+        <!-- ================================================================== -->
         <footer class="bg-base-100 border-t border-none">
           <div class="mx-auto max-w-8xl px-8 py-16 sm:px-12">
             <div class="grid gap-12 lg:grid-cols-2 lg:gap-16">
@@ -223,6 +247,9 @@
           </div>
         </footer>
       </div>
+      <!-- ==================================================================== -->
+      <!-- MOBILE MENU (drawer side)                                            -->
+      <!-- ==================================================================== -->
       <div class="drawer-side z-40">
         <label for="mobile-menu" aria-label="Close menu" class="drawer-overlay"></label>
         <div class="min-h-full w-full bg-base-100 p-4 text-base-content">
@@ -251,6 +278,9 @@
         </div>
       </div>
     </div>
+    <!-- ====================================================================== -->
+    <!-- SCRIPTS                                                                -->
+    <!-- ====================================================================== -->
     <script src="vendor/lucide.min.js"></script>
     <script>
       lucide.createIcons();

@@ -13,3 +13,12 @@
   - For a hyphenated compound that should read as one unit (e.g. "in-house-verktyg", "e-post"), use a non-breaking hyphen (`&#8209;`) instead of a plain `-`. It renders identically but stops the browser from splitting the word at the hyphen, so a wrap moves the whole compound to the next line instead of stranding a fragment like "in-" or "e-".
   - For long unbreakable strings like an email address, don't rely on `break-words`/`overflow-wrap` alone — it can strand a single character (e.g. a lone "e" off "martinlorentzon.se"). Add explicit `<wbr />` at natural boundaries instead (e.g. `contact@<wbr />martinlorentzon<wbr />.se`).
   - This is a static-build project (`npm run build`, Tailwind CLI → `dist/output.css`) — after adding a Tailwind class that isn't already used elsewhere in the file, rebuild before checking in the browser, or the new class won't be in the compiled CSS and will silently have no effect.
+- Mark every top-level structural region of `index.html` with a 3-line boxed banner comment, and add one whenever a new top-level region is introduced (don't wait to be asked):
+  ```
+  <!-- ================================================================== -->
+  <!-- SECTION NAME                                                      -->
+  <!-- ================================================================== -->
+  ```
+  - "Top-level" means: header/navbar, each `<section id="...">` in `<main>`, footer, the mobile drawer menu, and the scripts block at the end of `<body>` — not nested subsections within them (e.g. the FAQ accordion or footer link columns don't get their own banner).
+  - Match the indentation of the element the banner precedes; size the `=` dashes so the banner reads as a clean box at that indent level (see existing banners in `index.html` for the pattern).
+  - Name the section in caps, using the element's `id` or a short plain-English label (e.g. `HERO`, `KONTAKT`, `MOBILE MENU (drawer side)`).
