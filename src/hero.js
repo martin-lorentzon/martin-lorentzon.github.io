@@ -327,7 +327,7 @@ function initPopcornHero(container) {
     for (const p of popcorns) {
       if (p.willPop && !p.popped && elapsed >= p.popAt) {
         p.popped = true;
-        navigator.vibrate?.(15);
+        navigator.vibrate?.(20);
 
         const poppedSource = pickRandomMesh(p.isLastPopper ? LAST_POPPED_MESH_NAMES : POPPED_MESH_NAMES);
         p.mesh.geometry = poppedSource.geometry;
