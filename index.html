@@ -16,12 +16,13 @@
         <header class="navbar bg-base-100 sticky top-0 z-30 px-4">
           <div class="navbar-start">
             <ul class="menu menu-horizontal px-1">
-              <li><a class="text-xl font-semibold">Martin Lorentzon</a></li>
+              <li><a href="#hero" data-scroll-instant class="text-xl font-semibold">Martin Lorentzon</a></li>
             </ul>
           </div>
           <div class="navbar-center hidden lg:flex">
             <ul class="menu menu-horizontal px-1">
               <li><a href="#tjanster" data-scroll-instant>Tjänster</a></li>
+              <li><a href="#om-mig" data-scroll-instant>Om mig</a></li>
               <li><a href="#kontakt" data-scroll-instant>Kontakt</a></li>
               <li>
                 <details>
@@ -103,8 +104,8 @@
               <p>I fall av större projekt (exempelvis en serie av produkter) kan miljöer och digital studiobelysning återanvändas för att minimera ledtiden och kostnaden.</p>
               <h3 class="pt-2 text-2xl font-semibold text-base-content">Utbildning &amp; medicin</h3>
               <p>
-                Höj engagemanget och den allmänna förståelsen för ditt ämne med stiliserad film eller teknisk animation. Vi människor är visuella i vår inlärning, berättande med hjälp av 3D-animation
-                lämpar sig extremt bra till att skapa intuitiva förklaringar som är lätta att ta in och sätter sig på minnet.
+                Höj engagemanget och förståelsen för ditt ämne med stiliserad film eller teknisk animation. Vi människor är visuella i vår inlärning, berättande med hjälp av 3D-animation lämpar sig
+                extremt bra till att skapa intuitiva förklaringar som är lätta att ta in och sätter sig på minnet.
               </p>
             </div>
           </section>
@@ -155,9 +156,9 @@
           </section>
         </main>
         <footer class="bg-base-100 border-t border-none">
-          <div class="mx-auto max-w-5xl px-8 py-16 sm:px-12">
+          <div class="mx-auto max-w-8xl px-8 py-16 sm:px-12">
             <div class="grid gap-12 lg:grid-cols-2 lg:gap-16">
-              <div>
+              <div class="max-w-lg">
                 <h2 class="mb-4 text-2xl font-bold">Vanliga frågor</h2>
                 <div class="join join-vertical w-full">
                   <div class="collapse collapse-arrow join-item border border-base-300">
@@ -190,7 +191,7 @@
                   </div>
                 </div>
               </div>
-              <div class="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-2">
+              <div class="grid grid-cols-1 gap-8 sm:grid-cols-3 lg:border-l lg:border-base-300 lg:pl-8">
                 <div>
                   <h3 class="footer-title">Tjänster</h3>
                   <ul class="flex flex-col gap-2 text-base-content/80">
@@ -206,6 +207,13 @@
                       <a href="mailto:contact@martinlorentzon.se" class="link link-hover break-words">contact@<wbr />martinlorentzon<wbr />.se</a>
                     </li>
                     <li><a href="tel:+46709201481" class="link link-hover">+46 70 920 14 81</a></li>
+                    <li><a href="https://www.linkedin.com/in/martinlorentzon/" target="_blank" rel="noopener noreferrer" class="link link-hover">LinkedIn</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 class="footer-title">Om mig</h3>
+                  <ul class="flex flex-col gap-2 text-base-content/80">
+                    <li><a href="#om-mig" class="link link-hover">Om mig</a></li>
                   </ul>
                 </div>
               </div>
@@ -225,6 +233,7 @@
           </div>
           <ul class="menu w-full text-lg">
             <li><a href="#tjanster" data-scroll-instant>Tjänster</a></li>
+            <li><a href="#om-mig" data-scroll-instant>Om mig</a></li>
             <li><a href="#kontakt" data-scroll-instant>Kontakt</a></li>
             <li>
               <details>
@@ -248,10 +257,25 @@
 
       document.querySelectorAll("[data-scroll-instant]").forEach((link) => {
         link.addEventListener("click", (event) => {
-          const target = document.querySelector(link.getAttribute("href"));
+          const href = link.getAttribute("href");
+          if (href === "#hero") {
+            event.preventDefault();
+            history.pushState(null, "", location.pathname + location.search);
+            window.scrollTo({ top: 0, behavior: "instant" });
+            return;
+          }
+          const target = document.querySelector(href);
           if (!target) return;
           event.preventDefault();
+          history.pushState(null, "", href);
           target.scrollIntoView({ behavior: "instant" });
+        });
+      });
+
+      const mobileMenuToggle = document.getElementById("mobile-menu");
+      document.querySelectorAll(".drawer-side .menu a").forEach((link) => {
+        link.addEventListener("click", () => {
+          mobileMenuToggle.checked = false;
         });
       });
     </script>
