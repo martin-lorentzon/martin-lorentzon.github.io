@@ -29,11 +29,11 @@
 
 @layer components {
   .page-section {
-    @apply mx-auto max-w-5xl scroll-mt-18 px-6 py-14 sm:px-12 sm:py-20;
+    @apply mx-auto max-w-5xl scroll-mt-18 px-4 py-14 sm:px-12 sm:py-20;
   }
 
   .section-title {
-    @apply text-4xl font-semibold sm:text-5xl;
+    @apply text-4xl font-bold sm:text-5xl;
   }
 
   .section-title-icon {
@@ -45,11 +45,11 @@
   }
 
   .copy-punchy {
-    @apply font-semibold text-lg leading-snug text-base-content/50 sm:text-xl;
+    @apply font-medium text-lg leading-snug text-base-content/60 sm:text-xl;
   }
 
   .copy-punchy-highlight {
-    @apply font-semibold text-base-content;
+    @apply text-base-content;
   }
 
   .link-list {
