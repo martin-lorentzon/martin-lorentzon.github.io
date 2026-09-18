@@ -15,6 +15,8 @@ function initTextRotate(el) {
   el.style.overflow = 'hidden';
   syncSlotSize(el, words);
   window.addEventListener('resize', () => syncSlotSize(el, words));
+  // The slot is measured in pixels, so re-measure once the web font has replaced the fallback.
+  document.fonts.ready.then(() => syncSlotSize(el, words));
 
   el.textContent = '';
   let current = addLayer(el, words[0]);

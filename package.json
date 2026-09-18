@@ -8,6 +8,7 @@
     "watch": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch=always --poll"
   },
   "devDependencies": {
+    "@fontsource-variable/google-sans": "^5.3.1",
     "@tailwindcss/cli": "^4",
     "daisyui": "^5",
     "tailwindcss": "^4"

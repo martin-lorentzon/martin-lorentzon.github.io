@@ -14,6 +14,19 @@
   --radius-box: 0rem;
 }
 
+@font-face {
+  font-family: "Google Sans";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 700;
+  src: url("../vendor/fonts/google-sans-latin-wght-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@theme {
+  --font-sans: "Google Sans", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
 @layer components {
   .page-section {
     @apply mx-auto max-w-5xl scroll-mt-18 px-6 py-14 sm:px-12 sm:py-20;
@@ -32,7 +45,7 @@
   }
 
   .copy-punchy {
-    @apply font-medium text-lg leading-snug text-base-content/60 sm:text-xl;
+    @apply font-semibold text-lg leading-snug text-base-content/50 sm:text-xl;
   }
 
   .copy-punchy-highlight {
