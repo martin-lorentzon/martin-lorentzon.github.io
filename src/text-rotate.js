@@ -9,16 +9,15 @@ function initTextRotate(el) {
   const words = (el.dataset.textRotateWords || '').split('|').map((word) => word.trim()).filter(Boolean);
   if (words.length < 2) return;
 
-  // Reserve width/height for the widest word so surrounding text never shifts,
-  // and let the current + incoming words stack on top of each other while swapping.
+  // Reserve width/height for the widest word so surrounding text never shifts. Invisible copies of
+  // every word share one grid cell, so the browser sizes the slot itself (including when the web
+  // font replaces the fallback) instead of us measuring pixels. Live words are absolutely
+  // positioned on top and stack while swapping.
   el.style.position = 'relative';
   el.style.overflow = 'hidden';
-  syncSlotSize(el, words);
-  window.addEventListener('resize', () => syncSlotSize(el, words));
-  // The slot is measured in pixels, so re-measure once the web font has replaced the fallback.
-  document.fonts.ready.then(() => syncSlotSize(el, words));
-
+  el.style.display = 'inline-grid';
   el.textContent = '';
+  for (const word of words) el.appendChild(addSizer(word));
   let current = addLayer(el, words[0]);
 
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -46,26 +45,13 @@ function addLayer(el, text) {
   return layer;
 }
 
-function syncSlotSize(el, words) {
-  const probe = document.createElement('span');
-  probe.style.position = 'absolute';
-  probe.style.visibility = 'hidden';
-  probe.style.whiteSpace = 'nowrap';
-  probe.style.font = getComputedStyle(el).font;
-  document.body.appendChild(probe);
-
-  let maxWidth = 0;
-  let maxHeight = 0;
-  for (const word of words) {
-    probe.textContent = word;
-    const rect = probe.getBoundingClientRect();
-    maxWidth = Math.max(maxWidth, rect.width);
-    maxHeight = Math.max(maxHeight, rect.height);
-  }
-  probe.remove();
-
-  el.style.width = `${Math.ceil(maxWidth)}px`;
-  el.style.height = `${Math.ceil(maxHeight)}px`;
+function addSizer(text) {
+  const sizer = document.createElement('span');
+  sizer.textContent = text;
+  sizer.style.gridArea = '1 / 1';
+  sizer.style.visibility = 'hidden';
+  sizer.setAttribute('aria-hidden', 'true');
+  return sizer;
 }
 
 function animateWord(el, direction, delay) {
