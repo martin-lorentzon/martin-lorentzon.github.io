@@ -1,9 +1,10 @@
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="sv" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Martin Lorentzon</title>
+    <meta name="description" content="Interaktiv 3D för webben, produktfilm och animation samt interna verktyg och arbetsflöden. Martin Lorentzon, 3D-generalist i Göteborg." />
     <link rel="preload" href="vendor/fonts/google-sans-flex-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="dist/output.css" />
     <script type="importmap">
@@ -14,9 +15,9 @@
     <div class="drawer drawer-end">
       <input id="mobile-menu" type="checkbox" class="drawer-toggle" />
       <div class="drawer-content flex min-h-screen flex-col">
-        <!-- ================================================================== -->
-        <!-- HEADER / NAVBAR                                                    -->
-        <!-- ================================================================== -->
+        <!-- ======================================================================
+             MARK: HEADER / NAVBAR
+             ================================================================== -->
         <header class="navbar bg-base-100 sticky top-0 z-30 px-4">
           <div class="navbar-start">
             <ul class="menu menu-horizontal px-1">
@@ -45,28 +46,28 @@
           <div class="navbar-end gap-2">
             <label class="swap swap-rotate btn btn-ghost btn-circle" aria-label="Toggle dark mode">
               <input type="checkbox" class="theme-controller" value="black" />
-              <i data-lucide="sun" class="swap-off h-6 w-6" aria-hidden="true"></i>
-              <i data-lucide="moon" class="swap-on h-6 w-6" aria-hidden="true"></i>
+              <i data-lucide="sun" class="swap-off size-6" aria-hidden="true"></i>
+              <i data-lucide="moon" class="swap-on size-6" aria-hidden="true"></i>
             </label>
             <label for="mobile-menu" aria-label="Open menu" class="btn btn-ghost btn-square lg:hidden">
-              <i data-lucide="menu" class="h-6 w-6" aria-hidden="true"></i>
+              <i data-lucide="menu" class="size-6" aria-hidden="true"></i>
             </label>
           </div>
         </header>
         <main>
-          <!-- ================================================================== -->
-          <!-- HERO                                                               -->
-          <!-- ================================================================== -->
-          <!-- 72px = the sticky navbar's rendered height (stacks above this section in flow);
-               keep in sync if the navbar's content/padding ever changes its height.
+          <!-- ======================================================================
+               MARK: HERO
+               ================================================================== -->
+          <!-- --navbar-h (src/input.css) = the sticky navbar's rendered height (stacks above this
+               section in flow); keep in sync if the navbar's content/padding ever changes its height.
                svh (not dvh) so the mobile browser toolbar hiding/showing on scroll doesn't
                resize this section and shove the content below it. -->
-          <section id="hero" class="relative flex min-h-[calc(100svh-72px)] flex-col items-center justify-center overflow-hidden px-6 text-center sm:px-12">
+          <section id="hero" class="relative flex min-h-[calc(100svh-var(--navbar-h))] flex-col items-center justify-center overflow-hidden px-6 text-center sm:px-12">
             <div id="hero-canvas" class="absolute inset-0" aria-hidden="true"></div>
             <div class="relative z-10 max-w-2xl select-none">
               <h1 class="text-4xl font-semibold sm:text-6xl">
                 Låt din idé
-                <span class="bg-gradient-to-r from-amber-400 to-orange-600 bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]">poppa</span>
+                <span class="bg-linear-to-r from-amber-400 to-orange-600 bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]">poppa</span>
               </h1>
               <p
                 class="mx-auto mt-4 flex w-fit max-w-full items-center justify-center gap-x-1.5 whitespace-nowrap rounded-full border border-base-300 bg-base-200/60 px-7 py-2 text-sm text-base-content/70 sm:text-lg"
@@ -79,141 +80,141 @@
             <div class="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-4">
               <a href="#tjanster" data-scroll-instant class="btn btn-primary shadow-none">Se tjänster</a>
               <a href="#tjanster" class="text-base-content/50" aria-label="Scrolla till tjänster">
-                <i data-lucide="chevron-down" class="h-6 w-6 motion-safe:animate-bounce"></i>
+                <i data-lucide="chevron-down" class="size-6 motion-safe:animate-bounce" aria-hidden="true"></i>
               </a>
             </div>
           </section>
-          <!-- ================================================================== -->
-          <!-- TJÄNSTER (interaktiv 3D)                                          -->
-          <!-- ================================================================== -->
+          <!-- ======================================================================
+               MARK: TJÄNSTER
+               ================================================================== -->
           <section id="tjanster" class="page-section">
             <h2 class="section-title">
-              Visa din produkt i <span class="whitespace-nowrap">interaktiv 3D<i data-lucide="rotate-3d" class="section-title-icon" aria-hidden="true"></i></span>
+              Visa din produkt i <span class="whitespace-nowrap">interaktiv 3D<i data-lucide="rotate-3d" class="section-title-icon -translate-y-2" aria-hidden="true"></i></span>
             </h2>
-            <div class="copy-punchy mt-8 space-y-5">
-              <p>Ge dina kunder en djupare produktförståelse och stärk ditt varumärke med interaktiv 3D på webben.</p>
-              <p>
-                <span class="copy-punchy-highlight"
-                  >Konfigurationer, intressepunkter, rörliga delar och AR-läge <i data-lucide="scan-box" class="inline h-5 w-5 align-text-bottom" aria-hidden="true"></i
+            <div class="mt-8 space-y-5">
+              <p class="copy-punchy text-dimmed">Ge dina kunder en djupare produktförståelse och stärk ditt varumärke med interaktiv 3D på webben.</p>
+              <p class="copy-punchy text-dimmed">
+                <span class="text-emphasis"
+                  >Konfigurationer, intressepunkter, rörliga delar och AR-läge <i data-lucide="scan-box" class="copy-inline-icon" aria-hidden="true"></i
                 ></span>
                 (Augmented Reality) är exempel på funktioner som enkelt integreras i 3D-vyn.
               </p>
-              <p>3D-vyn fungerar direkt i webbläsaren <span class="copy-punchy-highlight">utan någon app</span> och skräddarsys för att bli en naturlig del av din befintliga hemsida.</p>
+              <p class="copy-punchy text-dimmed">3D-vyn fungerar direkt i webbläsaren <span class="text-emphasis">utan någon app</span> och skräddarsys för att bli en naturlig del av din befintliga hemsida.</p>
             </div>
           </section>
-          <!-- ================================================================== -->
-          <!-- INFOGRAFIK & ANIMATION                                            -->
-          <!-- ================================================================== -->
+          <!-- ======================================================================
+               MARK: INFOGRAFIK & ANIMATION
+               ================================================================== -->
           <section id="infografik" class="page-section">
             <h2 class="section-title">
-              Infografik &amp; <span class="whitespace-nowrap">animation<i data-lucide="clapperboard" class="section-title-icon" aria-hidden="true"></i></span>
+              Infografik &amp; <span class="whitespace-nowrap">animation<i data-lucide="clapperboard" class="section-title-icon -translate-y-1" aria-hidden="true"></i></span>
             </h2>
-            <div class="copy-body mt-8 space-y-5">
-              <h3 class="text-2xl font-semibold text-base-content">Produkter</h3>
-              <p>Förmedla utseende, känsla och funktion innan du har en prototyp.</p>
-              <p>
+            <div class="mt-8 space-y-5">
+              <h3 class="subtitle">Produkter</h3>
+              <p class="copy-body text-muted">Förmedla utseende, känsla och funktion innan du har en prototyp.</p>
+              <p class="copy-body text-muted">
                 Utifrån dina CAD-filer eller skisser tar jag fram färdiga produktfilmer och stillbilder. Under processen testar vi olika koncept för att hitta det visuella spår som lyfter din produkt
                 på bästa sätt.
               </p>
-              <p>I fall av större projekt (exempelvis en serie av produkter) kan miljöer och digital studiobelysning återanvändas för att minimera ledtiden och kostnaden.</p>
-              <h3 class="pt-2 text-2xl font-semibold text-base-content">Utbildning &amp; medicin</h3>
-              <p>
+              <p class="copy-body text-muted">I fall av större projekt (exempelvis en serie av produkter) kan miljöer och digital studiobelysning återanvändas för att minimera ledtiden och kostnaden.</p>
+              <h3 class="subtitle pt-2">Utbildning &amp; medicin</h3>
+              <p class="copy-body text-muted">
                 Höj engagemanget och förståelsen för ditt ämne med stiliserad film eller teknisk animation. Vi människor är visuella i vår inlärning, berättande med hjälp av 3D-animation lämpar sig
                 extremt bra till att skapa intuitiva förklaringar som är lätta att ta in och sätter sig på minnet.
               </p>
             </div>
           </section>
-          <!-- ================================================================== -->
-          <!-- VERKTYG (in-house-verktyg)                                        -->
-          <!-- ================================================================== -->
+          <!-- ======================================================================
+               MARK: VERKTYG
+               ================================================================== -->
           <section id="verktyg" class="page-section">
             <h2 class="section-title">
               Arbetsflöden &amp;
-              <span class="whitespace-nowrap">interna verktyg<i data-lucide="spline-pointer" class="section-title-icon" aria-hidden="true"></i></span>
+              <span class="whitespace-nowrap">interna verktyg<i data-lucide="spline-pointer" class="section-title-icon -translate-y-1.5" aria-hidden="true"></i></span>
             </h2>
-            <div class="copy-punchy mt-8 space-y-5">
-              <p>
-                Utveckling av verktyg på plats öppnar ofta upp osynliga dörrar <i data-lucide="door-open" class="inline h-5 w-5 align-text-bottom" aria-hidden="true"></i> det som tidigare känts
+            <div class="mt-8 space-y-5">
+              <p class="copy-punchy text-dimmed">
+                Utveckling av verktyg på plats öppnar ofta upp osynliga dörrar <i data-lucide="door-open" class="copy-inline-icon" aria-hidden="true"></i> det som tidigare känts
                 smärtsamt eller i vissa fall
-                <span class="copy-punchy-highlight">omöjligt blir till en självklarhet</span>
+                <span class="text-emphasis">omöjligt blir till en självklarhet</span>
                 och en strategisk fördel. Det kan handla om att
               </p>
-              <ul class="list-disc space-y-2 pl-6">
+              <ul class="copy-punchy text-dimmed list-disc space-y-2 pl-6">
                 <li>automatisera en lång och krånglig process</li>
                 <li>generera parametriska 3D-modeller</li>
                 <li>förenkla distribution av digitala tillgångar</li>
-                <li>skapa återanvändbara komponenter <span class="copy-punchy-highlight">för nuvarande och framtida projekt</span></li>
+                <li>skapa återanvändbara komponenter <span class="text-emphasis">för nuvarande och framtida projekt</span></li>
               </ul>
             </div>
           </section>
-          <!-- ================================================================== -->
-          <!-- OM MIG                                                            -->
-          <!-- ================================================================== -->
+          <!-- ======================================================================
+               MARK: OM MIG
+               ================================================================== -->
           <section id="om-mig" class="page-section">
             <h2 class="section-title text-center">Martin Lorentzon</h2>
             <div class="mt-8 flex flex-col items-center gap-8 sm:flex-row sm:items-start sm:gap-12">
               <img src="https://placehold.co/300x300" alt="Martin Lorentzon" class="w-48 shrink-0 rounded-box sm:w-64" />
-              <div class="copy-body space-y-5">
-                <p>
+              <div class="space-y-5">
+                <p class="copy-body text-muted">
                   Jag är från grunden självlärd 3D-generalist och hobbyist inom spelutveckling med en mixad visuell och teknisk bakgrund. Under gymnasiet inriktade jag mig på produktutveckling &amp;
                   design och fick inblick i Blender, det kändes precis som att återupptäcka hur kul att bygga med Lego var.
                 </p>
-                <p>
-                  Åren 2022-2024 pluggade jag på Yrgo (högre yrkesutbildning Göteborg) till teknisk 3D-grafiker och har sedan dess jobbat som 3D-utvecklare inom bilindustrin, som lärare på Yrgo och
+                <p class="copy-body text-muted">
+                  Åren 2022&ndash;2024 pluggade jag på Yrgo (högre yrkesutbildning Göteborg) till teknisk 3D-grafiker och har sedan dess jobbat som 3D-utvecklare inom bilindustrin, som lärare på Yrgo och
                   sålt verktyg åt 3D-branschen genom mitt eget AB.
                 </p>
               </div>
             </div>
           </section>
-          <!-- ================================================================== -->
-          <!-- KONTAKT                                                           -->
-          <!-- ================================================================== -->
+          <!-- ======================================================================
+               MARK: KONTAKT
+               ================================================================== -->
           <section id="kontakt" class="page-section text-center">
             <h2 class="section-title">
               <span class="whitespace-nowrap">Kontakt<i data-lucide="mail" class="section-title-icon" aria-hidden="true"></i></span>
             </h2>
             <div class="mt-8 space-y-2">
-              <h3 class="text-2xl font-semibold text-base-content break-words">contact@<wbr />martinlorentzon<wbr />.se</h3>
-              <h3 class="text-2xl font-semibold text-base-content">+46 70 920 14 81</h3>
-              <h3 class="text-xl font-semibold text-base-content">Jag nås helst via sms eller e&#8209;post.</h3>
-              <h3 class="text-2xl font-semibold text-base-content">Göteborg, Sverige</h3>
+              <p class="subtitle break-words"><a href="mailto:contact@martinlorentzon.se" class="link link-hover">contact@<wbr />martinlorentzon<wbr />.se</a></p>
+              <p class="subtitle"><a href="tel:+46709201481" class="link link-hover">+46 70 920 14 81</a></p>
+              <p class="subtitle text-xl">Jag nås helst via sms eller e&#8209;post.</p>
+              <p class="subtitle">Göteborg, Sverige</p>
             </div>
           </section>
         </main>
-        <!-- ================================================================== -->
-        <!-- FOOTER (FAQ + länkar)                                              -->
-        <!-- ================================================================== -->
-        <footer class="bg-base-100 border-t border-none">
-          <div class="mx-auto max-w-8xl px-6 py-16 sm:px-12">
+        <!-- ======================================================================
+             MARK: FOOTER
+             ================================================================== -->
+        <footer class="bg-base-100">
+          <div class="px-6 py-16 sm:px-12">
             <div class="grid gap-12 lg:grid-cols-2 lg:gap-16">
               <div class="max-w-lg">
-                <h2 class="mb-4 text-2xl font-semibold">Vanliga frågor</h2>
+                <h2 class="subtitle mb-4">Vanliga frågor</h2>
                 <div class="join join-vertical w-full">
                   <div class="collapse collapse-arrow join-item border border-base-300">
                     <input type="radio" name="faq-accordion" checked="checked" />
                     <div class="collapse-title font-semibold">Hur går en beställning till?</div>
-                    <div class="collapse-content text-sm text-base-content/80">
+                    <div class="collapse-content text-muted text-sm">
                       Vi börjar med ett kort samtal om ditt behov, varefter du får en offert. Efter godkännande sätter jag igång med arbetet och stämmer löpande av med dig.
                     </div>
                   </div>
                   <div class="collapse collapse-arrow join-item border border-base-300">
                     <input type="radio" name="faq-accordion" />
                     <div class="collapse-title font-semibold">Vilka filformat behöver du av mig?</div>
-                    <div class="collapse-content text-sm text-base-content/80">
+                    <div class="collapse-content text-muted text-sm">
                       Vanligtvis räcker CAD-filer i format som STEP eller IGES. Saknas underlag går det ofta att lösa ändå &ndash; hör av dig så tittar vi på det tillsammans.
                     </div>
                   </div>
                   <div class="collapse collapse-arrow join-item border border-base-300">
                     <input type="radio" name="faq-accordion" />
                     <div class="collapse-title font-semibold">Hur lång är leveranstiden?</div>
-                    <div class="collapse-content text-sm text-base-content/80">
+                    <div class="collapse-content text-muted text-sm">
                       Det beror på projektets omfattning, men enklare uppdrag levereras vanligtvis inom ett par veckor. Du får alltid en tidsuppskattning i offerten.
                     </div>
                   </div>
                   <div class="collapse collapse-arrow join-item border border-base-300">
                     <input type="radio" name="faq-accordion" />
                     <div class="collapse-title font-semibold">Kan jag beställa löpande arbete?</div>
-                    <div class="collapse-content text-sm text-base-content/80">
+                    <div class="collapse-content text-muted text-sm">
                       Ja, både enstaka projekt och återkommande samarbeten fungerar bra &ndash; hör av dig så hittar vi en upplägg som passar dig.
                     </div>
                   </div>
@@ -222,7 +223,7 @@
               <div class="grid grid-cols-1 gap-8 sm:grid-cols-3 lg:border-l lg:border-base-300 lg:pl-8">
                 <div>
                   <h3 class="footer-title">Tjänster</h3>
-                  <ul class="link-list">
+                  <ul class="link-list text-muted">
                     <li><a href="#tjanster" class="link link-hover">Interaktiv 3D</a></li>
                     <li><a href="#infografik" class="link link-hover">Infografik &amp; animation</a></li>
                     <li><a href="#verktyg" class="link link-hover">In&#8209;house&#8209;verktyg</a></li>
@@ -230,7 +231,7 @@
                 </div>
                 <div>
                   <h3 class="footer-title">Kontakt</h3>
-                  <ul class="link-list">
+                  <ul class="link-list text-muted">
                     <li>
                       <a href="mailto:contact@martinlorentzon.se" class="link link-hover break-words">contact@<wbr />martinlorentzon<wbr />.se</a>
                     </li>
@@ -240,26 +241,26 @@
                 </div>
                 <div>
                   <h3 class="footer-title">Om mig</h3>
-                  <ul class="link-list">
+                  <ul class="link-list text-muted">
                     <li><a href="#om-mig" class="link link-hover">Om mig</a></li>
                   </ul>
                 </div>
               </div>
             </div>
             <div class="divider"></div>
-            <p class="text-center text-sm text-base-content/60">Göteborg, Sverige</p>
+            <p class="text-center text-sm text-dimmed">Göteborg, Sverige</p>
           </div>
         </footer>
       </div>
-      <!-- ==================================================================== -->
-      <!-- MOBILE MENU (drawer side)                                            -->
-      <!-- ==================================================================== -->
+      <!-- ========================================================================
+           MARK: MOBILE MENU
+           ==================================================================== -->
       <div class="drawer-side z-40">
         <label for="mobile-menu" aria-label="Close menu" class="drawer-overlay"></label>
         <div class="min-h-full w-full bg-base-100 p-4 text-base-content">
           <div class="flex justify-end">
             <label for="mobile-menu" aria-label="Close menu" class="btn btn-ghost btn-square">
-              <i data-lucide="x" class="h-6 w-6" aria-hidden="true"></i>
+              <i data-lucide="x" class="size-6" aria-hidden="true"></i>
             </label>
           </div>
           <ul class="menu w-full text-lg">
@@ -282,9 +283,9 @@
         </div>
       </div>
     </div>
-    <!-- ====================================================================== -->
-    <!-- SCRIPTS                                                                -->
-    <!-- ====================================================================== -->
+    <!-- ==========================================================================
+         MARK: SCRIPTS
+         ====================================================================== -->
     <script src="vendor/lucide.min.js"></script>
     <script>
       lucide.createIcons();

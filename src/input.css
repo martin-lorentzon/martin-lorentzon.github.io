@@ -27,9 +27,15 @@
   --font-sans: "Google Sans Flex", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+@layer base {
+  :root {
+    --navbar-h: 4.5rem;
+  }
+}
+
 @layer components {
   .page-section {
-    @apply mx-auto max-w-5xl scroll-mt-18 px-4 py-14 sm:px-12 sm:py-20;
+    @apply mx-auto max-w-5xl px-4 py-14 scroll-mt-(--navbar-h) sm:px-12 sm:py-20;
   }
 
   .section-title {
@@ -37,23 +43,39 @@
   }
 
   .section-title-icon {
-    @apply ml-2 inline-block h-8 w-8 align-middle sm:h-10 sm:w-10;
+    @apply inline ml-2 h-8 w-8 align-middle sm:h-10 sm:w-10;
+  }
+
+  .subtitle {
+    @apply text-2xl font-semibold;
   }
 
   .copy-body {
-    @apply text-base-content/80 sm:text-lg;
+    @apply text-base sm:text-lg;
   }
 
   .copy-punchy {
-    @apply font-medium text-lg leading-snug text-base-content/60 sm:text-xl;
+    @apply text-lg font-medium leading-snug sm:text-xl;
   }
 
-  .copy-punchy-highlight {
+  .copy-inline-icon {
+    @apply inline h-5 w-5 -translate-y-0.5 align-middle;
+  }
+
+  .text-muted {
+    @apply text-base-content/80;
+  }
+
+  .text-dimmed {
+    @apply text-base-content/60;
+  }
+
+  .text-emphasis {
     @apply text-base-content;
   }
 
   .link-list {
-    @apply flex flex-col gap-2 text-base-content/80;
+    @apply flex flex-col gap-2;
   }
 }
 
