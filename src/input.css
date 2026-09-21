@@ -30,6 +30,9 @@
 @layer base {
   :root {
     --navbar-h: 4.5rem;
+    /* Full-screen views: wash colour and ink colour, mapped to the daisyUI theme. */
+    --fsv-tint: var(--color-base-100);
+    --fsv-ink: var(--color-base-content);
   }
 }
 
@@ -77,6 +80,197 @@
   .link-list {
     @apply flex flex-col gap-2;
   }
+
+  /* Full-screen views (.fsv, see docs/full-screen-views.md): default = plain stacked section (banner image A, then title + both copy panels;
+     image B is only used when pinned). */
+  .fsv-media {
+    @apply block h-56 w-full object-cover sm:h-80;
+  }
+
+  .fsv-layer-b,
+  .fsv-scrim,
+  .fsv-wash,
+  .fsv-next {
+    @apply hidden;
+  }
+
+  .fsv-content {
+    @apply mx-auto max-w-5xl px-4 py-14 sm:px-12 sm:py-20;
+  }
+
+  .fsv-texts {
+    @apply mt-8 grid gap-8;
+  }
+
+  /* Pinned mode (class added by src/fsv.js unless reduced motion). The stage is sticky under
+     the navbar and the runway is the sum of the scroll zones set in data-zone-* on the section in
+     index.html (the script writes it as --fsv-zone-total, plus --fsv-slide-start/--fsv-slide-len). Two kinds of
+     motion:
+       - The slide of image A is scrubbed: --fsv-p (0-1, scroll progress through the pinned stretch,
+         written by the script) drives --fsv-slide directly.
+       - Everything that fades is timed: the script flips data-state at scroll points and the
+         registered vars --fsv-tint-a/--fsv-text-1/--fsv-tint-b/--fsv-text-2 (see @property below) transition over
+         450ms once .fsv-animated is set.
+     Height uses svh (like the hero) so the mobile toolbar collapsing doesn't resize the stage; the
+     media layers use lvh so no strip shows when it does. */
+  .fsv-pinned {
+    @apply mb-14 sm:mb-20;
+    height: calc(var(--fsv-zone-total, 250svh) + 100svh - var(--navbar-h));
+    --fsv-p: 0;
+    --fsv-slide-start: 0.478;
+    --fsv-slide-len: 0.326;
+    --fsv-slide: clamp(0, calc((var(--fsv-p) - var(--fsv-slide-start)) / var(--fsv-slide-len)), 1);
+    --fsv-title-flip: clamp(0, calc((var(--fsv-slide) - 0.7) / 0.2), 1);
+    --fsv-next-flip: clamp(0, calc(var(--fsv-slide) / 0.1), 1);
+  }
+
+  .fsv-animated {
+    transition:
+      --fsv-tint-a 450ms ease-out,
+      --fsv-text-1 450ms ease-out,
+      --fsv-tint-b 450ms ease-out,
+      --fsv-text-2 450ms ease-out;
+  }
+
+  .fsv-pinned[data-state="1"] {
+    --fsv-tint-a: 1;
+    --fsv-text-1: 1;
+  }
+
+  .fsv-pinned[data-state="2"] {
+    --fsv-tint-a: 1;
+  }
+
+  .fsv-pinned[data-state="3"] {
+    --fsv-tint-a: 1;
+    --fsv-tint-b: 1;
+    --fsv-text-2: 1;
+  }
+
+  .fsv-pinned .fsv-stage {
+    position: sticky;
+    top: var(--navbar-h);
+    height: calc(100svh - var(--navbar-h));
+    overflow-x: clip;
+  }
+
+  .fsv-pinned .fsv-layer {
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    display: block;
+    height: calc(100lvh - var(--navbar-h));
+  }
+
+  .fsv-pinned .fsv-layer-a {
+    transform: translateY(calc(var(--fsv-slide) * -100%));
+    will-change: transform;
+  }
+
+  .fsv-pinned .fsv-media,
+  .fsv-pinned .fsv-scrim,
+  .fsv-pinned .fsv-wash {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .fsv-pinned .fsv-scrim {
+    @apply bg-linear-to-b from-black/60 via-transparent to-black/40;
+  }
+
+  .fsv-pinned .fsv-wash {
+    @apply backdrop-blur-md;
+    background: color-mix(in oklab, var(--fsv-tint) 90%, transparent);
+  }
+
+  .fsv-pinned .fsv-layer-a .fsv-scrim {
+    opacity: calc(1 - var(--fsv-tint-a));
+  }
+
+  .fsv-pinned .fsv-layer-a .fsv-wash {
+    opacity: var(--fsv-tint-a);
+  }
+
+  .fsv-pinned .fsv-layer-b .fsv-scrim {
+    opacity: calc(1 - var(--fsv-tint-b));
+  }
+
+  .fsv-pinned .fsv-layer-b .fsv-wash {
+    opacity: var(--fsv-tint-b);
+  }
+
+  .fsv-pinned .fsv-content {
+    position: relative;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    padding-block: 1.5rem;
+    color: var(--fsv-ink);
+  }
+
+  /* Same hero-style chevron as #hero; white while the bottom of the stage shows an untinted image
+     (B appears there as soon as A starts sliding), otherwise the hero's 50% base-content. */
+  .fsv-pinned .fsv-next {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    z-index: 10;
+    display: block;
+    translate: -50% 0;
+    color: color-mix(in oklab, white calc(min(1, 1 - var(--fsv-tint-a) + var(--fsv-next-flip) * (1 - var(--fsv-tint-b))) * 100%), color-mix(in oklab, var(--fsv-ink) 50%, transparent));
+  }
+
+  /* White over untinted image A, dark over the tint, white again once A's edge has passed the title. */
+  .fsv-pinned .fsv-title {
+    color: color-mix(in oklab, white calc(min(1, 1 - var(--fsv-tint-a) + var(--fsv-title-flip) * (1 - var(--fsv-tint-b))) * 100%), var(--fsv-ink));
+  }
+
+  .fsv-pinned .fsv-texts {
+    position: relative;
+    display: block;
+    flex: 1;
+  }
+
+  .fsv-pinned .fsv-panel {
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+  }
+
+  .fsv-pinned .fsv-panel-1 {
+    opacity: var(--fsv-text-1);
+  }
+
+  .fsv-pinned .fsv-panel-2 {
+    opacity: var(--fsv-text-2);
+  }
+}
+
+@property --fsv-tint-a {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --fsv-text-1 {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --fsv-tint-b {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --fsv-text-2 {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

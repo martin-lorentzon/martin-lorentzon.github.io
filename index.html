@@ -26,7 +26,16 @@
           </div>
           <div class="navbar-center hidden lg:flex">
             <ul class="menu menu-horizontal px-1">
-              <li><a href="#tjanster" data-scroll-instant>Tjänster</a></li>
+              <li>
+                <details>
+                  <summary>Tjänster</summary>
+                  <ul class="p-2 bg-base-100 w-56 z-1 shadow-none">
+                    <li><a href="#tjanster" data-scroll-instant>Interaktiv 3D</a></li>
+                    <li><a href="#infografik" data-scroll-instant>Infografik &amp; animation</a></li>
+                    <li><a href="#verktyg" data-scroll-instant>In&#8209;house&#8209;verktyg</a></li>
+                  </ul>
+                </details>
+              </li>
               <li><a href="#om-mig" data-scroll-instant>Om mig</a></li>
               <li><a href="#kontakt" data-scroll-instant>Kontakt</a></li>
               <li>
@@ -94,34 +103,59 @@
             <div class="mt-8 space-y-5">
               <p class="copy-punchy text-dimmed">Ge dina kunder en djupare produktförståelse och stärk ditt varumärke med interaktiv 3D på webben.</p>
               <p class="copy-punchy text-dimmed">
-                <span class="text-emphasis"
-                  >Konfigurationer, intressepunkter, rörliga delar och AR-läge <i data-lucide="scan-box" class="copy-inline-icon" aria-hidden="true"></i
-                ></span>
+                <span class="text-emphasis">Konfigurationer, intressepunkter, rörliga delar och AR-läge <i data-lucide="scan-box" class="copy-inline-icon" aria-hidden="true"></i></span>
                 (Augmented Reality) är exempel på funktioner som enkelt integreras i 3D-vyn.
               </p>
-              <p class="copy-punchy text-dimmed">3D-vyn fungerar direkt i webbläsaren <span class="text-emphasis">utan någon app</span> och skräddarsys för att bli en naturlig del av din befintliga hemsida.</p>
+              <p class="copy-punchy text-dimmed">
+                3D-vyn fungerar direkt i webbläsaren <span class="text-emphasis">utan någon app</span> och skräddarsys för att bli en naturlig del av din befintliga hemsida.
+              </p>
             </div>
           </section>
           <!-- ======================================================================
                MARK: INFOGRAFIK & ANIMATION
                ================================================================== -->
-          <section id="infografik" class="page-section">
-            <h2 class="section-title">
-              Infografik &amp; <span class="whitespace-nowrap">animation<i data-lucide="clapperboard" class="section-title-icon -translate-y-1" aria-hidden="true"></i></span>
-            </h2>
-            <div class="mt-8 space-y-5">
-              <h3 class="subtitle">Produkter</h3>
-              <p class="copy-body text-muted">Förmedla utseende, känsla och funktion innan du har en prototyp.</p>
-              <p class="copy-body text-muted">
-                Utifrån dina CAD-filer eller skisser tar jag fram färdiga produktfilmer och stillbilder. Under processen testar vi olika koncept för att hitta det visuella spår som lyfter din produkt
-                på bästa sätt.
-              </p>
-              <p class="copy-body text-muted">I fall av större projekt (exempelvis en serie av produkter) kan miljöer och digital studiobelysning återanvändas för att minimera ledtiden och kostnaden.</p>
-              <h3 class="subtitle pt-2">Utbildning &amp; medicin</h3>
-              <p class="copy-body text-muted">
-                Höj engagemanget och förståelsen för ditt ämne med stiliserad film eller teknisk animation. Vi människor är visuella i vår inlärning, berättande med hjälp av 3D-animation lämpar sig
-                extremt bra till att skapa intuitiva förklaringar som är lätta att ta in och sätter sig på minnet.
-              </p>
+          <!-- Scroll-pinned full-screen views (src/fsv.js, .fsv* in src/input.css, docs/full-screen-views.md).
+               data-zone-* = scroll distance in svh: image = each untinted view, text = each text view, slide = A sliding away to reveal B. -->
+          <section id="infografik" class="fsv scroll-mt-(--navbar-h)" data-zone-image="30" data-zone-text="45" data-zone-slide="75">
+            <div class="fsv-stage">
+              <div class="fsv-layer fsv-layer-b" aria-hidden="true">
+                <img src="https://placehold.co/1920x1080/0d9488/ffffff" alt="" class="fsv-media" />
+                <div class="fsv-scrim"></div>
+                <div class="fsv-wash"></div>
+              </div>
+              <div class="fsv-layer fsv-layer-a">
+                <img src="https://placehold.co/1920x1080/" alt="" class="fsv-media" />
+                <div class="fsv-scrim" aria-hidden="true"></div>
+                <div class="fsv-wash" aria-hidden="true"></div>
+              </div>
+              <div class="fsv-content">
+                <h2 class="section-title fsv-title">
+                  Infografik &amp; <span class="whitespace-nowrap">animation<i data-lucide="clapperboard" class="section-title-icon -translate-y-1" aria-hidden="true"></i></span>
+                </h2>
+                <div class="fsv-texts">
+                  <div class="fsv-panel fsv-panel-1 space-y-4">
+                    <h3 class="subtitle">Produkter</h3>
+                    <p class="copy-body text-emphasis">Förmedla utseende, känsla och funktion innan du har en prototyp.</p>
+                    <p class="copy-body text-emphasis">
+                      Utifrån dina CAD-filer eller skisser tar jag fram färdiga produktfilmer och stillbilder. Under processen testar vi olika koncept för att hitta det visuella spår som lyfter din
+                      produkt på bästa sätt.
+                    </p>
+                    <p class="copy-body text-emphasis">
+                      I fall av större projekt (exempelvis en serie av produkter) kan miljöer och digital studiobelysning återanvändas för att minimera ledtiden och kostnaden.
+                    </p>
+                  </div>
+                  <div class="fsv-panel fsv-panel-2 space-y-4">
+                    <h3 class="subtitle">Utbildning &amp; medicin</h3>
+                    <p class="copy-body text-emphasis">
+                      Höj engagemanget och förståelsen för ditt ämne med stiliserad film eller teknisk animation. Vi människor är visuella i vår inlärning, berättande med hjälp av 3D-animation lämpar
+                      sig extremt bra till att skapa intuitiva förklaringar som är lätta att ta in och sätter sig på minnet.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <a href="#verktyg" class="fsv-next" aria-label="Scrolla vidare" data-fsv-next>
+                <i data-lucide="chevron-down" class="size-6 motion-safe:animate-bounce" aria-hidden="true"></i>
+              </a>
             </div>
           </section>
           <!-- ======================================================================
@@ -134,8 +168,8 @@
             </h2>
             <div class="mt-8 space-y-5">
               <p class="copy-punchy text-dimmed">
-                Utveckling av verktyg på plats öppnar ofta upp osynliga dörrar <i data-lucide="door-open" class="copy-inline-icon" aria-hidden="true"></i> det som tidigare känts
-                smärtsamt eller i vissa fall
+                Utveckling av verktyg på plats öppnar ofta upp osynliga dörrar <i data-lucide="door-open" class="copy-inline-icon" aria-hidden="true"></i> det som tidigare känts smärtsamt eller i
+                vissa fall
                 <span class="text-emphasis">omöjligt blir till en självklarhet</span>
                 och en strategisk fördel. Det kan handla om att
               </p>
@@ -160,8 +194,8 @@
                   design och fick inblick i Blender, det kändes precis som att återupptäcka hur kul att bygga med Lego var.
                 </p>
                 <p class="copy-body text-muted">
-                  Åren 2022&ndash;2024 pluggade jag på Yrgo (högre yrkesutbildning Göteborg) till teknisk 3D-grafiker och har sedan dess jobbat som 3D-utvecklare inom bilindustrin, som lärare på Yrgo och
-                  sålt verktyg åt 3D-branschen genom mitt eget AB.
+                  Åren 2022&ndash;2024 pluggade jag på Yrgo (högre yrkesutbildning Göteborg) till teknisk 3D-grafiker och har sedan dess jobbat som 3D-utvecklare inom bilindustrin, som lärare på Yrgo
+                  och sålt verktyg åt 3D-branschen genom mitt eget AB.
                 </p>
               </div>
             </div>
@@ -174,7 +208,9 @@
               <span class="whitespace-nowrap">Kontakt<i data-lucide="mail" class="section-title-icon" aria-hidden="true"></i></span>
             </h2>
             <div class="mt-8 space-y-2">
-              <p class="subtitle break-words"><a href="mailto:contact@martinlorentzon.se" class="link link-hover">contact@<wbr />martinlorentzon<wbr />.se</a></p>
+              <p class="subtitle break-words">
+                <a href="mailto:contact@martinlorentzon.se" class="link link-hover">contact@<wbr />martinlorentzon<wbr />.se</a>
+              </p>
               <p class="subtitle"><a href="tel:+46709201481" class="link link-hover">+46 70 920 14 81</a></p>
               <p class="subtitle text-xl">Jag nås helst via sms eller e&#8209;post.</p>
               <p class="subtitle">Göteborg, Sverige</p>
@@ -214,9 +250,7 @@
                   <div class="collapse collapse-arrow join-item border border-base-300">
                     <input type="radio" name="faq-accordion" />
                     <div class="collapse-title font-semibold">Kan jag beställa löpande arbete?</div>
-                    <div class="collapse-content text-muted text-sm">
-                      Ja, både enstaka projekt och återkommande samarbeten fungerar bra &ndash; hör av dig så hittar vi en upplägg som passar dig.
-                    </div>
+                    <div class="collapse-content text-muted text-sm">Ja, både enstaka projekt och återkommande samarbeten fungerar bra &ndash; hör av dig så hittar vi en upplägg som passar dig.</div>
                   </div>
                 </div>
               </div>
@@ -264,7 +298,16 @@
             </label>
           </div>
           <ul class="menu w-full text-lg">
-            <li><a href="#tjanster" data-scroll-instant>Tjänster</a></li>
+            <li>
+              <details>
+                <summary>Tjänster</summary>
+                <ul class="p-2">
+                  <li><a href="#tjanster" data-scroll-instant>Interaktiv 3D</a></li>
+                  <li><a href="#infografik" data-scroll-instant>Infografik &amp; animation</a></li>
+                  <li><a href="#verktyg" data-scroll-instant>In&#8209;house&#8209;verktyg</a></li>
+                </ul>
+              </details>
+            </li>
             <li><a href="#om-mig" data-scroll-instant>Om mig</a></li>
             <li><a href="#kontakt" data-scroll-instant>Kontakt</a></li>
             <li>
@@ -307,6 +350,16 @@
         });
       });
 
+      const navDropdowns = document.querySelectorAll("header details");
+      navDropdowns.forEach((dropdown) => {
+        dropdown.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => (dropdown.open = false)));
+      });
+      document.addEventListener("click", (event) => {
+        navDropdowns.forEach((dropdown) => {
+          if (!dropdown.contains(event.target)) dropdown.open = false;
+        });
+      });
+
       const mobileMenuToggle = document.getElementById("mobile-menu");
       document.querySelectorAll(".drawer-side .menu a").forEach((link) => {
         link.addEventListener("click", () => {
@@ -314,6 +367,7 @@
         });
       });
     </script>
+    <script src="src/fsv.js"></script>
     <script type="module" src="src/hero.js"></script>
   </body>
 </html>
