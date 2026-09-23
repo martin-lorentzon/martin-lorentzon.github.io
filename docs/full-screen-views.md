@@ -79,12 +79,12 @@ On the `<section>` tag, in **svh of scroll distance** (1 svh = 1% of the viewpor
 
 ```html
 <section class="fsv scroll-mt-(--header-h)"
-         data-zone-image="30" data-zone-text="45" data-zone-slide="75">
+         data-zone-image="35" data-zone-text="45" data-zone-slide="75">
 ```
 
 | Attribute | Meaning | Default |
 |-----------|---------|---------|
-| `data-zone-image` | Scroll length of each untinted view (A, then B). | 30 |
+| `data-zone-image` | Scroll length of each untinted view (A, then B). | 35 |
 | `data-zone-text` | Scroll length of each text view (Text 1, then Text 2). | 45 |
 | `data-zone-slide` | Scroll length of A's slide (bigger = slower, smoother). | 75 |
 | `data-zone-slide-delay` *(optional)* | Extra tinted-A pause with no text before the slide, so the text finishes fading out first. | 10 (used when the attribute is absent) |
@@ -127,7 +127,7 @@ needed except on the arrow:
 
 ```html
 <section class="fsv scroll-mt-(--header-h)"
-         data-zone-image="30" data-zone-text="45" data-zone-slide="75">
+         data-zone-image="35" data-zone-text="45" data-zone-slide="75">
   <div class="fsv-stage">
     <div class="fsv-layer fsv-layer-b" aria-hidden="true">
       <img src="image-b.jpg" alt="" class="fsv-media" />
@@ -212,18 +212,18 @@ p         = clamp((pinnedTop - section.getBoundingClientRect().top) / range, 0, 
 `p = 0` when the section top reaches the header's bottom edge; `p = 1` when the runway's bottom leaves the
 stage. `--fsv-p` is written with 4 decimals.
 
-### Default numbers (30 / 45 / 75, delay 10, total 235svh)
+### Default numbers (35 / 45 / 75, delay 10, total 245svh)
 
 | Zone | svh | `--fsv-p` range |
 |------|-----|-----------------|
-| image-a | 30 | 0 - 0.128 |
-| text-1 | 45 | 0.128 - 0.319 |
-| slide-delay | 10 | 0.319 - 0.362 |
-| slide | 75 | 0.362 - 0.681 |
-| image-b | 30 | 0.681 - 0.809 |
-| text-2 | 45 | 0.809 - 1 |
+| image-a | 35 | 0 - 0.143 |
+| text-1 | 45 | 0.143 - 0.327 |
+| slide-delay | 10 | 0.327 - 0.367 |
+| slide | 75 | 0.367 - 0.673 |
+| image-b | 35 | 0.673 - 0.816 |
+| text-2 | 45 | 0.816 - 1 |
 
-Runway height = 235svh + 100svh - header height.
+Runway height = 245svh + 100svh - header height.
 
 ## 5. State machine (timed fades)
 
@@ -345,7 +345,7 @@ scrollTo({ top: sectionTop - pinnedTop + next * range, behavior: "smooth" });
 ```
 
 If none is left, the click is not prevented and the `href` scrolls on to the next section. (Defaults: stops at
-p ~ 0.223, 0.745, 0.904.) Because the smooth scroll passes through zones, the fades on the way still fire.
+p ~ 0.235, 0.745, 0.908.) Because the smooth scroll passes through zones, the fades on the way still fire.
 
 ## 11. Fallback layout (default styles, no `.fsv-pinned`)
 
