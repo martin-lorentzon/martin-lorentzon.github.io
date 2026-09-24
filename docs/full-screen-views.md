@@ -1,6 +1,6 @@
 # Pinned full-screen views (scroll-triggered stage)
 
-A reusable pattern: one full-screen "stage" stays pinned under a sticky header while the visitor scrolls
+A reusable pattern: one full-screen "stage" stays pinned behind a translucent sticky header while the visitor scrolls
 through a stretch of page, and switches between several **views** (images and text) without the title or
 the background ever leaving. Written from a working implementation; class, variable and attribute names are
 illustrative (prefix `fsv-` = "full-screen views") and can be renamed freely. **Assumes Tailwind CSS v4**
@@ -71,6 +71,8 @@ section from the last view.
 
 - A build step that compiles Tailwind v4 (`@import "tailwindcss";`).
 - A CSS variable `--header-h` equal to the rendered height of your sticky header (`0px` if there is none).
+  The stage runs full-screen *behind* the header (so a glass/translucent header shows the images through
+  it); `--header-h` is only used to pad the content clear of it and for the stacked layout's scroll margin.
 - The runway's ancestors must **not** set `overflow: hidden/auto/scroll` (it breaks `position: sticky`).
 
 ## Tuning (the only numbers you normally touch)
@@ -78,7 +80,7 @@ section from the last view.
 On the `<section>` tag, in **svh of scroll distance** (1 svh = 1% of the viewport height):
 
 ```html
-<section class="fsv scroll-mt-(--header-h)"
+<section class="fsv"
          data-zone-image="35" data-zone-text="45" data-zone-slide="75">
 ```
 
@@ -99,11 +101,11 @@ refresh (no CSS rebuild). The fade duration (450 ms) lives in the CSS and does n
 ## 1. Architecture in one picture
 
 ```
-<section class="fsv">                    height = zone-total + 100svh - header   (the "runway")
-  <div class="fsv-stage">                position: sticky; top: header; height: 100svh - header
+<section class="fsv">                    height = zone-total + 100svh   (the "runway")
+  <div class="fsv-stage">                position: sticky; top: 0; height: 100svh   (behind the header)
     layer-b  (bottom)  image B + scrim + wash
     layer-a  (above B) image A + scrim + wash      <- translateY(-slide * 100%)
-    content  (above)   title + text panels (absolute, stacked)
+    content  (above)   title + text panels (absolute, stacked), padded down by the header height
     a.fsv-next         bottom-centre chevron
   </div>
 </section>
@@ -126,7 +128,7 @@ Class names and structure the CSS and script rely on. Order in the DOM = paint o
 needed except on the arrow:
 
 ```html
-<section class="fsv scroll-mt-(--header-h)"
+<section class="fsv"
          data-zone-image="35" data-zone-text="45" data-zone-slide="75">
   <div class="fsv-stage">
     <div class="fsv-layer fsv-layer-b" aria-hidden="true">
@@ -159,8 +161,9 @@ needed except on the arrow:
 Notes:
 
 - **B comes before A in the DOM** so A paints over B without z-index. A is the layer that slides away.
-- Give the section its **own `scroll-mt-(--header-h)`** so in-page links to it land with the stage already
-  pinned at view 1.
+- The scroll margin lives in the CSS, not on the tag: `--header-h` for the stacked layout, `0` when pinned,
+  so in-page links land exactly where the pin starts (view 1, image under the header). A `scroll-mt-*`
+  utility on the tag would win over the component rule and stop the link a header-height early.
 - Keep the text panels **short** (they share one screen with the title), and don't put them in `overflow`
   containers. Both panels stay in the DOM at all times (opacity only), so they remain in reading order for
   assistive tech and in the no-JS fallback.
@@ -172,15 +175,20 @@ Notes:
 
 ## 3. Geometry and units
 
-- `--header-h` (`:root`) must equal the rendered height of the sticky header. The stage sticks at
-  `top: var(--header-h)`.
-- **Stage height uses `svh`**: `calc(100svh - var(--header-h))`. `svh` is the *small* viewport (mobile toolbar
-  shown), so when a browser hides its URL bar while scrolling the stage does **not** resize/jump.
-- **Image, scrim and wash layers use `lvh`**: `calc(100lvh - var(--header-h))`. They are taller than the
-  stage, so when the toolbar collapses no bare strip appears under the stage. The stage uses
-  `overflow-x: clip` only, so the extra height can overflow vertically.
-- **Runway height** = `var(--fsv-zone-total) + 100svh - var(--header-h)`. The sticky stage travels exactly
-  `zone-total` svh inside it, which is what makes zone lengths literal scroll distances.
+- The stage sticks at `top: 0`, **behind** the sticky header (the header's `z-index` keeps it on top), so a
+  translucent/blurred header shows the images through it. `.fsv-content` gets
+  `padding-top: calc(var(--header-h) + 1.5rem)` so the title clears the header. `--header-h` (`:root`) must
+  equal the rendered height of the sticky header.
+- **Stage height uses `svh`**: `100svh`. `svh` is the *small* viewport (mobile toolbar shown), so when a
+  browser hides its URL bar while scrolling the stage does **not** resize/jump.
+- **Image, scrim and wash layers use `lvh`**: `100lvh`. They are taller than the stage, so when the toolbar
+  collapses no bare strip appears under the stage. The stage uses `overflow-x: clip` only, so the extra
+  height can overflow vertically.
+- **Runway height** = `var(--fsv-zone-total) + 100svh`. The sticky stage travels exactly `zone-total` svh
+  inside it, which is what makes zone lengths literal scroll distances.
+- **Opaque header instead:** pin under it with `top: var(--header-h)`, subtract `var(--header-h)` from the
+  stage, layer and runway heights, and drop the content's extra top padding. The script needs no change (it
+  reads the stage's computed `top`).
 - The pinned section gets a bottom margin (`mb-14 sm:mb-20` in the reference) so there is breathing room
   before the next section.
 
@@ -204,12 +212,12 @@ image-a | text-1 | slide-delay | slide | image-b | text-2
 Progress calculation (runs in `requestAnimationFrame`, coalesced by a `queued` flag on `scroll`/`resize`):
 
 ```
-pinnedTop = parseFloat(getComputedStyle(stage).top)          // header height in px
+pinnedTop = parseFloat(getComputedStyle(stage).top)          // 0 (the stage pins at the very top)
 range     = section.offsetHeight - stage.offsetHeight        // == zone-total in px
 p         = clamp((pinnedTop - section.getBoundingClientRect().top) / range, 0, 1)
 ```
 
-`p = 0` when the section top reaches the header's bottom edge; `p = 1` when the runway's bottom leaves the
+`p = 0` when the section top reaches the stage's pinned top; `p = 1` when the runway's bottom leaves the
 stage. `--fsv-p` is written with 4 decimals.
 
 ### Default numbers (35 / 45 / 75, delay 10, total 245svh)
@@ -223,7 +231,7 @@ stage. `--fsv-p` is written with 4 decimals.
 | image-b | 35 | 0.673 - 0.816 |
 | text-2 | 45 | 0.816 - 1 |
 
-Runway height = 245svh + 100svh - header height.
+Runway height = 245svh + 100svh.
 
 ## 5. State machine (timed fades)
 
@@ -288,14 +296,13 @@ mid-section (reload, anchor jump) snaps to its state instead of fading in from s
   --fsv-slide: clamp(0, calc((var(--fsv-p) - var(--fsv-slide-start)) / var(--fsv-slide-len)), 1);
 }
 .fsv-pinned .fsv-layer-a {
-  transform: translateY(calc(var(--fsv-slide) * -100%));   /* -100% of its own height (lvh - header) */
+  transform: translateY(calc(var(--fsv-slide) * -100%));   /* -100% of its own height (100lvh) */
   will-change: transform;
 }
 ```
 
 `--fsv-slide` is 0..1 across the slide zone only (clamped), so before it starts A is in place and after it
-ends A is fully above the stage. (A sticky header with a higher `z-index` hides the sliver that overlaps the
-header band.) The tinted wash travels with A because the wash is a child of layer A.
+ends A is fully above the stage (and the viewport). The tinted wash travels with A because the wash is a child of layer A.
 
 ## 8. Title and arrow colour
 
@@ -379,6 +386,7 @@ In your Tailwind entry file. Everything lives in `@layer components` except `:ro
 
 @layer components {
   /* --- fallback (default) layout --- */
+  .fsv { @apply scroll-mt-(--header-h); }
   .fsv-media { @apply block h-56 w-full object-cover sm:h-80; }
   .fsv-layer-b, .fsv-scrim, .fsv-wash, .fsv-next { @apply hidden; }
   .fsv-content { @apply mx-auto max-w-5xl px-4 py-14 sm:px-12 sm:py-20; }
@@ -386,8 +394,8 @@ In your Tailwind entry file. Everything lives in `@layer components` except `:ro
 
   /* --- pinned mode (class added by fsv.js unless reduced motion) --- */
   .fsv-pinned {
-    @apply mb-14 sm:mb-20;
-    height: calc(var(--fsv-zone-total, 250svh) + 100svh - var(--header-h));
+    @apply mb-14 scroll-mt-0 sm:mb-20;
+    height: calc(var(--fsv-zone-total, 250svh) + 100svh);
     --fsv-p: 0;
     --fsv-slide-start: 0.5;          /* fallbacks; the script always overwrites these */
     --fsv-slide-len: 0.3;
@@ -404,12 +412,12 @@ In your Tailwind entry file. Everything lives in `@layer components` except `:ro
   .fsv-pinned[data-state="3"] { --fsv-tint-a: 1; --fsv-tint-b: 1; --fsv-text-2: 1; }
 
   .fsv-pinned .fsv-stage {
-    position: sticky; top: var(--header-h);
-    height: calc(100svh - var(--header-h)); overflow-x: clip;
+    position: sticky; top: 0;
+    height: 100svh; overflow-x: clip;
   }
   .fsv-pinned .fsv-layer {
     position: absolute; inset-inline: 0; top: 0; display: block;
-    height: calc(100lvh - var(--header-h));
+    height: 100lvh;
   }
   .fsv-pinned .fsv-layer-a { transform: translateY(calc(var(--fsv-slide) * -100%)); will-change: transform; }
   .fsv-pinned .fsv-media,
@@ -425,7 +433,8 @@ In your Tailwind entry file. Everything lives in `@layer components` except `:ro
   .fsv-pinned .fsv-layer-b .fsv-scrim { opacity: calc(1 - var(--fsv-tint-b)); }
   .fsv-pinned .fsv-layer-b .fsv-wash  { opacity: var(--fsv-tint-b); }
   .fsv-pinned .fsv-content {
-    position: relative; display: flex; height: 100%; flex-direction: column; padding-block: 1.5rem;
+    position: relative; display: flex; height: 100%; flex-direction: column;
+    padding-top: calc(var(--header-h) + 1.5rem); padding-bottom: 1.5rem;
     color: var(--fsv-ink);
   }
   .fsv-pinned .fsv-next {
@@ -559,9 +568,9 @@ Jump to a scroll position by `--fsv-p` in the browser console (works at any view
 ```js
 const s = document.querySelector(".fsv");
 const stage = s.querySelector(".fsv-stage");
-const header = parseFloat(getComputedStyle(stage).top);        // header height in px
+const pinnedTop = parseFloat(getComputedStyle(stage).top);     // 0 unless pinned under an opaque header
 const top = s.getBoundingClientRect().top + scrollY;
-const goTo = (p) => scrollTo(0, top - header + p * (s.offsetHeight - stage.offsetHeight));
+const goTo = (p) => scrollTo(0, top - pinnedTop + p * (s.offsetHeight - stage.offsetHeight));
 goTo(0.5); // then read s.dataset.state, s.style.getPropertyValue("--fsv-p"),
            // getComputedStyle(s).getPropertyValue("--fsv-tint-a")
 ```
@@ -595,10 +604,11 @@ phone viewport; reduced motion shows the stacked layout.
 ## 17. Adapting it
 
 - **No sticky header:** set `--header-h: 0px`. Remove the header mentions from your own notes.
+- **Opaque header:** see the last bullet of section 3 (pin under the header instead of behind it).
 - **Theme / dark mode:** only `--fsv-tint` and `--fsv-ink` need to change per theme (a class, a
   `[data-theme]` selector, or `@media (prefers-color-scheme)`).
-- **Different content sizes:** the stage is one screen tall minus the header, so each text panel plus the
-  title must fit that. Long text is the main failure mode; split it into another view instead of shrinking it.
+- **Different content sizes:** the stage is one screen tall, less the header-height top padding, so each
+  text panel plus the title must fit what is left. Long text is the main failure mode; split it into another view instead of shrinking it.
 - **More or fewer views:** every *timed* element is a registered variable plus a `data-state` rule; every
   zone is an entry in `zoneNames` / `zones`. To add a view, add its zone(s), a trigger, a state value, a
   variable (and its `@property` + transition entry) and the panel/layer that consumes it. To drop the slide

@@ -18,7 +18,7 @@
         <!-- ======================================================================
              MARK: HEADER / NAVBAR
              ================================================================== -->
-        <header class="navbar bg-base-100 sticky top-0 z-30 px-4">
+        <header class="navbar site-nav sticky top-0 z-30 px-4">
           <div class="navbar-start">
             <ul class="menu menu-horizontal px-1">
               <li><a href="#hero" data-scroll-instant class="text-xl font-semibold">Martin Lorentzon</a></li>
@@ -29,7 +29,7 @@
               <li>
                 <details>
                   <summary>Tjänster</summary>
-                  <ul class="p-2 bg-base-100 w-56 z-1 shadow-none">
+                  <ul class="nav-dropdown p-2 bg-base-100 w-56 z-1 shadow-none">
                     <li><a href="#tjanster" data-scroll-instant>Interaktiv 3D</a></li>
                     <li><a href="#infografik" data-scroll-instant>Infografik &amp; animation</a></li>
                     <li><a href="#verktyg" data-scroll-instant>In&#8209;house&#8209;verktyg</a></li>
@@ -41,7 +41,7 @@
               <li>
                 <details>
                   <summary>Tidigare Arbeten</summary>
-                  <ul class="p-2 bg-base-100 w-50 z-1 shadow-none">
+                  <ul class="nav-dropdown p-2 bg-base-100 w-50 z-1 shadow-none">
                     <li>
                       <a href="https://lorentzon.notion.site/main" target="_blank" rel="noopener noreferrer">Föregående Portfolio</a>
                     </li>
@@ -49,7 +49,6 @@
                 </details>
               </li>
               <li><a>Lanseringserbjudande</a></li>
-              <li><a>Produktsidan</a></li>
             </ul>
           </div>
           <div class="navbar-end gap-2">
@@ -116,7 +115,7 @@
                ================================================================== -->
           <!-- Scroll-pinned full-screen views (src/fsv.js, .fsv* in src/input.css, docs/full-screen-views.md).
                data-zone-* = scroll distance in svh: image = each untinted view, text = each text view, slide = A sliding away to reveal B. -->
-          <section id="infografik" class="fsv scroll-mt-(--navbar-h)" data-zone-image="35" data-zone-text="45" data-zone-slide="75">
+          <section id="infografik" class="fsv" data-zone-image="35" data-zone-text="45" data-zone-slide="75">
             <div class="fsv-stage">
               <div class="fsv-layer fsv-layer-b" aria-hidden="true">
                 <img src="https://placehold.co/1920x1080/0d9488/ffffff" alt="" class="fsv-media" />
@@ -321,7 +320,6 @@
               </details>
             </li>
             <li><a>Lanseringserbjudande</a></li>
-            <li><a>Produktsidan</a></li>
           </ul>
         </div>
       </div>
@@ -359,6 +357,12 @@
           if (!dropdown.contains(event.target)) dropdown.open = false;
         });
       });
+
+      // Glass header once the page has scrolled (.site-nav in src/input.css).
+      const siteNav = document.querySelector(".site-nav");
+      const updateSiteNav = () => siteNav.toggleAttribute("data-scrolled", scrollY > 12);
+      addEventListener("scroll", updateSiteNav, { passive: true });
+      updateSiteNav();
 
       const mobileMenuToggle = document.getElementById("mobile-menu");
       document.querySelectorAll(".drawer-side .menu a").forEach((link) => {

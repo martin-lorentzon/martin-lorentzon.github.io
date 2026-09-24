@@ -81,8 +81,23 @@
     @apply flex flex-col gap-2;
   }
 
+  /* Sticky header: solid at the top of the page, then glass (the hero pill's tint and hairline, plus
+     blur) once data-scrolled is set by the script in index.html. The hairline is an overlaid ::after
+     rather than a border, since a border would add to the header's height (--navbar-h). */
+  .site-nav {
+    @apply bg-base-100 transition-[background-color,backdrop-filter] duration-200 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-base-300 after:opacity-0 after:transition-opacity after:duration-200;
+  }
+
+  .site-nav[data-scrolled] {
+    @apply bg-base-200/60 backdrop-blur-md after:opacity-100;
+  }
+
   /* Full-screen views (.fsv, see docs/full-screen-views.md): default = plain stacked section (banner image A, then title + both copy panels;
      image B is only used when pinned). */
+  .fsv {
+    @apply scroll-mt-(--navbar-h);
+  }
+
   .fsv-media {
     @apply block h-56 w-full object-cover sm:h-80;
   }
@@ -102,8 +117,8 @@
     @apply mt-8 grid gap-8;
   }
 
-  /* Pinned mode (class added by src/fsv.js unless reduced motion). The stage is sticky under
-     the navbar and the runway is the sum of the scroll zones set in data-zone-* on the section in
+  /* Pinned mode (class added by src/fsv.js unless reduced motion). The stage is sticky at the very
+     top, behind the glass navbar (the content is padded down to clear it), and the runway is the sum of the scroll zones set in data-zone-* on the section in
      index.html (the script writes it as --fsv-zone-total, plus --fsv-slide-start/--fsv-slide-len). Two kinds of
      motion:
        - The slide of image A is scrubbed: --fsv-p (0-1, scroll progress through the pinned stretch,
@@ -112,10 +127,11 @@
          registered vars --fsv-tint-a/--fsv-text-1/--fsv-tint-b/--fsv-text-2 (see @property below) transition over
          450ms once .fsv-animated is set.
      Height uses svh (like the hero) so the mobile toolbar collapsing doesn't resize the stage; the
-     media layers use lvh so no strip shows when it does. */
+     media layers use lvh so no strip shows when it does. No scroll margin, so in-page links land
+     where the pin starts. */
   .fsv-pinned {
-    @apply mb-14 sm:mb-20;
-    height: calc(var(--fsv-zone-total, 250svh) + 100svh - var(--navbar-h));
+    @apply mb-14 scroll-mt-0 sm:mb-20;
+    height: calc(var(--fsv-zone-total, 250svh) + 100svh);
     --fsv-p: 0;
     --fsv-slide-start: 0.478;
     --fsv-slide-len: 0.326;
@@ -149,8 +165,8 @@
 
   .fsv-pinned .fsv-stage {
     position: sticky;
-    top: var(--navbar-h);
-    height: calc(100svh - var(--navbar-h));
+    top: 0;
+    height: 100svh;
     overflow-x: clip;
   }
 
@@ -159,7 +175,7 @@
     inset-inline: 0;
     top: 0;
     display: block;
-    height: calc(100lvh - var(--navbar-h));
+    height: 100lvh;
   }
 
   .fsv-pinned .fsv-layer-a {
@@ -207,7 +223,8 @@
     display: flex;
     height: 100%;
     flex-direction: column;
-    padding-block: 1.5rem;
+    padding-top: calc(var(--navbar-h) + 1.5rem);
+    padding-bottom: 1.5rem;
     color: var(--fsv-ink);
   }
 
@@ -247,6 +264,17 @@
   .fsv-pinned .fsv-panel-2 {
     opacity: var(--fsv-text-2);
   }
+}
+
+/* Navbar dropdown panel (the <ul> inside a menu-horizontal <details>): hangs flush from the navbar's
+   bottom edge instead of daisyUI's fixed 1rem under the item, which lands inside this taller bar. The
+   panel starts at the item's bottom edge, and the navbar centres the item, so the gap to the bar's bottom
+   is (bar height - item height) / 2; the item is one line (1lh, same font as the panel) plus daisyUI's
+   0.375rem summary padding top and bottom. (top can't be used: its containing block is the <details>
+   content box, which starts under the summary and has no height while opening.) An @utility, not a
+   component class, because daisyUI's menu rules sit in the utilities layer and would otherwise win. */
+@utility nav-dropdown {
+  margin-top: calc((var(--navbar-h) - 1lh - 0.75rem) / 2);
 }
 
 @property --fsv-tint-a {
