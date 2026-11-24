@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Kartan Prototyp</title>
+    <!-- Internal draft: a working prototype of direction R (round 5). Not linked from the site.
+         One Three.js scene, two zoom levels: seen from straight above with flattened buildings it is the 2D map;
+         zooming in raises the city and drops into a third-person view. Walking is optional: every place is one click away. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Inter+Tight:wght@400..700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+      :root { --land: #ddd5c6; --water: #9fbcc2; --ink: #1a1a1a; --sand: #f2eee7; --cap: #6c665d; --you: #2b4cc4; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; overflow: hidden; background: var(--water); color: var(--ink); font: 15px/1.45 "Inter Tight", system-ui, sans-serif; }
+      #c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+      button, a { font: inherit; color: inherit; }
+      :focus-visible { outline: 2px solid var(--you); outline-offset: 2px; }
+      .skip { position: fixed; left: 16px; top: -60px; z-index: 20; background: var(--ink); color: var(--sand); padding: 8px 12px; border-radius: 6px; }
+      .skip:focus { top: 12px; }
+      .ttl { position: fixed; left: 16px; top: 16px; z-index: 4; background: var(--ink); color: var(--sand); padding: 10px 14px; font: 800 20px/1.05 "Archivo", sans-serif; font-variation-settings: "wdth" 62; letter-spacing: 0.08em; text-transform: uppercase; }
+      .ttl small { display: block; font: 400 11px/1.5 "JetBrains Mono", monospace; letter-spacing: 0; text-transform: none; color: #b9b2a6; }
+      nav.dest { position: fixed; left: 50%; top: 16px; transform: translateX(-50%); z-index: 4; }
+      nav.dest ul { list-style: none; margin: 0; padding: 2px; display: flex; gap: 6px; }
+      nav.dest button { white-space: nowrap; background: #fff; border: 1.5px solid var(--ink); border-radius: 999px; padding: 0 14px; min-height: 40px; cursor: pointer; font-weight: 600; font-size: 14px; display: inline-flex; gap: 7px; align-items: center; }
+      nav.dest button i { font-style: normal; font-size: 12px; }
+      nav.dest button[aria-current="true"] { background: var(--ink); color: var(--sand); }
+      .layer { position: fixed; inset: 0; pointer-events: none; z-index: 2; overflow: hidden; }
+      .mk { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; pointer-events: auto; cursor: pointer; background: none; border: 0; padding: 0; will-change: transform; }
+      .mk i { width: 40px; height: 40px; border-radius: 8px; background: var(--ink); color: var(--sand); display: grid; place-items: center; font-style: normal; font-size: 17px; border: 3px solid #fff; }
+      .mk b { font: 700 12px/1 "Inter Tight", sans-serif; background: #fff; padding: 4px 7px; border-radius: 4px; white-space: nowrap; }
+      .dl { position: absolute; left: 0; top: 0; font: 800 16px/1 "Archivo", sans-serif; font-variation-settings: "wdth" 62; letter-spacing: 0.16em; text-transform: uppercase; color: #1a1a1a8c; white-space: nowrap; }
+      .dl.river { font-style: italic; font-weight: 600; letter-spacing: 0.4em; color: #4f727a; font-size: 13px; }
+      .you { position: absolute; left: 0; top: 0; font: 600 11px/1 "JetBrains Mono", monospace; color: var(--you); white-space: nowrap; background: #ffffffcc; padding: 3px 5px; border-radius: 3px; }
+      .leg { position: fixed; left: 16px; bottom: 16px; z-index: 3; background: var(--sand); border: 1.5px solid var(--ink); padding: 10px 14px; display: grid; gap: 4px; font: 400 11px/1.3 "JetBrains Mono", monospace; }
+      .leg b { font: 800 12px/1.2 "Archivo", sans-serif; font-variation-settings: "wdth" 62; text-transform: uppercase; letter-spacing: 0.1em; }
+      .ctl { position: fixed; right: 16px; bottom: 16px; z-index: 4; display: flex; gap: 6px; }
+      .ctl button { background: #fff; border: 1.5px solid var(--ink); border-radius: 6px; min-width: 44px; min-height: 44px; padding: 0 14px; font-weight: 600; cursor: pointer; }
+      .ctl button:disabled { opacity: 0.35; cursor: default; }
+      .hint { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 3; font: 400 12px/1.4 "JetBrains Mono", monospace; background: #ffffffe0; padding: 7px 11px; border-radius: 6px; white-space: nowrap; pointer-events: none; }
+      .panel { position: fixed; right: 16px; top: 72px; z-index: 5; width: min(380px, calc(100% - 32px)); background: var(--sand); border: 1.5px solid var(--ink); border-radius: 12px; padding: 20px 22px 22px; transform: translateX(calc(100% + 32px)); transition: transform 0.35s ease; }
+      .panel.open { transform: none; }
+      .panel small { display: block; font: 400 11px/1.5 "JetBrains Mono", monospace; color: var(--cap); letter-spacing: 0.05em; }
+      .panel h2 { margin: 6px 0 10px; font: 800 28px/1.02 "Archivo", sans-serif; letter-spacing: -0.03em; }
+      .panel p { margin: 0 0 10px; }
+      .panel ul { margin: 0 0 12px; padding: 0; list-style: none; font-size: 13.5px; }
+      .panel li { border-top: 1px solid #1a1a1a1f; padding: 6px 0; }
+      .panel .tip { font: 400 12px/1.5 "JetBrains Mono", monospace; color: var(--you); }
+      .panel .acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+      .panel .acts a, .panel .acts button { min-height: 44px; padding: 0 16px; border-radius: 8px; display: inline-flex; align-items: center; font-weight: 600; text-decoration: none; cursor: pointer; border: 1.5px solid var(--ink); background: transparent; }
+      .panel .acts a { background: var(--ink); color: var(--sand); }
+      .panel .x { position: absolute; right: 8px; top: 8px; width: 40px; height: 40px; border: 0; background: none; font-size: 22px; cursor: pointer; border-radius: 8px; }
+      .list { position: fixed; inset: 0; z-index: 10; background: #1a1a1a66; display: grid; place-items: center; padding: 12px; }
+      .list[hidden] { display: none; }
+      .list .box { background: var(--sand); border-radius: 12px; padding: 22px; width: min(560px, 100%); max-height: 86vh; overflow: auto; }
+      .list h2 { margin: 0 0 12px; font: 800 24px/1 "Archivo", sans-serif; }
+      .list ul { list-style: none; margin: 0; padding: 0; }
+      .list li button { width: 100%; text-align: left; background: #fff; border: 1.5px solid #1a1a1a26; border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; }
+      .list li b { display: block; font-size: 16px; }
+      .list li span { color: var(--cap); font-size: 13.5px; }
+      .list .close { margin-top: 6px; min-height: 44px; padding: 0 16px; border-radius: 8px; border: 1.5px solid var(--ink); background: transparent; font-weight: 600; cursor: pointer; }
+      .draft { position: fixed; right: 16px; top: 16px; z-index: 6; font: 400 11px/1.4 "JetBrains Mono", monospace; background: var(--ink); color: var(--sand); padding: 6px 10px; border-radius: 6px; max-width: 30ch; }
+      @media (max-width: 1100px) { nav.dest { left: 16px; right: 16px; top: 80px; transform: none; overflow-x: auto; } nav.dest ul { width: max-content; } .panel { top: 132px; } }
+      @media (max-width: 640px) {
+        .ttl { font-size: 17px; padding: 8px 12px; } .draft { display: none; }
+        nav.dest { left: 12px; right: 12px; top: 68px; }
+        .leg, .hint { display: none; }
+        .panel { left: 12px; right: 12px; top: auto; bottom: 72px; width: auto; max-height: 52svh; overflow: auto; transform: translateY(calc(100% + 120px)); }
+        .panel.open { transform: none; } .panel h2 { font-size: 24px; }
+        .ctl { right: 12px; bottom: 12px; left: 12px; justify-content: flex-end; }
+      }
+      @media (prefers-reduced-motion: reduce) { .panel { transition: none; } }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#" id="skip">Visa som lista</a>
+    <canvas id="c" aria-hidden="true"></canvas>
+    <div class="layer" id="layer"></div>
+    <div class="ttl" id="ttl">Karta<small>Lorentzon Visualisation, Göteborg</small></div>
+    <nav class="dest" aria-label="Platser"><ul id="chips"></ul></nav>
+    <div class="leg" id="leg"><b>Teckenförklaring</b><span>▶ Film &amp; animation</span><span>◆ Interaktiv 3D</span><span>⚙ Verktyg &amp; tillägg</span><span>● Studion · ✉ Kontakt</span></div>
+    <p class="hint" id="hint"></p>
+    <div class="ctl"><button type="button" id="zin" aria-label="Zooma in">+</button><button type="button" id="zout" aria-label="Zooma ut till kartan">−</button><button type="button" id="lst">Visa som lista</button></div>
+    <aside class="panel" id="panel" aria-live="polite" aria-labelledby="p-title">
+      <button type="button" class="x" id="p-x" aria-label="Stäng">×</button>
+      <small id="p-kick"></small><h2 id="p-title"></h2><p id="p-text"></p><ul id="p-facts"></ul><p class="tip" id="p-tip"></p>
+      <div class="acts"><a href="#" id="p-cta"></a><button type="button" id="p-next">Nästa plats →</button></div>
+    </aside>
+    <div class="list" id="list" hidden role="dialog" aria-modal="true" aria-labelledby="l-title">
+      <div class="box"><h2 id="l-title">Alla platser</h2><ul id="l-items"></ul><button type="button" class="close" id="l-close">Stäng</button></div>
+    </div>
+    <p class="draft">Utkast: prototyp av riktning R. Klicka på en plats, eller gå med WASD.</p>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+      (function () {
+        // MARK: Data. Copy follows today's site; the places are the services, About and Contact.
+        const DEST = [
+          { id: "film", icon: "▶", name: "Produktfilm", district: "Filmkvarteret", pos: [-50, -35], h: 11,
+            kick: "FILMKVARTERET · FILM & ANIMATION", title: "Film innan prototypen finns.",
+            text: "Produktfilmer och stillbilder från CAD-filer eller skisser. Stiliserad och teknisk animation för utbildning och medicin.",
+            facts: ["Indata: STEP, IGES eller skisser", "Leverans: film, stillbilder och loopar", "Tid: ett par veckor för enklare jobb"], cta: "Se filmerna" },
+          { id: "3d", icon: "◆", name: "Interaktiv 3D", district: "3D-hamnen", pos: [25, -20], h: 9,
+            kick: "3D-HAMNEN · INTERAKTIV 3D", title: "Låt kunden vrida på den.",
+            text: "Konfigurationer, intressepunkter, rörliga delar och AR-läge. I webbläsaren, utan app, inbyggt i din egen sajt.",
+            facts: ["Fungerar på mobil och dator", "AR på iPhone och Android"], tip: "Ställ dig på en provbit framför sockeln för att byta material.", cta: "Se den på en sajt" },
+          { id: "tools", icon: "⚙", name: "Verktyg", district: "Verkstaden", pos: [10, 45], h: 8,
+            kick: "VERKSTADEN · ARBETSFLÖDEN & VERKTYG", title: "Timmar tillbaka varje vecka.",
+            text: "Automatisering av långa processer, parametriska 3D-modeller, enklare distribution av assets och återanvändbara komponenter.",
+            facts: ["Egna Blender-tillägg", "Pipelines för hela team"], cta: "Se verktygen" },
+          { id: "studio", icon: "●", name: "Studion", district: "Om Martin", pos: [-70, 48], h: 8,
+            kick: "STUDION · OM MIG", title: "Martin Lorentzon",
+            text: "Självlärd 3D-generalist i Göteborg. Yrgo, bilindustrin, undervisning och ett eget företag för verktyg.",
+            facts: [], cta: "Läs mer om mig" },
+          { id: "contact", icon: "✉", name: "Kontakt", district: "Brevlådan", pos: [75, 32], h: 6,
+            kick: "BREVLÅDAN · KONTAKT", title: "Hör av dig.",
+            text: "Ett kort samtal, sedan en offert och regelbundna avstämningar. SMS eller e-post går bäst.",
+            facts: ["Skicka gärna STEP- eller IGES-filer", "Enklare jobb tar ett par veckor"], cta: "Skriv ett underlag" },
+        ];
+        DEST.forEach((d) => { d.spawn = [d.pos[0], d.pos[1] + 13]; });
+        const START = [0, -6];
+
+        // MARK: World helpers
+        const W = { minX: -110, maxX: 110, minZ: -73, maxZ: 77 };
+        const zc = (x) => 10 - 0.15 * x; // river centre line
+        const COSA = Math.cos(Math.atan(0.15));
+        const waterDist = (x, z) => Math.abs(z - zc(x)) * COSA;
+        const BRIDGES = [-30, 50];
+        const inWater = (x, z) => waterDist(x, z) < 9;
+        const onBridge = (x) => BRIDGES.some((b) => Math.abs(x - b) < 2.6);
+        let seed = 42;
+        const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+        const lerp = (a, b, t) => a + (b - a) * t;
+        const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+        const smooth = (a, b, v) => { const t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+        const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+        const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        // MARK: Renderer and scene
+        const canvas = document.getElementById("c");
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, logarithmicDepthBuffer: true });
+        renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+        const scene = new THREE.Scene();
+        const SEA = new THREE.Color(0x9fbcc2), SKY = new THREE.Color(0xe9e4da);
+        scene.background = SEA.clone();
+        scene.fog = new THREE.Fog(SKY.clone(), 60, 10000);
+        const camera = new THREE.PerspectiveCamera(24, 1, 0.5, 4000);
+        scene.add(new THREE.HemisphereLight(0xffffff, 0xb9ad98, 0.6));
+        const sun = new THREE.DirectionalLight(0xffffff, 0.48);
+        sun.position.set(-0.5, 1, 0.3);
+        scene.add(sun);
+        const city = new THREE.Group(); // everything that rises when you zoom in
+        scene.add(city);
+        const colliders = [];
+        const addBox = (x, z, w, d) => colliders.push({ x0: x - w / 2, x1: x + w / 2, z0: z - d / 2, z1: z + d / 2 });
+        const unit = new THREE.BoxGeometry(1, 1, 1);
+        const mat = (c) => new THREE.MeshLambertMaterial({ color: c });
+        function slab(parent, x, z, w, d, h, y, m) { const o = new THREE.Mesh(unit, m); o.scale.set(w, h, d); o.position.set(x, y, z); parent.add(o); return o; }
+
+        // MARK: Ground, river, streets, bridges, parks
+        const ground = new THREE.Mesh(new THREE.PlaneGeometry(W.maxX - W.minX, W.maxZ - W.minZ), new THREE.MeshBasicMaterial({ color: 0xddd5c6 }));
+        ground.rotation.x = -Math.PI / 2; ground.position.set(0, 0, (W.minZ + W.maxZ) / 2); scene.add(ground);
+        const water = new THREE.Mesh(new THREE.PlaneGeometry(232 / COSA, 18), new THREE.MeshBasicMaterial({ color: 0x9fbcc2 }));
+        water.rotation.order = "YXZ"; water.rotation.set(-Math.PI / 2, Math.atan(0.15), 0); water.position.set(0, 0.05, 10); scene.add(water);
+        const streetMat = mat(0xf7f4ee);
+        function runs(a, b, ok) { const out = []; let s = null; for (let t = a; t <= b + 0.001; t += 0.5) { const good = ok(t) && t < b; if (good && s === null) s = t; if (!good && s !== null) { out.push([s, t]); s = null; } } return out; }
+        for (let x = -90; x <= 90; x += 20) runs(W.minZ, W.maxZ, (z) => !inWater(x, z)).forEach(([a, b]) => slab(scene, x, (a + b) / 2, 3, b - a, 0.1, 0.06, streetMat));
+        for (let z = -60; z <= 60; z += 20) runs(W.minX, W.maxX, (x) => !inWater(x, z)).forEach(([a, b]) => slab(scene, (a + b) / 2, z, b - a, 3, 0.1, 0.06, streetMat));
+        const bridgeMat = mat(0xefe9de), railMat = mat(0xb9b0a2);
+        BRIDGES.forEach((bx) => {
+          const len = 2 * (9 / COSA) + 3;
+          slab(scene, bx, zc(bx), 5.2, len, 0.3, 0.15, bridgeMat);
+          slab(city, bx - 2.6, zc(bx), 0.2, len, 1, 0.8, railMat); slab(city, bx + 2.6, zc(bx), 0.2, len, 1, 0.8, railMat);
+        });
+        const PARKS = [[-80, -30, 16, 16], [80, 50, 16, 14]];
+        const parkMat = mat(0xb6c2a0), trunkMat = mat(0x8a7a66), crownMat = mat(0x93a47e);
+        const trunkGeo = new THREE.CylinderGeometry(0.25, 0.3, 1.4, 6), crownGeo = new THREE.SphereGeometry(1.5, 10, 8);
+        PARKS.forEach(([x, z, w, d]) => {
+          slab(scene, x, z, w, d, 0.12, 0.06, parkMat);
+          for (let i = 0; i < 7; i++) {
+            const tx = x - w / 2 + 2 + rnd() * (w - 4), tz = z - d / 2 + 2 + rnd() * (d - 4);
+            const tr = new THREE.Mesh(trunkGeo, trunkMat); tr.position.set(tx, 0.7, tz); city.add(tr);
+            const cr = new THREE.Mesh(crownGeo, crownMat); cr.position.set(tx, 2.4, tz); cr.scale.setScalar(0.8 + rnd() * 0.5); city.add(cr);
+            addBox(tx, tz, 0.8, 0.8);
+          }
+        });
+
+        // MARK: City blocks (instanced)
+        const PLAZAS = DEST.map((d) => ({ x: d.pos[0], z: d.pos[1] + 5, r: 18 })).concat([{ x: START[0], z: START[1], r: 9 }]);
+        const lots = [];
+        for (let bx = -100; bx <= 100; bx += 20) for (let bz = -70; bz <= 70; bz += 20) for (const ox of [-4.25, 4.25]) for (const oz of [-4.25, 4.25]) {
+          const x = bx + ox, z = bz + oz;
+          if (x < W.minX + 4 || x > W.maxX - 4 || z < W.minZ + 4 || z > W.maxZ - 4) continue;
+          if (waterDist(x, z) < 14) continue;
+          if (PLAZAS.some((p) => Math.hypot(x - p.x, z - p.z) < p.r)) continue;
+          if (PARKS.some(([px, pz, w, d]) => Math.abs(x - px) < w / 2 + 4 && Math.abs(z - pz) < d / 2 + 4)) continue;
+          if (rnd() < 0.12) continue;
+          lots.push({ x, z, w: 5.6 + rnd() * 1.6, d: 5.6 + rnd() * 1.6, h: rnd() < 0.07 ? 12 + rnd() * 6 : 2.5 + rnd() * 6 });
+        }
+        const bGeo = new THREE.BoxGeometry(1, 1, 1); bGeo.translate(0, 0.5, 0);
+        const blocks = new THREE.InstancedMesh(bGeo, mat(0xffffff), lots.length);
+        const m4 = new THREE.Matrix4(), col = new THREE.Color();
+        const PAL = [0xece6db, 0xe5ded0, 0xf1ebe1, 0xdcd3c3, 0xe8e1d4];
+        lots.forEach((l, i) => { m4.makeScale(l.w, l.h, l.d); m4.setPosition(l.x, 0, l.z); blocks.setMatrixAt(i, m4); blocks.setColorAt(i, col.setHex(PAL[(rnd() * PAL.length) | 0])); addBox(l.x, l.z, l.w, l.d); });
+        city.add(blocks);
+
+        // MARK: Landmarks, one per place
+        const anim = [];
+        // Film: a cinema with a live screen.
+        (function () {
+          const [x, z] = DEST[0].pos;
+          slab(city, x, z, 16, 10, 11, 5.5, mat(0x2e2c2b));
+          slab(city, x, z + 5.3, 16.6, 0.6, 1.2, 10.2, mat(0xf2eee7));
+          const fc = document.createElement("canvas"); fc.width = 320; fc.height = 180;
+          const fx = fc.getContext("2d"); const tex = new THREE.CanvasTexture(fc);
+          const scr = new THREE.Mesh(new THREE.PlaneGeometry(12.8, 7.2), new THREE.MeshBasicMaterial({ map: tex }));
+          scr.position.set(x, 5.4, z + 5.05); city.add(scr);
+          addBox(x, z, 16, 10);
+          anim.push((t) => {
+            const g = fx.createLinearGradient(0, 0, 320, 180); g.addColorStop(0, "#1c1b1a"); g.addColorStop(1, "#3a342d");
+            fx.fillStyle = g; fx.fillRect(0, 0, 320, 180);
+            const px = 160 + Math.sin(t * 0.6) * 18;
+            const rg = fx.createRadialGradient(px - 14, 72, 4, px, 96, 62); rg.addColorStop(0, "#fff4e2"); rg.addColorStop(0.5, "#b58a5c"); rg.addColorStop(1, "#2a2017");
+            fx.fillStyle = rg; fx.beginPath(); fx.ellipse(px, 98, 30, 48, 0, 0, Math.PI * 2); fx.fill();
+            fx.fillStyle = "rgba(255,240,215,0.09)"; fx.fillRect(((t * 70) % 480) - 80, 0, 40, 180);
+            fx.fillStyle = "#d8d2c8"; fx.font = "12px monospace";
+            const s = Math.floor(t) % 60, f = Math.floor((t % 1) * 25);
+            fx.fillText("PRODUKTFILM  00:00:" + String(s).padStart(2, "0") + ":" + String(f).padStart(2, "0"), 12, 20);
+            tex.needsUpdate = true;
+          });
+        })();
+        // Interactive 3D: a product on a turning plinth, and material samples to stand on.
+        const pads = [];
+        let objMat;
+        (function () {
+          const [x, z] = DEST[1].pos;
+          const pl = new THREE.Mesh(new THREE.CylinderGeometry(4, 4.3, 1.2, 40), mat(0xf2eee7)); pl.position.set(x, 0.6, z); city.add(pl);
+          const prof = [[0, 0], [1.6, 0], [1.9, 0.3], [2.0, 1.5], [1.8, 4.6], [1.3, 6.2], [0.7, 6.9], [0, 7.1]].map(([a, b]) => new THREE.Vector2(a, b));
+          objMat = new THREE.MeshPhongMaterial({ color: 0xac8253, shininess: 50, specular: 0x333333 });
+          const obj = new THREE.Mesh(new THREE.LatheGeometry(prof, 48), objMat); obj.position.set(x, 1.2, z); obj.scale.set(1, 1, 0.82); city.add(obj);
+          addBox(x, z, 8.6, 8.6);
+          [[0xac8253, -6], [0x59655d, 0], [0xb9bdc1, 6]].forEach(([c, dx]) => {
+            const p = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 0.25, 32), mat(c)); p.position.set(x + dx, 0.13, z + 8); scene.add(p);
+            pads.push({ x: x + dx, z: z + 8, c: new THREE.Color(c) });
+          });
+          anim.push((t, dt) => { obj.rotation.y += dt * 0.5; });
+        })();
+        // Tools: a workshop with a turning gear and a conveyor.
+        (function () {
+          const [x, z] = DEST[2].pos;
+          slab(city, x, z, 14, 10, 7, 3.5, mat(0xcfc6b6));
+          for (let i = 0; i < 3; i++) { const r = slab(city, x - 4.7 + i * 4.7, z, 4.6, 10, 2.4, 7.6, mat(0xb9b0a2)); r.rotation.z = 0.5; }
+          addBox(x, z, 14, 10);
+          const gear = new THREE.Group(); gear.position.set(x - 4, 4, z + 6.2);
+          const gm = mat(0xb9bdc1);
+          const disc = new THREE.Mesh(new THREE.CylinderGeometry(2.6, 2.6, 0.7, 28), gm); disc.rotation.x = Math.PI / 2; gear.add(disc);
+          for (let i = 0; i < 10; i++) { const tth = new THREE.Mesh(unit, gm); tth.scale.set(0.9, 1, 0.7); const a = (i / 10) * Math.PI * 2; tth.position.set(Math.cos(a) * 2.9, Math.sin(a) * 2.9, 0); tth.rotation.z = a; gear.add(tth); }
+          city.add(gear);
+          slab(city, x - 4, z + 6.2, 0.6, 0.6, 1.4, 0.7, gm);
+          slab(city, x + 3, z + 6.5, 10, 1.8, 0.8, 0.4, mat(0x3a3d42));
+          addBox(x - 1, z + 6.4, 14, 2.4);
+          const crates = [0, 1, 2].map(() => slab(city, 0, z + 6.5, 1.2, 1.2, 1.2, 1.4, mat(0xac8253)));
+          anim.push((t, dt) => { gear.rotation.z -= dt * 0.8; crates.forEach((c, i) => { c.position.x = x - 1.5 + (((t * 1.5 + i * 3) % 9)); }); });
+        })();
+        // Studio: a small house with a warm window.
+        (function () {
+          const [x, z] = DEST[3].pos;
+          slab(city, x, z, 9, 7, 5, 2.5, mat(0xeae4d8));
+          const roof = new THREE.Mesh(new THREE.ConeGeometry(6.6, 3.6, 4), mat(0x6c665d)); roof.rotation.y = Math.PI / 4; roof.scale.set(1, 1, 0.78); roof.position.set(x, 6.8, z); city.add(roof);
+          const win = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 2), new THREE.MeshBasicMaterial({ color: 0xf4d9a6 })); win.position.set(x - 1.6, 2.8, z + 3.52); city.add(win);
+          const door = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 2.6), new THREE.MeshBasicMaterial({ color: 0x3a3632 })); door.position.set(x + 2.4, 1.3, z + 3.52); city.add(door);
+          addBox(x, z, 9, 7);
+        })();
+        // Contact: a big mailbox.
+        (function () {
+          const [x, z] = DEST[4].pos;
+          const ink = mat(0x1a1a1a);
+          slab(city, x, z, 0.8, 0.8, 2.4, 1.2, ink);
+          slab(city, x, z, 4.4, 3.4, 3, 3.9, ink);
+          const top = new THREE.Mesh(new THREE.CylinderGeometry(1.7, 1.7, 4.4, 24, 1, false, 0, Math.PI), ink); top.rotation.z = Math.PI / 2; top.rotation.y = Math.PI / 2; top.position.set(x, 5.4, z); top.scale.set(1, 1, 1.3); city.add(top);
+          slab(city, x - 0.2, z + 1.72, 2.6, 0.05, 0.35, 4.6, mat(0xf2eee7));
+          const flag = slab(city, x + 2.5, z, 0.2, 0.4, 2.6, 5.2, mat(0x2b4cc4));
+          addBox(x, z, 4.4, 3.4);
+          anim.push((t) => { flag.rotation.x = Math.sin(t * 1.4) * 0.15; });
+        })();
+
+        // MARK: The visitor
+        const me = new THREE.Group(); scene.add(me);
+        const body = new THREE.Group(); me.add(body);
+        const inkMat = mat(0x1a1a1a);
+        const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.62, 1.5, 16), inkMat); torso.position.y = 1.05; body.add(torso);
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.42, 16, 12), mat(0xe9e3d8)); head.position.y = 2.12; body.add(head);
+        const nose = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.3), mat(0x2b4cc4)); nose.position.set(0, 1.5, 0.5); body.add(nose);
+        const dot = new THREE.Mesh(new THREE.CircleGeometry(1, 40), new THREE.MeshBasicMaterial({ color: 0x2b4cc4, transparent: true, opacity: 0.9 }));
+        dot.rotation.x = -Math.PI / 2; dot.position.y = 0.3; me.add(dot);
+        const halo = new THREE.Mesh(new THREE.RingGeometry(1.25, 1.9, 40), new THREE.MeshBasicMaterial({ color: 0x2b4cc4, transparent: true, opacity: 0.25 }));
+        halo.rotation.x = -Math.PI / 2; halo.position.y = 0.29; me.add(halo);
+        const tgt = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.85, 32), new THREE.MeshBasicMaterial({ color: 0x1a1a1a })); tgt.rotation.x = -Math.PI / 2; tgt.position.y = 0.2; tgt.visible = false; scene.add(tgt);
+        const pos = new THREE.Vector2(START[0], START[1]);
+        const follow = new THREE.Vector3(START[0], 0, START[1]);
+        let heading = Math.PI, target = null;
+        function blocked(x, z) {
+          if (x < W.minX + 1 || x > W.maxX - 1 || z < W.minZ + 1 || z > W.maxZ - 1) return true;
+          if (inWater(x, z) && !onBridge(x)) return true;
+          const r = 0.7;
+          return colliders.some((c) => x > c.x0 - r && x < c.x1 + r && z > c.z0 - r && z < c.z1 + r);
+        }
+        function findFree(x, z) {
+          if (!blocked(x, z)) return [x, z];
+          for (let r = 1; r < 14; r += 1) for (let a = 0; a < 16; a++) { const nx = x + Math.cos((a / 16) * Math.PI * 2) * r, nz = z + Math.sin((a / 16) * Math.PI * 2) * r; if (!blocked(nx, nz)) return [nx, nz]; }
+          return START;
+        }
+
+        // MARK: Zoom state. 0 = map, 1 = close-up. One tween drives camera, city height, fog and overlays.
+        let zoom = 0, tween = null;
+        function zoomTo(to, ms, done) {
+          if (reduce || ms === 0) { zoom = to; tween = null; if (done) done(); return; }
+          tween = { from: zoom, to, t0: performance.now(), ms, done };
+        }
+        const busy = () => tween !== null;
+        function placeAt(x, z, face) { pos.set(x, z); follow.set(x, 0, z); target = null; tgt.visible = false; if (face !== undefined) heading = face; }
+        function travel(d) {
+          if (busy()) return;
+          dismissed = null;
+          const go = () => { placeAt(d.spawn[0], d.spawn[1], Math.PI); zoomTo(1, 1500); };
+          if (zoom > 0.5) zoomTo(0, 900, go); else go();
+        }
+        function toMap() { if (!busy() && zoom > 0.5) zoomTo(0, 1100); }
+        function toClose() { if (!busy() && zoom < 0.5) zoomTo(1, 1300); }
+
+        // MARK: Overlays (markers, district names, chips, panel, list)
+        const layer = document.getElementById("layer");
+        const chips = document.getElementById("chips");
+        DEST.forEach((d) => {
+          d.mk = document.createElement("button"); d.mk.type = "button"; d.mk.className = "mk"; d.mk.tabIndex = -1; d.mk.setAttribute("aria-hidden", "true");
+          d.mk.innerHTML = "<i>" + d.icon + "</i><b>" + d.name + "</b>"; d.mk.addEventListener("click", () => travel(d)); layer.appendChild(d.mk);
+          d.dl = document.createElement("span"); d.dl.className = "dl"; d.dl.textContent = d.district; layer.appendChild(d.dl);
+          const li = document.createElement("li"); d.chip = document.createElement("button"); d.chip.type = "button";
+          d.chip.innerHTML = "<i aria-hidden=\"true\">" + d.icon + "</i>" + d.name; d.chip.addEventListener("click", () => travel(d)); li.appendChild(d.chip); chips.appendChild(li);
+        });
+        const river = document.createElement("span"); river.className = "dl river"; river.textContent = "ÄLVEN"; layer.appendChild(river);
+        const youLbl = document.createElement("span"); youLbl.className = "you"; youLbl.textContent = "Du är här"; layer.appendChild(youLbl);
+        const panel = document.getElementById("panel");
+        let current = null, dismissed = null;
+        function fillPanel(d) {
+          document.getElementById("p-kick").textContent = d.kick;
+          document.getElementById("p-title").textContent = d.title;
+          document.getElementById("p-text").textContent = d.text;
+          document.getElementById("p-facts").innerHTML = d.facts.map((f) => "<li>" + f + "</li>").join("");
+          document.getElementById("p-tip").textContent = d.tip || "";
+          document.getElementById("p-tip").hidden = !d.tip;
+          document.getElementById("p-cta").textContent = d.cta;
+        }
+        document.getElementById("p-x").addEventListener("click", () => { dismissed = current; });
+        document.getElementById("p-next").addEventListener("click", () => { const i = DEST.indexOf(current); travel(DEST[(i + 1) % DEST.length]); });
+        document.getElementById("p-cta").addEventListener("click", (e) => e.preventDefault());
+        const list = document.getElementById("list");
+        document.getElementById("l-items").innerHTML = DEST.map((d, i) => "<li><button type=\"button\" data-i=\"" + i + "\"><b>" + d.icon + " " + d.name + "</b><span>" + d.text + "</span></button></li>").join("");
+        list.addEventListener("click", (e) => { const b = e.target.closest("[data-i]"); if (b) { closeList(); travel(DEST[+b.dataset.i]); } });
+        function openList() { list.hidden = false; list.querySelector("button").focus(); }
+        function closeList() { list.hidden = true; }
+        document.getElementById("l-close").addEventListener("click", closeList);
+        document.getElementById("lst").addEventListener("click", openList);
+        document.getElementById("skip").addEventListener("click", (e) => { e.preventDefault(); openList(); });
+        document.getElementById("zin").addEventListener("click", toClose);
+        document.getElementById("zout").addEventListener("click", toMap);
+        const hint = document.getElementById("hint");
+
+        // MARK: Input
+        const keys = {};
+        addEventListener("keydown", (e) => {
+          if (e.key === "Escape") { if (!list.hidden) closeList(); else toMap(); return; }
+          if (!list.hidden || e.target.closest && e.target.closest("button, a") && e.key === " ") return;
+          if (e.key === "m" || e.key === "M") { zoom > 0.5 ? toMap() : toClose(); return; }
+          const k = e.key.toLowerCase();
+          if (["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright", "shift"].includes(k)) { keys[k] = true; if (k.startsWith("arrow")) e.preventDefault(); }
+        });
+        addEventListener("keyup", (e) => { keys[e.key.toLowerCase()] = false; });
+        addEventListener("blur", () => { for (const k in keys) keys[k] = false; });
+        const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hit = new THREE.Vector3();
+        let down = null;
+        canvas.addEventListener("pointerdown", (e) => { down = { x: e.clientX, y: e.clientY }; });
+        canvas.addEventListener("pointerup", (e) => {
+          if (!down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6 || busy()) return;
+          ndc.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+          ray.setFromCamera(ndc, camera);
+          if (!ray.ray.intersectPlane(plane, hit)) return;
+          if (zoom < 0.5) { const [x, z] = findFree(hit.x, hit.z); placeAt(x, z); dismissed = null; zoomTo(1, 1300); }
+          else if (zoom > 0.98) { target = new THREE.Vector2(hit.x, hit.z); tgt.position.set(hit.x, 0.2, hit.z); tgt.visible = true; }
+        });
+        let wheelAcc = 0;
+        canvas.addEventListener("wheel", (e) => {
+          e.preventDefault(); if (busy()) return;
+          wheelAcc += e.deltaY;
+          if (wheelAcc < -60) { wheelAcc = 0; toClose(); } else if (wheelAcc > 60) { wheelAcc = 0; toMap(); }
+        }, { passive: false });
+
+        // MARK: Resize
+        // Portrait screens turn the map 90 degrees so the long river runs down the screen; the zoom turns it back.
+        let mapH = 400;
+        const UP_MAP = new THREE.Vector3(0, 0, -1), UP_CLOSE = new THREE.Vector3(0, 1, 0);
+        function resize() {
+          renderer.setSize(innerWidth, innerHeight, false);
+          camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+          const k = 2 * Math.tan(THREE.MathUtils.degToRad(12));
+          const portrait = camera.aspect < 0.85, ex = W.maxX - W.minX, ez = W.maxZ - W.minZ;
+          const vExt = portrait ? ex : ez, hExt = portrait ? ez : ex;
+          mapH = Math.max((vExt * 1.06) / k, (hExt * 1.04) / (k * camera.aspect));
+          UP_MAP.set(portrait ? 1 : 0, 0, portrait ? 0 : -1);
+        }
+        addEventListener("resize", resize); resize();
+
+        // MARK: Loop
+        const MAPC = new THREE.Vector3(0, 0, (W.minZ + W.maxZ) / 2);
+        const v = new THREE.Vector3(), look = new THREE.Vector3();
+        function screen(x, y, z) { v.set(x, y, z).project(camera); return { x: (v.x * 0.5 + 0.5) * innerWidth, y: (-v.y * 0.5 + 0.5) * innerHeight, front: v.z < 1 }; }
+        function place(el, p, s, o) {
+          el.style.transform = "translate(" + p.x.toFixed(1) + "px," + p.y.toFixed(1) + "px) translate(-50%,-50%) scale(" + s.toFixed(3) + ")";
+          el.style.opacity = p.front ? o.toFixed(3) : 0;
+          if (el.classList.contains("mk")) el.style.pointerEvents = p.front && o > 0.3 ? "auto" : "none";
+        }
+        const clock = new THREE.Clock();
+        let walkT = 0, lastHint = "";
+        function frame() {
+          requestAnimationFrame(frame);
+          const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+          if (tween) {
+            const p = clamp((performance.now() - tween.t0) / tween.ms, 0, 1);
+            zoom = lerp(tween.from, tween.to, ease(p));
+            if (p >= 1) { const d = tween.done; tween = null; if (d) d(); }
+          }
+          // Movement, only in the close-up.
+          let mx = 0, mz = 0, moving = false;
+          if (zoom > 0.98 && !busy()) {
+            mx = (keys.d || keys.arrowright ? 1 : 0) - (keys.a || keys.arrowleft ? 1 : 0);
+            mz = (keys.s || keys.arrowdown ? 1 : 0) - (keys.w || keys.arrowup ? 1 : 0);
+            if (mx || mz) { target = null; tgt.visible = false; }
+            else if (target) { mx = target.x - pos.x; mz = target.y - pos.y; if (Math.hypot(mx, mz) < 0.5) { target = null; tgt.visible = false; mx = mz = 0; } }
+            const len = Math.hypot(mx, mz);
+            if (len > 0) {
+              const sp = (keys.shift ? 26 : 15) * dt, dx = (mx / len) * sp, dz = (mz / len) * sp;
+              let moved = false;
+              if (!blocked(pos.x + dx, pos.y)) { pos.x += dx; moved = true; }
+              if (!blocked(pos.x, pos.y + dz)) { pos.y += dz; moved = true; }
+              if (!moved && target) { target = null; tgt.visible = false; }
+              heading = Math.atan2(dx, dz); moving = moved;
+            }
+          }
+          me.position.set(pos.x, 0, pos.y);
+          let dh = heading - body.rotation.y; dh = Math.atan2(Math.sin(dh), Math.cos(dh)); body.rotation.y += dh * Math.min(1, dt * 12);
+          walkT += moving ? dt * 12 : 0; body.position.y = moving ? Math.abs(Math.sin(walkT)) * 0.18 : 0;
+          follow.lerp(v.set(pos.x, 0, pos.y), 1 - Math.exp(-dt * 6));
+          // Pads change the product's material.
+          pads.forEach((p) => { if (Math.hypot(pos.x - p.x, pos.y - p.z) < 2.1) objMat.color.lerp(p.c, 1 - Math.exp(-dt * 5)); });
+          anim.forEach((f) => f(t, dt));
+
+          // Camera: from straight above (map) to behind the visitor (close-up).
+          const z = zoom, wxz = 1 - Math.pow(1 - z, 3);
+          const h = Math.exp(lerp(Math.log(mapH), Math.log(15), z));
+          camera.position.set(lerp(MAPC.x, follow.x, wxz), h, lerp(MAPC.z, follow.z, wxz) + 20 * z * z + 0.001);
+          look.set(lerp(MAPC.x, follow.x, wxz), lerp(0, 1.6, z), lerp(MAPC.z, follow.z, wxz));
+          camera.up.copy(UP_MAP).lerp(UP_CLOSE, z).normalize();
+          camera.lookAt(look);
+          camera.fov = lerp(24, 52, z); camera.updateProjectionMatrix();
+          city.scale.y = lerp(0.04, 1, smooth(0.25, 0.95, z));
+          scene.background.copy(SEA).lerp(SKY, smooth(0.3, 0.9, z));
+          scene.fog.color.copy(scene.background); scene.fog.near = lerp(4000, 70, smooth(0.4, 1, z)); scene.fog.far = lerp(9000, 190, smooth(0.4, 1, z));
+          const ds = lerp(mapH / 95, 0.75, smooth(0, 0.8, z)); dot.scale.setScalar(ds); halo.scale.setScalar(ds);
+          body.visible = z > 0.4; body.scale.setScalar(smooth(0.4, 0.8, z) || 0.001);
+          renderer.render(scene, camera);
+
+          // Overlays follow the same camera.
+          const mapUi = 1 - smooth(0, 0.35, z);
+          DEST.forEach((d) => {
+            const lift = lerp(0.5, d.h * city.scale.y + 4, z);
+            const p = screen(d.pos[0], lift, d.pos[1]);
+            const dist = Math.hypot(pos.x - d.pos[0], pos.y - d.pos[1]);
+            const o = z < 0.5 ? 1 : clamp(1.4 - dist / 110, 0, 1);
+            place(d.mk, p, lerp(1, 0.85, z), o);
+            const lp = { x: p.x, y: p.y - 58, front: p.front }; place(d.dl, lp, 1, mapUi);
+          });
+          const ra = screen(-40, 0, zc(-40)), rb = screen(40, 0, zc(40)), rp = screen(-6, 0, zc(-6));
+          let ang = Math.atan2(rb.y - ra.y, rb.x - ra.x) * 180 / Math.PI; if (ang > 90) ang -= 180; if (ang < -90) ang += 180;
+          river.style.transform = "translate(" + rp.x + "px," + rp.y + "px) translate(-50%,-50%) rotate(" + ang.toFixed(1) + "deg)"; river.style.opacity = mapUi;
+          place(youLbl, (function () { const p = screen(pos.x, 0, pos.y); p.x += 64; return p; })(), 1, mapUi);
+          document.getElementById("ttl").style.opacity = 0.35 + 0.65 * mapUi;
+          document.getElementById("leg").style.opacity = mapUi;
+          document.getElementById("zin").disabled = z > 0.5; document.getElementById("zout").disabled = z < 0.5;
+          canvas.style.cursor = z < 0.5 ? "zoom-in" : "pointer";
+
+          // Arriving at a place opens its panel.
+          let near = null;
+          if (z > 0.98) { let bd = 1e9; DEST.forEach((d) => { const dd = Math.hypot(pos.x - d.spawn[0], pos.y - (d.spawn[1] - 4)); if (dd < bd) { bd = dd; near = d; } }); if (bd > 16) near = null; }
+          if (near !== current) {
+            current = near; if (near) { fillPanel(near); history.replaceState(null, "", "#" + near.id); }
+            DEST.forEach((d) => d.chip.setAttribute("aria-current", d === near ? "true" : "false"));
+          }
+          panel.classList.toggle("open", !!current && current !== dismissed);
+          const hTxt = z < 0.5 ? "Klicka på en plats för att åka dit, eller var som helst på kartan för att gå ner." : "Gå: WASD, piltangenterna eller klicka på marken · Shift springer · M eller − visar kartan";
+          if (hTxt !== lastHint) { hint.textContent = hTxt; lastHint = hTxt; }
+        }
+        requestAnimationFrame(frame);
+
+        // Deep links: #film, #3d, #tools, #studio, #contact open straight at that place.
+        const start = DEST.find((d) => "#" + d.id === location.hash);
+        if (start) { placeAt(start.spawn[0], start.spawn[1], Math.PI); zoom = 1; }
+      })();
+    </script>
+  </body>
+</html>
