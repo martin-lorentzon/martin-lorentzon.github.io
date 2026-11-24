@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Direction Feedback Tags</title>
+    <!-- Internal tool for the founder: the ten round 4 concepts, each with its tags beside it.
+         Generated from visual-directions-v4.html. Picks are kept in this browser only. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400..700&family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet" />
+    <style>
+      :root { --bg: #f4f4f2; --surface: #ffffff; --ink: #17181a; --muted: #5d6066; --line: #dcdcd8; --focus: #1d5fd1; }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) { --bg: #121315; --surface: #1b1c1f; --ink: #ececea; --muted: #a3a6ad; --line: #2e3034; --focus: #7aa7ff; }
+      }
+      :root[data-theme="dark"] { --bg: #121315; --surface: #1b1c1f; --ink: #ececea; --muted: #a3a6ad; --line: #2e3034; --focus: #7aa7ff; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 "Archivo", system-ui, sans-serif; }
+      a { color: inherit; }
+      a:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+      .wrap { max-width: 1180px; margin: 0 auto; padding: 48px 16px 96px; }
+      @media (min-width: 720px) { .wrap { padding: 64px 32px 120px; } }
+      header.top h1 { font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.02; letter-spacing: -0.02em; margin: 0 0 12px; font-weight: 800; font-variation-settings: "wdth" 112; }
+      header.top p { max-width: 64ch; color: var(--muted); margin: 0 0 8px; }
+      h2.part { font-size: 1.5rem; margin: 64px 0 16px; letter-spacing: -0.01em; }
+      .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+      .card ul { margin: 0; padding-left: 1.1em; } .card li { margin: 6px 0; }
+      .dir { margin-top: 48px; }
+      .dir-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin-bottom: 14px; }
+      .dir-head h3 { margin: 0; font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -0.01em; }
+      .dir-head .tag { color: var(--muted); }
+      .rec { display: inline-block; font-size: 0.8rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--ink); color: var(--bg); }
+      .idea { font-size: 1.15rem; max-width: 70ch; margin: 0 0 20px; }
+      .mock { border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; position: relative; border: 1px solid var(--line); }
+      @media (max-width: 640px) { .mock { aspect-ratio: 4 / 5; } }
+      .spec { display: grid; gap: 16px; margin-top: 20px; }
+      @media (min-width: 860px) { .spec { grid-template-columns: repeat(2, 1fr); } }
+      .spec h4 { margin: 0 0 6px; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+      .spec p { margin: 0; }
+      .swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+      .sw { display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; width: 78px; }
+      .sw i { display: block; height: 44px; border-radius: 8px; border: 1px solid var(--line); }
+      .sw b { font-weight: 600; }
+      .sw span { font-family: "JetBrains Mono", monospace; color: var(--muted); }
+      .refs a { margin-right: 14px; }
+      .scores { font-family: "JetBrains Mono", monospace; font-size: 0.9rem; }
+      .mono { font-family: "JetBrains Mono", monospace; }
+
+      
+      /* ---------- Review layout and tags ---------- */
+      :root { --yes: #136f3a; --yes-bg: #dcf3e4; --no: #a3221b; --no-bg: #fbe1df; }
+      @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --yes: #7fe0a4; --yes-bg: #173a25; --no: #ff9c94; --no-bg: #43201d; } }
+      :root[data-theme="dark"] { --yes: #7fe0a4; --yes-bg: #173a25; --no: #ff9c94; --no-bg: #43201d; }
+      .wrap { max-width: 1440px; padding-bottom: 140px; }
+      .jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; }
+      .jump a { font-size: 0.9rem; padding: 6px 12px; min-height: 36px; display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; text-decoration: none; background: var(--surface); }
+      .jump a .n { opacity: 0.7; margin-left: 4px; font-size: 0.8rem; }
+      .review { display: grid; gap: 20px; margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--line); scroll-margin-top: 8px; }
+      @media (min-width: 1000px) {
+        .review { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+        .tagbox { position: sticky; top: 16px; max-height: calc(100vh - 110px); overflow-y: auto; }
+      }
+      .round { margin: 0 0 4px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+      .show-dir { margin-top: 0; }
+      .tagbox { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px 22px; }
+      .tagbox h3 { margin: 0; font-size: 1.05rem; }
+      fieldset { border: 0; padding: 0; margin: 18px 0 0; }
+      legend { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; margin-bottom: 8px; padding: 0; }
+      .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+      .tagbox .tag { font: inherit; font-size: 0.88rem; padding: 5px 10px; min-height: 34px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; }
+      .tagbox .tag[data-state="yes"] { background: var(--yes-bg); color: var(--yes); border-color: var(--yes); }
+      .tagbox .tag[data-state="yes"]::before { content: "+ "; font-weight: 700; }
+      .tagbox .tag[data-state="no"] { background: var(--no-bg); color: var(--no); border-color: var(--no); text-decoration: line-through; }
+      .tagbox .tag[data-state="no"]::before { content: "− "; font-weight: 700; }
+      .rating { display: flex; gap: 6px; flex-wrap: wrap; }
+      .rating button { font: inherit; width: 44px; height: 40px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; }
+      .rating button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+      textarea { width: 100%; min-height: 84px; font: inherit; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); resize: vertical; }
+      button:focus-visible, textarea:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+      .overall { margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--line); }
+      .bar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--line); padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; z-index: 3; }
+      .bar button { font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px; border-radius: 10px; border: 1px solid var(--ink); background: var(--ink); color: var(--bg); cursor: pointer; }
+      .bar button.ghost { background: transparent; color: var(--ink); }
+      .bar .status { font-size: 0.9rem; color: var(--muted); min-width: 12ch; }
+      #out { margin-top: 28px; }
+      #out[hidden] { display: none; }
+      #out textarea { min-height: 260px; font-family: ui-monospace, Consolas, monospace; font-size: 0.85rem; }
+
+      /* ---------- Mock D: One full turn ---------- */
+      .mD { background: radial-gradient(120% 85% at 50% 0%, #f2efea, #dcd7cf 70%, #cdc7bd); color: #141414; font-family: "Archivo", sans-serif; container-type: inline-size; }
+      .mD .deg { position: absolute; left: 4%; top: 5%; margin: 0; font-weight: 900; font-variation-settings: "wdth" 125; font-size: 17cqi; line-height: 0.8; letter-spacing: -0.05em; }
+      .mD .deg span { color: #2340c8; }
+      .mD .orbit { position: absolute; left: 50%; bottom: 7%; width: 60%; aspect-ratio: 3.4; transform: translateX(-50%); border: 1px solid #14141438; border-radius: 50%; }
+      .mD .orbit::after { content: ""; position: absolute; right: -0.8cqi; top: 50%; width: 1.6cqi; aspect-ratio: 1; border-radius: 50%; background: #2340c8; transform: translateY(-50%); }
+      .mD .plate { position: absolute; left: 50%; bottom: 13%; width: 36%; aspect-ratio: 3.3; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, #c4bdb2, #a8a094 75%, #8f877b); }
+      .mD .obj { position: absolute; left: 50%; bottom: 19%; width: 13%; aspect-ratio: 0.6; transform: translateX(-50%); border-radius: 44% 44% 10% 10% / 30% 30% 6% 6%; background: linear-gradient(90deg, #121212, #4c4c4c 22%, #222 48%, #6a6a6a 70%, #191919); }
+      .mD .obj::after { content: ""; position: absolute; left: 58%; top: 18%; width: 22%; bottom: 14%; border-radius: 40%; background: linear-gradient(90deg, #0b0b0b, #2e2e2e); }
+      .mD .stops { position: absolute; right: 4%; top: 6%; margin: 0; padding: 0; list-style: none; font: 400 clamp(0.55rem, 1.25cqi, 0.9rem)/2 "JetBrains Mono", monospace; text-align: right; color: #14141499; }
+      .mD .stops b { color: #2340c8; font-weight: 600; }
+      .mD .cap { position: absolute; left: 4%; bottom: 7%; max-width: 30%; margin: 0; font-size: clamp(0.7rem, 1.6cqi, 1.1rem); line-height: 1.3; }
+      .mD .cap b { display: block; font-weight: 800; font-variation-settings: "wdth" 112; font-size: 1.35em; }
+      @container (max-width: 520px) {
+        .mD .deg { font-size: 26cqi; } .mD .stops { top: auto; bottom: 4%; font-size: 2.6cqi; }
+        .mD .cap { top: 30%; bottom: auto; max-width: 60%; font-size: 3.6cqi; } .mD .obj { width: 22%; bottom: 26%; } .mD .plate { width: 62%; bottom: 21%; } .mD .orbit { width: 90%; bottom: 17%; }
+      }
+
+      /* ---------- Mock E: The box ---------- */
+      .mE { background: radial-gradient(90% 70% at 50% 35%, #232325, #0c0c0d 75%); color: #efebe4; font-family: "Inter Tight", sans-serif; container-type: inline-size; }
+      .mE .hint { position: absolute; left: 4%; top: 5%; font: 400 clamp(0.55rem, 1.1cqi, 0.8rem)/1 "JetBrains Mono", monospace; color: #8c877f; }
+      .mE .lid { position: absolute; left: 20%; right: 20%; top: 3%; height: 27%; background: linear-gradient(180deg, #232325, #161617); border: 1px solid #2f2f31; border-radius: 6px; transform: perspective(900px) rotateX(48deg); display: grid; place-items: center; }
+      .mE .lid span { font-family: "Instrument Serif", serif; font-size: 3.6cqi; letter-spacing: 0.42em; color: #c8a96a; }
+      .mE .base { position: absolute; left: 12%; right: 12%; top: 38%; bottom: 7%; background: #19191a; border: 1px solid #2c2c2e; border-radius: 8px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 3%; padding: 3%; }
+      .mE .cut { border-radius: 12px; background: radial-gradient(80% 80% at 50% 40%, #0a0a0b, #121213 70%, #1c1c1d); display: grid; place-items: center; align-content: center; gap: 1.2cqi; text-align: center; }
+      .mE .cut small { font-size: clamp(0.6rem, 1.4cqi, 0.95rem); letter-spacing: 0.08em; text-transform: uppercase; color: #c8a96a; }
+      .mE .cut em { display: block; font-style: normal; color: #8c877f; font-size: clamp(0.5rem, 1.05cqi, 0.8rem); letter-spacing: 0; text-transform: none; margin-top: 2px; }
+      .mE .reel { width: 8cqi; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #19191a 0 14%, #d9d4cb 15% 22%, transparent 23%), conic-gradient(#d9d4cb 0 40deg, #8f8a82 0 120deg, #d9d4cb 0 160deg, #8f8a82 0 240deg, #d9d4cb 0 280deg, #8f8a82 0); }
+      .mE .cube { width: 8cqi; aspect-ratio: 1; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: conic-gradient(from -60deg at 50% 50%, #ece7dd 0 120deg, #6a655d 0 240deg, #aaa398 0); }
+      .mE .nut { width: 8cqi; aspect-ratio: 1; clip-path: polygon(25% 4%, 75% 4%, 100% 50%, 75% 96%, 25% 96%, 0 50%); background: radial-gradient(circle, #121213 0 26%, #c9c3b8 27% 34%, #9a948a 35%); }
+      .mE .note { position: absolute; right: 5%; top: 30%; width: 20%; aspect-ratio: 1.45; background: #efebe4; color: #1a1918; transform: rotate(7deg); border-radius: 3px; padding: 1.4cqi; font-family: "Instrument Serif", serif; font-style: italic; font-size: clamp(0.65rem, 1.7cqi, 1.15rem); line-height: 1.15; }
+      .mE .note b { display: block; font-style: normal; font-weight: 400; margin-top: 0.6em; }
+      @container (max-width: 520px) {
+        .mE .lid { left: 8%; right: 8%; top: 8%; height: 16%; } .mE .lid span { font-size: 5.4cqi; }
+        .mE .base { left: 6%; right: 6%; top: 32%; bottom: 20%; } .mE .reel, .mE .cube, .mE .nut { width: 13cqi; }
+        .mE .cut small { font-size: 2.6cqi; } .mE .cut em { display: none; }
+        .mE .note { top: auto; bottom: 3%; right: auto; left: 8%; width: 60%; aspect-ratio: auto; transform: rotate(-2deg); font-size: 3.6cqi; padding: 2.5cqi; }
+      }
+
+      /* ---------- Mock F: The sentence ---------- */
+      .mF { background: #f3efe7; color: #1b1a17; font-family: "Newsreader", serif; container-type: inline-size; }
+      .mF .to { position: absolute; left: 6%; top: 7%; font: 400 clamp(0.55rem, 1.15cqi, 0.8rem)/1 "JetBrains Mono", monospace; color: #6d685f; letter-spacing: 0.04em; }
+      .mF .s { position: absolute; left: 6%; right: 40%; top: 13%; margin: 0; font-weight: 400; font-size: 4.5cqi; line-height: 1.13; letter-spacing: -0.01em; }
+      .mF .s u { text-decoration: none; font-style: italic; color: #2b4cc4; border-bottom: 0.22cqi solid #2b4cc4; white-space: nowrap; }
+      .mF .s u::after { content: " ▾"; font-size: 0.45em; vertical-align: 0.35em; font-style: normal; }
+      .mF .pv { position: absolute; right: 6%; top: 11%; width: 27%; aspect-ratio: 4 / 5; border-radius: 4px; background: radial-gradient(40% 32% at 50% 56%, #fbf8f2, #cfc7b8 60%, transparent 61%), linear-gradient(180deg, #e2dbcf, #bdb4a4); }
+      .mF .pv span { position: absolute; left: 0; top: 102%; font: 400 clamp(0.5rem, 1.05cqi, 0.75rem)/1.4 "JetBrains Mono", monospace; color: #6d685f; white-space: nowrap; }
+      .mF .reply { position: absolute; left: 6%; right: 40%; bottom: 9%; margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 1.6cqi 2.4cqi; }
+      .mF .reply p { margin: 0; flex: 1 1 22cqi; font-size: clamp(0.7rem, 1.6cqi, 1.1rem); line-height: 1.35; }
+      .mF .reply p i { display: block; font: 400 clamp(0.5rem, 1.05cqi, 0.75rem)/1.6 "JetBrains Mono", monospace; font-style: normal; color: #6d685f; }
+      .mF .send { font: 600 clamp(0.6rem, 1.4cqi, 1rem)/1 "Inter Tight", sans-serif; background: #1b1a17; color: #f3efe7; padding: 1.3cqi 2.2cqi; border-radius: 999px; white-space: nowrap; }
+      @container (max-width: 520px) { .mF .s { right: 6%; font-size: 7.4cqi; top: 14%; } .mF .pv { display: none; } .mF .reply { right: 6%; } .mF .reply p { font-size: 3.6cqi; flex-basis: 100%; } .mF .send { font-size: 3.6cqi; padding: 3cqi 5cqi; } .mF .to { font-size: 2.6cqi; } }
+
+      /* ---------- Mock G: Photo or 3D ---------- */
+      .mG { background: #f7f6f3; color: #121212; font-family: "Inter Tight", sans-serif; container-type: inline-size; }
+      .mG h5 { position: absolute; left: 0; right: 0; top: 6%; margin: 0; text-align: center; font-weight: 700; font-size: 4.2cqi; letter-spacing: -0.03em; line-height: 1; }
+      .mG h5 span { display: block; font-weight: 400; color: #77746e; font-size: 0.5em; letter-spacing: 0; margin-top: 0.6em; }
+      .mG .pair { position: absolute; left: 10%; right: 10%; top: 25%; bottom: 20%; display: grid; grid-template-columns: 1fr 1fr; gap: 3%; }
+      .mG .ph { position: relative; border-radius: 4px; background: linear-gradient(180deg, #e9e6e0 0 64%, #d8d3ca 64%); overflow: hidden; }
+      .mG .ph::before { content: ""; position: absolute; left: 34%; bottom: 22%; width: 32%; aspect-ratio: 0.78; border-radius: 30% 30% 18% 18% / 40% 40% 12% 12%; background: radial-gradient(60% 55% at 35% 30%, #fbfaf7, #d6d0c6 55%, #8d867b); }
+      .mG .ph::after { content: ""; position: absolute; left: 63%; bottom: 40%; width: 9%; aspect-ratio: 0.5; border: 1.2cqi solid #c9c2b7; border-left: 0; border-radius: 0 50% 50% 0; }
+      .mG .ph.b::before { left: 30%; background: radial-gradient(60% 55% at 60% 28%, #fbfaf7, #d3cdc2 55%, #857e73); }
+      .mG .ph.b { background: linear-gradient(180deg, #e4e1db 0 61%, #d1ccc2 61%); outline: 0.3cqi solid #121212; outline-offset: 0.6cqi; }
+      .mG .ph b { position: absolute; left: 3%; top: 3%; font: 600 clamp(0.6rem, 1.4cqi, 1rem)/1 "JetBrains Mono", monospace; }
+      .mG .verdict { position: absolute; left: 50%; bottom: 6%; transform: translateX(-50%); background: #121212; color: #f7f6f3; border-radius: 999px; padding: 1.1cqi 2.4cqi; font-size: clamp(0.6rem, 1.45cqi, 1rem); white-space: nowrap; }
+      .mG .verdict i { display: inline-block; width: 0.6em; height: 0.6em; border-radius: 50%; background: #3fbf74; margin-right: 0.6em; }
+      @container (max-width: 520px) { .mG h5 { font-size: 7cqi; top: 7%; } .mG .pair { left: 5%; right: 5%; top: 26%; bottom: 22%; } .mG .verdict { font-size: 3cqi; padding: 2.4cqi 4cqi; } .mG .ph b { font-size: 3cqi; } }
+
+      /* ---------- Mock H: The sample kit ---------- */
+      .mH { background: linear-gradient(180deg, #e6e2db, #d2cdc4); color: #161616; font-family: "Archivo", sans-serif; container-type: inline-size; }
+      .mH h5 { position: absolute; left: 5%; top: 7%; margin: 0; font-weight: 800; font-variation-settings: "wdth" 100; font-size: 4.2cqi; line-height: 0.98; letter-spacing: -0.03em; max-width: 40%; }
+      .mH .lamp { position: absolute; left: 58%; top: 10%; width: 22%; height: 58%; }
+      .mH .shade { position: absolute; left: 0; right: 0; top: 0; height: 46%; border-radius: 50% 50% 4% 4% / 92% 92% 4% 4%; background: linear-gradient(100deg, #6f4c2d, #ac8253 32%, #d4ad7e 48%, #94693f 78%, #5e3f24); }
+      .mH .stem { position: absolute; left: 48%; width: 4%; top: 46%; bottom: 8%; background: #2a2a2a; }
+      .mH .foot { position: absolute; left: 18%; right: 18%; bottom: 0; height: 10%; border-radius: 50%; background: linear-gradient(180deg, #3a3a3a, #161616); }
+      .mH .call { position: absolute; left: 82%; top: 16%; font: 400 clamp(0.5rem, 1.05cqi, 0.75rem)/1.5 "JetBrains Mono", monospace; color: #55524c; max-width: 16%; border-left: 1px solid #16161660; padding-left: 1cqi; }
+      .mH .kit { position: absolute; left: 5%; right: 5%; bottom: 6%; display: flex; gap: 2.2cqi; align-items: flex-end; }
+      .mH .chip { width: 9cqi; display: flex; flex-direction: column; gap: 0.8cqi; font: 400 clamp(0.5rem, 1.05cqi, 0.75rem)/1.2 "JetBrains Mono", monospace; color: #3e3b36; }
+      .mH .chip i { display: block; aspect-ratio: 0.72; border-radius: 1cqi; -webkit-mask: radial-gradient(circle at 50% 14%, transparent 0 0.8cqi, #000 0.85cqi); mask: radial-gradient(circle at 50% 14%, transparent 0 0.8cqi, #000 0.85cqi); }
+      .mH .chip.lift { position: absolute; left: 40%; top: 34%; transform: rotate(-12deg); }
+      .mH .slot i { border: 1.5px dashed #16161670; -webkit-mask: none; mask: none; }
+      .mH .oak i { background: linear-gradient(100deg, #6f4c2d, #ac8253 32%, #d4ad7e 48%, #94693f 78%); }
+      .mH .alu i { background: repeating-linear-gradient(90deg, #b9bdc1 0 0.3cqi, #a9adb2 0.3cqi 0.6cqi), linear-gradient(#c9cdd1, #8e9297); background-blend-mode: multiply; }
+      .mH .felt i { background: radial-gradient(#6b776f 1px, transparent 1.5px) 0 0/0.6cqi 0.6cqi, #59655d; }
+      .mH .coat i { background: linear-gradient(160deg, #2a2c30, #15171a); }
+      .mH .glass i { background: linear-gradient(160deg, #fbfcfc, #dfe5e8 60%, #c8d2d6); }
+      @container (max-width: 520px) { .mH h5 { font-size: 7cqi; max-width: 80%; } .mH .lamp { left: 30%; top: 26%; width: 40%; height: 40%; } .mH .call { display: none; } .mH .chip { width: 15cqi; font-size: 2.3cqi; } .mH .kit { gap: 3cqi; } .mH .chip.lift { left: 12%; top: 40%; } }
+
+      /* ---------- Mock J: Powers of ten ---------- */
+      .mJ { background: repeating-linear-gradient(0deg, #ffffff08 0 1px, transparent 1px 4cqi), repeating-linear-gradient(90deg, #ffffff08 0 1px, transparent 1px 4cqi), #0e1116; color: #e8ecef; font-family: "Archivo", sans-serif; container-type: inline-size; }
+      .mJ .f { position: absolute; border: 1px solid #e8ecef30; }
+      .mJ .f span { position: absolute; left: 0.8cqi; top: 0.6cqi; font: 400 clamp(0.45rem, 1cqi, 0.72rem)/1 "JetBrains Mono", monospace; color: #8b96a1; white-space: nowrap; }
+      .mJ .f1 { inset: 6% 8%; } .mJ .f2 { inset: 16% 22%; } .mJ .f3 { inset: 26% 33%; } .mJ .f4 { inset: 35% 41%; border-color: #e6e1a1; }
+      .mJ .f4 span { color: #e6e1a1; }
+      .mJ .f5 { inset: 41% 46%; overflow: hidden; background: repeating-linear-gradient(118deg, #c5ccd2 0 0.5cqi, #59626b 0.5cqi 1cqi, #2a3037 1cqi 1.4cqi); border: 0; }
+      .mJ h5 { position: absolute; left: 4%; bottom: 7%; margin: 0; font-weight: 900; font-variation-settings: "wdth" 125; font-size: 4.6cqi; line-height: 0.92; letter-spacing: -0.03em; }
+      .mJ .exp { position: absolute; right: 4%; top: 5%; font: 400 5.4cqi/1 "JetBrains Mono", monospace; color: #e6e1a1; }
+      .mJ .exp sup { font-size: 0.5em; }
+      .mJ .bar { position: absolute; right: 4%; bottom: 8%; width: 14cqi; border-bottom: 1px solid #e8ecef; height: 1.2cqi; border-left: 1px solid #e8ecef; border-right: 1px solid #e8ecef; }
+      .mJ .bar span { position: absolute; right: 0; bottom: 140%; font: 400 clamp(0.5rem, 1.05cqi, 0.75rem)/1 "JetBrains Mono", monospace; white-space: nowrap; }
+      @container (max-width: 520px) { .mJ h5 { font-size: 8cqi; bottom: 14%; } .mJ .exp { font-size: 9cqi; } .mJ .bar { width: 24cqi; bottom: 5%; } .mJ .f span { font-size: 2.2cqi; } .mJ .f1 { inset: 18% 6% 30%; } .mJ .f2 { inset: 26% 18% 38%; } .mJ .f3 { inset: 32% 30% 44%; } .mJ .f4 { inset: 37% 38% 49%; } .mJ .f5 { inset: 40% 43% 52%; } }
+
+      /* ---------- Mock K: Right now ---------- */
+      .mK { background: #f1eee8; color: #1d1c1a; font-family: "Newsreader", serif; container-type: inline-size; }
+      .mK .live { position: absolute; left: 5%; top: 8%; font: 400 clamp(0.5rem, 1.1cqi, 0.8rem)/1 "JetBrains Mono", monospace; letter-spacing: 0.05em; color: #57544e; }
+      .mK .live i { display: inline-block; width: 0.75em; height: 0.75em; border-radius: 50%; background: #1f8a4c; margin-right: 0.7em; vertical-align: -0.05em; }
+      .mK .now { position: absolute; left: 5%; right: 52%; top: 15%; margin: 0; font-weight: 400; font-size: 3.9cqi; line-height: 1.1; letter-spacing: -0.01em; }
+      .mK .now em { color: #6d6a63; }
+      .mK .prog { position: absolute; left: 5%; right: 52%; top: 60%; }
+      .mK .prog .t { height: 0.5cqi; background: #d7d2c8; }
+      .mK .prog .t i { display: block; width: 43%; height: 100%; background: #1d1c1a; }
+      .mK .prog span { display: block; margin-top: 1cqi; font: 400 clamp(0.5rem, 1.05cqi, 0.75rem)/1.5 "JetBrains Mono", monospace; color: #57544e; }
+      .mK .free { position: absolute; left: 5%; right: 52%; bottom: 8%; margin: 0; font-size: clamp(0.65rem, 1.5cqi, 1.05rem); line-height: 1.35; border-top: 1px solid #1d1c1a30; padding-top: 1.4cqi; }
+      .mK .rend { position: absolute; left: 53%; right: 5%; top: 8%; bottom: 8%; border-radius: 3px; overflow: hidden; background: radial-gradient(30% 22% at 50% 62%, #8a6a4c, #5b4330 70%, transparent 71%), radial-gradient(70% 50% at 45% 30%, #f6efe2, #cdbda4 60%, #9c8a70); }
+      .mK .rend .todo { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, #1d1c1a22 0 1px, transparent 1px 20%), repeating-linear-gradient(90deg, #1d1c1a22 0 1px, transparent 1px 12.5%), #dcd7cd; clip-path: polygon(0 60%, 62.5% 60%, 62.5% 40%, 100% 40%, 100% 100%, 0 100%); }
+      .mK .rend .bucket { position: absolute; left: 50%; top: 40%; width: 12.5%; height: 20%; border: 1.5px solid #1d1c1a; }
+      @container (max-width: 520px) { .mK .now { right: 5%; font-size: 6.4cqi; top: 14%; } .mK .rend { left: 5%; top: 50%; bottom: 26%; } .mK .prog { right: 5%; top: auto; bottom: 18%; } .mK .free { right: 5%; bottom: 3%; font-size: 3cqi; } .mK .live { font-size: 2.4cqi; } .mK .prog span { font-size: 2.4cqi; } }
+
+      /* ---------- Mock L: The catalogue ---------- */
+      .mL { background: #e7e1d7; color: #1a1a1a; font-family: "Inter Tight", sans-serif; container-type: inline-size; }
+      .mL .mast { position: absolute; left: 4%; right: 4%; top: 4%; display: flex; justify-content: space-between; font-size: clamp(0.55rem, 1.2cqi, 0.85rem); border-bottom: 1px solid #1a1a1a; padding-bottom: 1cqi; }
+      .mL .mast b { font-weight: 600; }
+      .mL .grid { position: absolute; left: 4%; right: 4%; top: 13%; bottom: 5%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.4cqi; }
+      .mL .art { display: flex; flex-direction: column; gap: 0.8cqi; font-size: clamp(0.5rem, 1.1cqi, 0.8rem); line-height: 1.4; }
+      .mL .im { flex: 1; border-radius: 2px; background: linear-gradient(180deg, #f2eee7, #ddd6ca); position: relative; }
+      .mL .im::before { content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -45%); }
+      .mL .a1 .im::before { width: 34%; aspect-ratio: 0.62; border-radius: 44% 44% 10% 10% / 30% 30% 6% 6%; background: linear-gradient(90deg, #262626, #5b5b5b 30%, #202020 60%, #3c3c3c); }
+      .mL .a2 .im::before { width: 40%; aspect-ratio: 1; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: conic-gradient(from -60deg at 50% 50%, #faf7f1 0 120deg, #8c8478 0 240deg, #c4bbad 0); }
+      .mL .a3 .im::before { width: 36%; aspect-ratio: 1; clip-path: polygon(25% 4%, 75% 4%, 100% 50%, 75% 96%, 25% 96%, 0 50%); background: radial-gradient(circle, #ddd6ca 0 26%, #9b958b 27% 34%, #6e6960 35%); }
+      .mL .no { font-family: "JetBrains Mono", monospace; color: #6c665d; }
+      .mL h6 { margin: 0; font-size: 2.2cqi; font-weight: 600; letter-spacing: -0.02em; line-height: 1; }
+      .mL .sp { color: #4a463f; min-height: 2.8em; }
+      .mL .pr { border-top: 1px solid #1a1a1a40; padding-top: 0.6cqi; display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; }
+      @container (max-width: 520px) { .mL .grid { grid-template-columns: 1fr; grid-template-rows: 1fr auto auto; gap: 3cqi; } .mL .art { font-size: 2.8cqi; } .mL .a2 .im, .mL .a3 .im, .mL .a2 .sp, .mL .a3 .sp, .mL .a2 .pr, .mL .a3 .pr { display: none; } .mL h6 { font-size: 6cqi; } .mL .a2, .mL .a3 { flex-direction: row; gap: 3cqi; align-items: baseline; border-top: 1px solid #1a1a1a40; padding-top: 2cqi; } .mL .a2 h6, .mL .a3 h6 { font-size: 4.4cqi; } .mL .mast { font-size: 2.6cqi; } .mL .mast span:last-child { display: none; } }
+
+      /* ---------- Mock M: The colour chart ---------- */
+      .mM { background: #151515; color: #f0f0ee; font-family: "Archivo", sans-serif; container-type: inline-size; }
+      .mM .chart { position: absolute; left: 5%; right: 5%; top: 6%; bottom: 19%; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(4, 1fr); gap: 1.1cqi; }
+      .mM .chart i { border-radius: 0.8cqi; position: relative; }
+      .mM .chart i.p { outline: 0.3cqi solid #f0f0ee; outline-offset: 0.3cqi; z-index: 1; }
+      .mM .chart i.w { background: radial-gradient(34% 40% at 50% 58%, #f4f1ec, #a49e95 70%, transparent 72%), linear-gradient(180deg, #627a9d, #33435c) !important; }
+      .mM .chart i.w2 { background: radial-gradient(38% 30% at 50% 60%, #d9dde6, #6a72a8 70%, transparent 72%), linear-gradient(180deg, #383d96, #1c1f55) !important; }
+      .mM .chart i.w3 { background: radial-gradient(28% 36% at 50% 56%, #ffffff, #b5b5b5 70%, transparent 72%), linear-gradient(180deg, #e9e9e7, #b9b9b7) !important; }
+      .mM .chart i span { position: absolute; left: 0.8cqi; bottom: 0.6cqi; font: 400 clamp(0.45rem, 0.95cqi, 0.7rem)/1 "JetBrains Mono", monospace; color: #ffffffb0; mix-blend-mode: difference; }
+      .mM h5 { position: absolute; left: 5%; bottom: 6%; margin: 0; font-weight: 800; font-variation-settings: "wdth" 62; font-size: 5.2cqi; line-height: 0.9; letter-spacing: -0.01em; text-transform: uppercase; }
+      .mM .lab { position: absolute; right: 5%; bottom: 6%; text-align: right; font: 400 clamp(0.5rem, 1.1cqi, 0.8rem)/1.5 "JetBrains Mono", monospace; color: #a5a5a2; }
+      @container (max-width: 520px) { .mM .chart { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(6, 1fr); bottom: 24%; gap: 1.8cqi; } .mM h5 { font-size: 9cqi; bottom: 9%; } .mM .lab { font-size: 2.4cqi; bottom: 3%; left: 5%; text-align: left; } .mM .chart i span { font-size: 2cqi; } }
+
+      /* ---------- Mock N: On your table ---------- */
+      .mN { background: #ebe7e0; color: #171615; font-family: "Bricolage Grotesque", sans-serif; container-type: inline-size; }
+      .mN .room { position: absolute; left: 0; top: 0; bottom: 0; width: 62%; background: linear-gradient(180deg, #cfc8bd 0 58%, transparent 58%), linear-gradient(180deg, #a67b52, #7e5937); overflow: hidden; }
+      .mN .room::before { content: ""; position: absolute; left: 8%; top: 10%; width: 22%; height: 38%; background: linear-gradient(160deg, #f4efe6, #ddd5c7); border: 0.6cqi solid #b9b0a2; }
+      .mN .obj { position: absolute; left: 46%; bottom: 33%; width: 15%; aspect-ratio: 0.95; border-radius: 50% 50% 46% 46% / 56% 56% 44% 44%; background: radial-gradient(60% 55% at 38% 30%, #7f8a8f, #3d464b 55%, #1d2326); }
+      .mN .obj::after { content: ""; position: absolute; left: 22%; right: 22%; top: 30%; height: 36%; border-radius: 50%; background: repeating-radial-gradient(circle, #1d2326 0 0.25cqi, #2f373b 0.25cqi 0.5cqi); }
+      .mN .ret { position: absolute; left: 41%; bottom: 29%; width: 25%; aspect-ratio: 3.4; border-radius: 50%; border: 0.25cqi dashed #ffffffcc; }
+      .mN .cam { position: absolute; inset: 6%; background: linear-gradient(#fff, #fff) 0 0/3cqi 0.25cqi, linear-gradient(#fff, #fff) 0 0/0.25cqi 3cqi, linear-gradient(#fff, #fff) 100% 0/3cqi 0.25cqi, linear-gradient(#fff, #fff) 100% 0/0.25cqi 3cqi, linear-gradient(#fff, #fff) 0 100%/3cqi 0.25cqi, linear-gradient(#fff, #fff) 0 100%/0.25cqi 3cqi, linear-gradient(#fff, #fff) 100% 100%/3cqi 0.25cqi, linear-gradient(#fff, #fff) 100% 100%/0.25cqi 3cqi; background-repeat: no-repeat; }
+      .mN .side { position: absolute; left: 66%; right: 5%; top: 9%; bottom: 9%; display: flex; flex-direction: column; justify-content: space-between; }
+      .mN h5 { margin: 0; font-weight: 800; font-size: 4.6cqi; line-height: 0.95; letter-spacing: -0.035em; }
+            .mN .qr { width: 15cqi; aspect-ratio: 1; display: block; }
+      .mN p { margin: 0; font-size: clamp(0.65rem, 1.45cqi, 1rem); line-height: 1.35; }
+      .mN .btn { display: none; }
+      @container (max-width: 520px) { .mN .room { width: 100%; } .mN .side { left: 6%; right: 6%; top: 5%; bottom: 5%; } .mN h5 { font-size: 9cqi; color: #171615; } .mN .qr, .mN p { display: none; } .mN .btn { display: block; align-self: center; font: 700 3.8cqi/1 "Bricolage Grotesque", sans-serif; background: #171615; color: #ebe7e0; padding: 3.4cqi 6cqi; border-radius: 999px; } .mN .obj { left: 38%; width: 26%; } .mN .ret { left: 30%; width: 42%; } .mN .room::before { display: none; } }
+    
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <h1>Tag round 4</h1>
+        <p>All directions on one page, each with its tags beside it (below it on a phone). Click a tag once to mark it true (green, +), again to mark it wrong for us (red, −), a third time to clear it. Add a score and a note if you like, then press <b>Copy feedback</b> and paste the result back to me. Your picks stay in this browser, so you can stop and come back.</p>
+        <nav class="jump" aria-label="Jump to a direction" id="jump"></nav>
+      </header>
+
+      <article class="review" id="dir-D">
+        <div class="show"><p class="round">Round 4</p>
+        <section class="dir show-dir" aria-labelledby="d-title">
+        <div class="dir-head"><h3 id="d-title">D. Varvet</h3><span class="tag">One full turn. The whole page is a turntable</span></div>
+        <p class="idea">One product stands on a turntable for the whole visit. Scrolling turns it, and the page is exactly one revolution: 0° is the welcome, 90° film, 180° interactive 3D, 270° tools, 360° contact. A huge degree number is the only heading, and the menu is a list of angles. Every studio shows its work on a turntable; this site is one.</p>
+        <div class="mock mD" role="img" aria-label="Mock of direction D: a dark product on a turntable in a warm grey studio, a huge '90°' with a blue degree sign at top left, a list of angles as the menu on the right, and the caption 'Produktfilm'.">
+          <p class="deg">90<span>°</span></p>
+          <ul class="stops"><li>0° Hej</li><li><b>90° Produktfilm</b></li><li>180° Interaktiv 3D</li><li>270° Verktyg</li><li>360° Kontakt</li></ul>
+          <div class="orbit"></div><div class="plate"></div><div class="obj"></div>
+          <p class="cap"><b>Produktfilm</b>Från CAD-filer till färdig lansering, innan prototypen finns.</p>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#e8e4de"></i><b>Studio</b><span>#E8E4DE</span></div>
+            <div class="sw"><i style="background:#a8a094"></i><b>Plate</b><span>#A8A094</span></div>
+            <div class="sw"><i style="background:#141414"></i><b>Ink</b><span>#141414</span></div>
+            <div class="sw"><i style="background:#2340c8"></i><b>Degree blue</b><span>#2340C8</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:Archivo;font-weight:900;font-variation-settings:'wdth' 125">Archivo Expanded 900</b> for the degree number, the one heading; Archivo 400 for text; <span class="mono">JetBrains Mono</span> for the angle menu.</p></div>
+          <div><h4>Composition &amp; immersion</h4><p>The product is pinned in the centre for the whole page and never leaves; only the copy, the angle and the light change. Each quarter turn shows the side that proves the service: the face for film, the open hatch for interactive 3D, the underside with its parts for tools. Motion verb: <i>turn</i>.</p></div>
+          <div><h4>What it carries over</h4><p>90° product film from CAD; 180° the four interactive features (configurations, points of interest, moving parts, AR) shown on the same object; 270° Blender add-ons and pipelines; 360° Martin's short call, quote and check-ins. Case studies each get their own turntable.</p></div>
+          <div><h4>What people remember</h4><p>"The site that's one full turn." The degree number makes the scroll position something you can name and link to (lorentzon.se/#180).</p></div>
+          <div><h4>Risk</h4><p>One object has to carry the whole story, so it must be a strong model. Reduced motion shows four still angles.</p></div>
+          <div><h4>Scores</h4><p class="scores">Memorable 5 · Fit 5 · Buildable 4 · Portable 3</p></div>
+        </div>
+      </section></div>
+        <aside class="tagbox" data-dir="D" aria-label="Tags for direction D"></aside>
+      </article>
+
+      <article class="review" id="dir-E">
+        <div class="show"><p class="round">Round 4</p>
+        <section class="dir show-dir" aria-labelledby="e-title">
+        <div class="dir-head"><h3 id="e-title">E. Asken</h3><span class="tag">The box. The site arrives like a premium product</span></div>
+        <p class="idea">The first thing you see is a closed, matte black box with the name foiled in gold. Scrolling lifts the lid. Inside, three pieces sit in cut foam: the services, presented the way a high-end product is presented. Tucked in the lid is a card from Martin. It shows clients the experience their own customers could have, before a word is said.</p>
+        <div class="mock mE" role="img" aria-label="Mock of direction E: an opened matte black box with LORENTZON in gold on the lifted lid, three foam cut-outs holding a film reel, a cube and a hex nut labelled Film, Interaktiv 3D and Verktyg, and a cream card reading 'Tack för att du öppnade. Martin'.">
+          <span class="hint">scrolla för att lyfta locket</span>
+          <div class="lid"><span>LORENTZON</span></div>
+          <div class="base">
+            <div class="cut"><div class="reel"></div><small>Film<em>produktfilm &amp; animation</em></small></div>
+            <div class="cut"><div class="cube"></div><small>Interaktiv 3D<em>i webbläsaren, utan app</em></small></div>
+            <div class="cut"><div class="nut"></div><small>Verktyg<em>Blender-tillägg &amp; pipelines</em></small></div>
+          </div>
+          <div class="note">Tack för att du öppnade. Ta upp den del du kom för.<b>Martin</b></div>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#0c0c0d"></i><b>Box</b><span>#0C0C0D</span></div>
+            <div class="sw"><i style="background:#19191a"></i><b>Foam</b><span>#19191A</span></div>
+            <div class="sw"><i style="background:#c8a96a"></i><b>Foil</b><span>#C8A96A</span></div>
+            <div class="sw"><i style="background:#efebe4"></i><b>Card</b><span>#EFEBE4</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><span style="font-family:'Instrument Serif';font-size:1.2em">Instrument Serif</span> for the foiled name and the card, <span style="font-family:'Inter Tight'">Inter Tight</span> for everything else. Small, wide-spaced capitals, like packaging.</p></div>
+          <div><h4>Composition &amp; immersion</h4><p>A top-down still life in real-time 3D. Lifting a piece out of the foam opens that service: the reel unspools into a film, the cube unfolds into a configurator, the nut turns and a tool starts. Putting it back closes it. Motion verb: <i>lift</i>.</p></div>
+          <div><h4>What it carries over</h4><p>The three services, each as a physical object. The card carries About in Martin's voice (self-taught, Yrgo, the car industry, teaching). The box's base lists the FAQ like a spec label: STEP or IGES files, a couple of weeks for simpler jobs, SMS or e-mail.</p></div>
+          <div><h4>What people remember</h4><p>"I unboxed their website." Unboxing is something buyers of physical products already care about.</p></div>
+          <div><h4>Risk</h4><p>Gold on black can tip into luxury cliché; the foil must stay small and matte. Fits product clients better than medical ones.</p></div>
+          <div><h4>Scores</h4><p class="scores">Memorable 5 · Fit 4 · Buildable 3 · Portable 3</p></div>
+        </div>
+      </section></div>
+        <aside class="tagbox" data-dir="E" aria-label="Tags for direction E"></aside>
+      </article>
+
+      <article class="review" id="dir-F">
+        <div class="show"><p class="round">Round 4</p>
+        <section class="dir show-dir" aria-labelledby="f-title">
+        <div class="dir-head"><h3 id="f-title">F. Meningen</h3><span class="tag">The sentence. The brief is one line you finish</span></div>
+        <p class="idea">The front page is a sentence addressed to Martin with blanks to fill: "Hi Martin, I have a new product and need a film for the launch in March." Every blank is a menu. As you change it, the example beside it changes to real work that fits, and Martin's usual answer appears underneath. Press send and the sentence arrives as a text or an e-mail. A conversation, not a sales page.</p>
+        <div class="mock mF" role="img" aria-label="Mock of direction F: a large serif sentence 'Hej Martin, jag har en ny produkt och behöver en film till lanseringen i mars' with the three blanks underlined in blue, an example image on the right, Martin's typical answer below and a black 'Skicka meningen' button.">
+          <span class="to">TILL: MARTIN LORENTZON, GÖTEBORG</span>
+          <p class="s">Hej Martin, jag har <u>en ny produkt</u> och behöver <u>en produktfilm</u> till <u>lanseringen i mars</u>.</p>
+          <div class="pv"><span>exempel · lanseringsfilm, 40 s</span></div>
+          <div class="reply"><p><i>MARTIN SVARAR OFTAST</i>Ett par veckor för en enklare film. Skicka STEP- eller IGES-filer, så ringer jag dig.</p><span class="send">Skicka meningen →</span></div>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#f3efe7"></i><b>Paper</b><span>#F3EFE7</span></div>
+            <div class="sw"><i style="background:#1b1a17"></i><b>Ink</b><span>#1B1A17</span></div>
+            <div class="sw"><i style="background:#2b4cc4"></i><b>Fountain blue</b><span>#2B4CC4</span></div>
+            <div class="sw"><i style="background:#6d685f"></i><b>Pencil</b><span>#6D685F</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><span style="font-family:Newsreader;font-size:1.15em">Newsreader</span> at large size for the sentence, italic for the blanks; <span class="mono">JetBrains Mono</span> for small labels; Inter Tight for the button.</p></div>
+          <div><h4>Composition &amp; immersion</h4><p>Almost nothing on screen but one sentence, so the blanks are impossible to miss. The immersion is personal rather than visual: you are writing to someone. Each choice re-cuts the page below it (the cases, the FAQ answers, the time estimate). Motion verb: <i>fill in</i>.</p></div>
+          <div><h4>What it carries over</h4><p>The blanks are today's services and use cases: "a product film / an interactive 3D viewer / a configurator / a Blender tool / an animation for teaching". Martin's answers come straight from today's FAQ: a short call, a quote, check-ins; STEP or IGES; a couple of weeks; SMS or e-mail.</p></div>
+          <div><h4>What people remember</h4><p>"You just finish a sentence to Martin." The most direct path from landing to contact of all ten.</p></div>
+          <div><h4>Risk</h4><p>Quiet visually, so the showpiece has to come right after. Every blank must stay keyboard- and screen-reader-friendly (real select menus).</p></div>
+          <div><h4>Scores</h4><p class="scores">Memorable 4 · Fit 5 · Buildable 5 · Portable 5</p></div>
+        </div>
+      </section></div>
+        <aside class="tagbox" data-dir="F" aria-label="Tags for direction F"></aside>
+      </article>
+
+      <article class="review" id="dir-G">
+        <div class="show"><p class="round">Round 4</p>
+        <section class="dir show-dir" aria-labelledby="g-title">
+        <div class="dir-head"><h3 id="g-title">G. Foto eller 3D?</h3><span class="tag">Photo or 3D? The visitor guesses, and is wrong</span></div>
+        <p class="idea">The site opens with two images side by side and one line: "One of these is a photo. Which?" You pick one. Both are renders, and the counter says how many people guessed wrong before you. A few rounds follow, each from a different field: a product, a medical device, an interior. Proof of quality in the first 5 seconds, without a single adjective.</p>
+        <div class="mock mG" role="img" aria-label="Mock of direction G: the heading 'Ett av dem är ett foto. Vilket?', two near-identical images of a ceramic jug labelled A and B with B selected, and a black pill reading 'Båda är 3D. 71 % gissar fel.'">
+          <h5>Ett av dem är ett foto.<span>Vilket?</span></h5>
+          <div class="pair"><div class="ph"><b>A</b></div><div class="ph b"><b>B</b></div></div>
+          <span class="verdict"><i></i>Båda är 3D. 71 % gissar fel.</span>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#f7f6f3"></i><b>Gallery</b><span>#F7F6F3</span></div>
+            <div class="sw"><i style="background:#121212"></i><b>Ink</b><span>#121212</span></div>
+            <div class="sw"><i style="background:#77746e"></i><b>Muted</b><span>#77746E</span></div>
+            <div class="sw"><i style="background:#3fbf74"></i><b>Correct</b><span>#3FBF74</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><span style="font-family:'Inter Tight';font-weight:700">Inter Tight</span> 700 for the question, 400 for text, mono for the round counter. Neutral on purpose: the images do the talking.</p></div>
+          <div><h4>Composition &amp; immersion</h4><p>Strict symmetry: two frames, one question, one answer. After the reveal, the "photo" turns slowly to show it was 3D all along, then becomes an interactive viewer. Motion verb: <i>reveal</i>.</p></div>
+          <div><h4>What it carries over</h4><p>Round 1 product film still, round 2 an education or medical animation frame, round 3 a configurator (the reveal turns it into a live one). Then: "This is what I do. A short call, then a quote."</p></div>
+          <div><h4>What people remember</h4><p>"I got fooled by their homepage." People share a test they failed.</p></div>
+          <div><h4>Risk</h4><p>Your tags marked "gimmicky" against round 2's popcorn; this is a game too, so it lives or dies on how serious the images are. It needs truly photoreal work, and the counter must be real.</p></div>
+          <div><h4>Scores</h4><p class="scores">Memorable 5 · Fit 4 · Buildable 4 · Portable 4</p></div>
+        </div>
+      </section></div>
+        <aside class="tagbox" data-dir="G" aria-label="Tags for direction G"></aside>
+      </article>
+
+      <article class="review" id="dir-H">
+        <div class="show"><p class="round">Round 4</p>
+        <section class="dir show-dir" aria-labelledby="h-title">
+        <div class="dir-head"><h3 id="h-title">H. Provbitarna</h3><span class="tag">The sample kit. Drag a material onto the product</span></div>
+        <p class="idea">At the bottom of the first screen sits a row of real-looking material samples, the kind designers carry: oak, brushed aluminium, wool felt, black powder coat, opal glass. Drag one onto the product and it changes, live, in the browser. The visitor has used a configurator before they've read what one is.</p>
+        <div class="mock mH" role="img" aria-label="Mock of direction H: a table lamp with an oak shade, the heading 'Dra ett material till lampan.', and a row of five punched material samples along the bottom, one lifted towards the lamp with the label 'dra hit'.">
+          <h5>Dra ett material till lampan.</h5>
+          <div class="lamp"><div class="shade"></div><div class="stem"></div><div class="foot"></div></div>
+          <span class="chip oak lift"><i></i><b>Ek → dra hit</b></span>
+          <span class="call">Konfigurator. I din egen sajt, utan app.</span>
+          <div class="kit">
+            <span class="chip slot"><i></i>Ek</span>
+            <span class="chip alu"><i></i>Aluminium</span>
+            <span class="chip felt"><i></i>Ullfilt</span>
+            <span class="chip coat"><i></i>Pulverlack</span>
+            <span class="chip glass"><i></i>Opalglas</span>
+          </div>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#e2ded7"></i><b>Studio</b><span>#E2DED7</span></div>
+            <div class="sw"><i style="background:#161616"></i><b>Ink</b><span>#161616</span></div>
+            <div class="sw"><i style="background:#ac8253"></i><b>Oak</b><span>#AC8253</span></div>
+            <div class="sw"><i style="background:#59655d"></i><b>Felt</b><span>#59655D</span></div>
+            <div class="sw"><i style="background:#b9bdc1"></i><b>Alu</b><span>#B9BDC1</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:Archivo;font-weight:800">Archivo 800</b> at normal width for headings, <span class="mono">JetBrains Mono</span> for sample labels, like a printed tag.</p></div>
+          <div><h4>Composition &amp; immersion</h4><p>Product above, samples below, like a desk in a design studio. The palette of the whole page shifts with the chosen material (warm with oak, cool with aluminium). Motion verb: <i>drag</i>. On phones, tap a sample.</p></div>
+          <div><h4>What it carries over</h4><p>Configurations first, then points of interest (tap the switch), moving parts (tilt the shade) and AR (put the lamp in your room). Film and tools follow as "the same lamp, as a film" and "the add-on that made the samples".</p></div>
+          <div><h4>What people remember</h4><p>"The site where you drag the oak onto the lamp." Hands-on in the first 3 seconds.</p></div>
+          <div><h4>Risk</h4><p>Leans on interactive 3D more than film and tools. The product shown should change between visits so it doesn't read as a lamp company.</p></div>
+          <div><h4>Scores</h4><p class="scores">Memorable 5 · Fit 5 · Buildable 4 · Portable 3</p></div>
+        </div>
+      </section></div>
+        <aside class="tagbox" data-dir="H" aria-label="Tags for direction H"></aside>
+      </article>
+
+      <article class="review" id="dir-J">
+        <div class="show"><p class="round">Round 4</p>
+        <section class="dir show-dir" aria-labelledby="j-title">
+        <div class="dir-head"><h3 id="j-title">J. Tiopotenser</h3><span class="tag">Powers of ten. One zoom from Gothenburg to a screw thread</span></div>
+        <p class="idea">The page is one continuous zoom. It starts high above Gothenburg and every scroll step is ten times closer: the city, the studio, the desk, the product, a screw in the product, the thread of that screw. A scale bar in the corner counts down from 10 km to 1 mm. It says what renders are about: detail, at every scale, from someone who is from somewhere.</p>
+        <div class="mock mJ" role="img" aria-label="Mock of direction J: nested frames on a dark grid labelled from 10 km Göteborg down to 1 mm gängan, the innermost showing a machined screw thread, the exponent '10⁻³ m' top right, a scale bar, and the heading 'Från Göteborg till gängan.'">
+          <div class="f f1"><span>10 km · Göteborg</span></div>
+          <div class="f f2"><span>10 m · studion</span></div>
+          <div class="f f3"><span>1 m · skrivbordet</span></div>
+          <div class="f f4"><span>10 cm · produkten</span></div>
+          <div class="f f5"></div>
+          <span class="exp">10<sup>−3</sup> m</span>
+          <h5>Från Göteborg<br />till gängan.</h5>
+          <div class="bar"><span>1 mm</span></div>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#0e1116"></i><b>Night</b><span>#0E1116</span></div>
+            <div class="sw"><i style="background:#e8ecef"></i><b>Ink</b><span>#E8ECEF</span></div>
+            <div class="sw"><i style="background:#8b96a1"></i><b>Grid</b><span>#8B96A1</span></div>
+            <div class="sw"><i style="background:#e6e1a1"></i><b>Measure</b><span>#E6E1A1</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:Archivo;font-weight:900;font-variation-settings:'wdth' 125">Archivo Expanded 900</b> for the few headings; <span class="mono">JetBrains Mono</span> carries the scale, which is the real navigation.</p></div>
+          <div><h4>Composition &amp; immersion</h4><p>Always centred, always zooming in; you never scroll sideways or back out until the end, where one pull zooms all the way back to the city. Each scale stop holds one section. Motion verb: <i>zoom</i>.</p></div>
+          <div><h4>What it carries over</h4><p>10 m: About, in the studio. 1 m: tools on the desk (Blender add-ons, pipelines). 10 cm: the product, interactive (configure, open it). 1 cm: a technical animation of the mechanism, the kind made for education and medicine. 1 mm: "Detaljer som syns innan prototypen finns."</p></div>
+          <div><h4>What people remember</h4><p>"The zoom from Gothenburg into a screw." The scale bar gives a free, unusual way to name every section.</p></div>
+          <div><h4>Risk</h4><p>One unbroken zoom is heavy to build and to load; it needs a scale-by-scale loading plan. A well-known film idea (Eames, 1977), so the execution has to be its own.</p></div>
+          <div><h4>Scores</h4><p class="scores">Memorable 5 · Fit 4 · Buildable 2 · Portable 3</p></div>
+        </div>
+      </section></div>
+        <aside class="tagbox" data-dir="J" aria-label="Tags for direction J"></aside>
+      </article>
+
+      <article class="review" id="dir-K">
+        <div class="show"><p class="round">Round 4</p>
+        <section class="dir show-dir" aria-labelledby="k-title">
+        <div class="dir-head"><h3 id="k-title">K. Just nu</h3><span class="tag">Right now. The front page is the studio, live</span></div>
+        <p class="idea">The first screen says what Martin is doing right now: "Rendering scene 3 of 7 for a Swedish furniture maker." Beside it, a render fills in tile by tile, the way renders really do. There's a real progress bar and the week he is free next. No agency would dare; a one-person studio can, and it's the most personal and honest thing on the list.</p>
+        <div class="mock mK" role="img" aria-label="Mock of direction K: a live status line 'Just nu i studion', a large serif sentence about rendering scene 3 of 7 for a Swedish furniture maker, a progress bar at frame 412 of 960, a note 'Ledig för nya projekt från vecka 50', and a render on the right that is half filled in, tile by tile.">
+          <span class="live"><i></i>JUST NU I STUDION · TIS 24 NOV · 14:32</span>
+          <p class="now">Renderar scen 3 av 7 till en produktfilm för en svensk möbeltillverkare. <em>Musiken är för hög.</em></p>
+          <div class="prog"><div class="t"><i></i></div><span>bildruta 412 / 960 · klar ca 18:10</span></div>
+          <p class="free">Ledig för nya projekt från vecka 50. Svarar på SMS samma dag.</p>
+          <div class="rend"><div class="todo"></div><div class="bucket"></div></div>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#f1eee8"></i><b>Paper</b><span>#F1EEE8</span></div>
+            <div class="sw"><i style="background:#1d1c1a"></i><b>Ink</b><span>#1D1C1A</span></div>
+            <div class="sw"><i style="background:#dcd7cd"></i><b>Unrendered</b><span>#DCD7CD</span></div>
+            <div class="sw"><i style="background:#1f8a4c"></i><b>Live</b><span>#1F8A4C</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><span style="font-family:Newsreader;font-size:1.15em">Newsreader</span> for the status sentence (it reads like a diary), <span class="mono">JetBrains Mono</span> for time, frames and status.</p></div>
+          <div><h4>Composition &amp; immersion</h4><p>A desk-diary split: words left, the render right. Immersion comes from time, not space: come back tomorrow and the page has moved on. Below the fold, finished work as usual. Motion verb: <i>fill in</i>.</p></div>
+          <div><h4>What it carries over</h4><p>The status rotates through the three services as the work does (a film, a configurator, a Blender tool). About is the log history ("this year: 14 films, 3 configurators, 2 add-ons"). Availability and "SMS or e-mail" answer the FAQ before it's asked.</p></div>
+          <div><h4>What people remember</h4><p>"His site tells you what he's rendering right now." It gives a reason to come back.</p></div>
+          <div><h4>Risk</h4><p>Needs a feed Martin keeps up with no effort, ideally fed by the render queue itself. Client work must stay anonymous unless allowed. Stale status is worse than none.</p></div>
+          <div><h4>Scores</h4><p class="scores">Memorable 4 · Fit 4 · Buildable 3 · Portable 5</p></div>
+        </div>
+      </section></div>
+        <aside class="tagbox" data-dir="K" aria-label="Tags for direction K"></aside>
+      </article>
+
+      <article class="review" id="dir-L">
+        <div class="show"><p class="round">Round 4</p>
+        <section class="dir show-dir" aria-labelledby="l-title">
+        <div class="dir-head"><h3 id="l-title">L. Katalogen</h3><span class="tag">The catalogue. Services presented like design objects</span></div>
+        <p class="idea">The site is laid out like a Nordic furniture catalogue: numbered articles, each shot on a seamless backdrop, with a short spec underneath. The difference is what's for sale: No. 01 Product film, No. 02 Interactive 3D, No. 03 Tools. Every service gets a clear spec (what you send, what you get, how long it takes), so a buyer understands the offer as easily as a chair.</p>
+        <div class="mock mL" role="img" aria-label="Mock of direction L: a catalogue page on sand-coloured paper with a masthead 'Katalog 2027', three numbered articles on seamless backdrops: No. 01 Produktfilm, No. 02 Interaktiv 3D, No. 03 Verktyg, each with a short spec and 'Pris efter ett kort samtal'.">
+          <div class="mast"><b>Lorentzon Visualisation</b><span>Katalog 2027</span><span>Formgivet i Göteborg</span></div>
+          <div class="grid">
+            <div class="art a1"><div class="im"></div><span class="no">No. 01</span><h6>Produktfilm</h6><span class="sp">Från CAD eller skiss. Film och stillbilder innan prototypen finns.</span><span class="pr"><span>Ett par veckor</span><span>Pris efter ett kort samtal</span></span></div>
+            <div class="art a2"><div class="im"></div><span class="no">No. 02</span><h6>Interaktiv 3D</h6><span class="sp">Konfigurationer, intressepunkter, rörliga delar, AR. I din egen sajt.</span><span class="pr"><span>Webbläsare, ingen app</span><span>Pris efter ett kort samtal</span></span></div>
+            <div class="art a3"><div class="im"></div><span class="no">No. 03</span><h6>Verktyg</h6><span class="sp">Blender-tillägg, pipelines och parametriska modeller.</span><span class="pr"><span>Sparar timmar per vecka</span><span>Pris efter ett kort samtal</span></span></div>
+          </div>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#e7e1d7"></i><b>Sand</b><span>#E7E1D7</span></div>
+            <div class="sw"><i style="background:#f2eee7"></i><b>Seamless</b><span>#F2EEE7</span></div>
+            <div class="sw"><i style="background:#1a1a1a"></i><b>Ink</b><span>#1A1A1A</span></div>
+            <div class="sw"><i style="background:#6c665d"></i><b>Caption</b><span>#6C665D</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><span style="font-family:'Inter Tight';font-weight:600">Inter Tight</span> 600 for article names and 400 for specs, with tabular figures; <span class="mono">JetBrains Mono</span> for article numbers.</p></div>
+          <div><h4>Composition &amp; immersion</h4><p>A strict print grid with lots of air, like a page you'd keep. Each article opens to a full-bleed spread with the work in real-time 3D on the same seamless backdrop. The quietest of the ten; the immersion is in the spreads. Motion verb: <i>turn the page</i>.</p></div>
+          <div><h4>What it carries over</h4><p>All three services with today's wording, plus the FAQ as specs: files accepted (STEP, IGES), lead time (a couple of weeks for simpler jobs), how it works (a short call, a quote, check-ins). Add-ons for Blender appear as products with real prices. About is the designer's page at the back.</p></div>
+          <div><h4>What people remember</h4><p>"They sell 3D like furniture." Clear in 3 seconds, and the most Nordic of the ten.</p></div>
+          <div><h4>Risk</h4><p>Can tip into "too safe" if the spreads aren't strong. Showing prices or not is your call; the mock says "price after a short call", as today's FAQ does.</p></div>
+          <div><h4>Scores</h4><p class="scores">Memorable 3 · Fit 5 · Buildable 5 · Portable 4</p></div>
+        </div>
+      </section></div>
+        <aside class="tagbox" data-dir="L" aria-label="Tags for direction L"></aside>
+      </article>
+
+      <article class="review" id="dir-M">
+        <div class="show"><p class="round">Round 4</p>
+        <section class="dir show-dir" aria-labelledby="m-title">
+        <div class="dir-head"><h3 id="m-title">M. Färgkartan</h3><span class="tag">The colour chart. A calibration card as the grid</span></div>
+        <p class="idea">The work page is laid out as the 24-patch colour chart that photographers and render artists use to check colour. Each patch is a project, tinted to its patch colour until you point at it, when it shows in full. Clients see a beautiful grid of colour; anyone who works with images sees someone who cares about getting colour right.</p>
+        <div class="mock mM" role="img" aria-label="Mock of direction M: a dark page with a 6 by 4 grid of colour-chart patches, three of them outlined and showing product renders, the heading 'Rätt färg. Varje gång.' and the label 'Patch 13 · Produktfilm, medicinteknik'.">
+          <div class="chart">
+            <i style="background:#735244"><span>01</span></i><i style="background:#c29682"><span>02</span></i><i class="p w" style="background:#627a9d"><span>03</span></i><i style="background:#576c43"><span>04</span></i><i style="background:#8580b1"><span>05</span></i><i style="background:#67bdaa"><span>06</span></i>
+            <i style="background:#d67e2c"><span>07</span></i><i style="background:#505ba6"><span>08</span></i><i style="background:#c15a63"><span>09</span></i><i style="background:#5e3c6c"><span>10</span></i><i style="background:#9dbc40"><span>11</span></i><i style="background:#e0a32e"><span>12</span></i>
+            <i class="p w2" style="background:#383d96"><span>13</span></i><i style="background:#469449"><span>14</span></i><i style="background:#af363c"><span>15</span></i><i style="background:#e7c71f"><span>16</span></i><i style="background:#bb5695"><span>17</span></i><i style="background:#0885a1"><span>18</span></i>
+            <i style="background:#f3f3f2"><span>19</span></i><i class="p w3" style="background:#c8c8c8"><span>20</span></i><i style="background:#a0a0a0"><span>21</span></i><i style="background:#7a7a79"><span>22</span></i><i style="background:#555555"><span>23</span></i><i style="background:#343434"><span>24</span></i>
+          </div>
+          <h5>Rätt färg. Varje gång.</h5>
+          <span class="lab">Patch 13 · Produktfilm, medicinteknik<br />Peka på en ruta för att se arbetet</span>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#151515"></i><b>Board</b><span>#151515</span></div>
+            <div class="sw"><i style="background:#f0f0ee"></i><b>Ink</b><span>#F0F0EE</span></div>
+            <div class="sw"><i style="background:#383d96"></i><b>Patch 13</b><span>#383D96</span></div>
+            <div class="sw"><i style="background:#627a9d"></i><b>Patch 03</b><span>#627A9D</span></div>
+            <div class="sw"><i style="background:#c8c8c8"></i><b>Patch 20</b><span>#C8C8C8</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:Archivo;font-weight:800;font-variation-settings:'wdth' 62;text-transform:uppercase">Archivo Condensed 800</b>, uppercase, the narrow end of the same family as A's wide type; <span class="mono">JetBrains Mono</span> for patch numbers.</p></div>
+          <div><h4>Composition &amp; immersion</h4><p>The chart is the whole first screen and the whole work index. Choosing a patch floods the page with its colour and opens the project inside it. The chart's six greys at the bottom hold tools and About. Motion verb: <i>flood</i>.</p></div>
+          <div><h4>What it carries over</h4><p>Each project is filed under the patch closest to its main colour, so films, configurators and medical animations mix on one grid. The grey row carries Blender tools ("calibrated tools") and Martin. The FAQ sits on the back of the card.</p></div>
+          <div><h4>What people remember</h4><p>"The colour-chart portfolio." A grid you could print as a poster, and a quiet in-joke for Blender add-on buyers.</p></div>
+          <div><h4>Risk</h4><p>Lots of colour, including one orange patch (07); the chart has to keep its real colours or the idea fails. Needs at least 12 projects to feel full.</p></div>
+          <div><h4>Scores</h4><p class="scores">Memorable 4 · Fit 4 · Buildable 4 · Portable 4</p></div>
+        </div>
+      </section></div>
+        <aside class="tagbox" data-dir="M" aria-label="Tags for direction M"></aside>
+      </article>
+
+      <article class="review" id="dir-N">
+        <div class="show"><p class="round">Round 4</p>
+        <section class="dir show-dir" aria-labelledby="n-title">
+        <div class="dir-head"><h3 id="n-title">N. På ditt bord</h3><span class="tag">On your table. The site starts in the visitor's room</span></div>
+        <p class="idea">On a phone, the first button opens the camera and puts the product on your own table, in AR, straight from the browser. On a computer, the hero is that same moment shown on a rendered table, with a code to scan. Everything else on the site follows from "it's already in your room". AR is the most surprising thing today's site offers, so it goes first.</p>
+        <div class="mock mN" role="img" aria-label="Mock of direction N: a camera view of an oak table with a dark product standing on a dashed AR placement ring, camera corner brackets, and on the right the heading 'Ställ den på ditt bord.', a QR code and the text 'Peka med mobilen. AR direkt i webbläsaren, utan app.'">
+          <div class="room"><div class="cam"></div><div class="ret"></div><div class="obj"></div></div>
+          <div class="side"><h5>Ställ den på<br />ditt bord.</h5><span class="btn">Öppna kameran</span><svg class="qr" viewBox="-1 -1 23 23" aria-hidden="true"><rect x="-1" y="-1" width="23" height="23" fill="#ebe7e0"/><path fill="#171615" fill-rule="evenodd" d="M8 0h1v1h-1zM10 0h1v1h-1zM11 0h1v1h-1zM9 1h1v1h-1zM11 2h1v1h-1zM12 2h1v1h-1zM10 3h1v1h-1zM12 3h1v1h-1zM10 4h1v1h-1zM8 6h1v1h-1zM9 6h1v1h-1zM11 6h1v1h-1zM12 6h1v1h-1zM8 7h1v1h-1zM9 7h1v1h-1zM10 7h1v1h-1zM2 8h1v1h-1zM3 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM9 8h1v1h-1zM10 8h1v1h-1zM11 8h1v1h-1zM15 8h1v1h-1zM16 8h1v1h-1zM17 8h1v1h-1zM18 8h1v1h-1zM19 8h1v1h-1zM20 8h1v1h-1zM2 9h1v1h-1zM4 9h1v1h-1zM12 9h1v1h-1zM14 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM0 10h1v1h-1zM2 10h1v1h-1zM3 10h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM7 10h1v1h-1zM9 10h1v1h-1zM10 10h1v1h-1zM12 10h1v1h-1zM19 10h1v1h-1zM20 10h1v1h-1zM0 11h1v1h-1zM1 11h1v1h-1zM2 11h1v1h-1zM4 11h1v1h-1zM6 11h1v1h-1zM8 11h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM13 11h1v1h-1zM14 11h1v1h-1zM15 11h1v1h-1zM19 11h1v1h-1zM0 12h1v1h-1zM4 12h1v1h-1zM5 12h1v1h-1zM6 12h1v1h-1zM8 12h1v1h-1zM12 12h1v1h-1zM13 12h1v1h-1zM14 12h1v1h-1zM16 12h1v1h-1zM19 12h1v1h-1zM12 13h1v1h-1zM13 13h1v1h-1zM16 13h1v1h-1zM17 13h1v1h-1zM18 13h1v1h-1zM8 14h1v1h-1zM11 14h1v1h-1zM13 14h1v1h-1zM14 14h1v1h-1zM15 14h1v1h-1zM8 15h1v1h-1zM10 15h1v1h-1zM11 15h1v1h-1zM15 15h1v1h-1zM16 15h1v1h-1zM17 15h1v1h-1zM18 15h1v1h-1zM11 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM16 16h1v1h-1zM18 16h1v1h-1zM19 16h1v1h-1zM8 17h1v1h-1zM9 17h1v1h-1zM16 17h1v1h-1zM8 18h1v1h-1zM9 18h1v1h-1zM10 18h1v1h-1zM11 18h1v1h-1zM12 18h1v1h-1zM13 18h1v1h-1zM16 18h1v1h-1zM17 18h1v1h-1zM18 18h1v1h-1zM20 18h1v1h-1zM8 19h1v1h-1zM10 19h1v1h-1zM13 19h1v1h-1zM14 19h1v1h-1zM15 19h1v1h-1zM16 19h1v1h-1zM19 19h1v1h-1zM9 20h1v1h-1zM10 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM17 20h1v1h-1zM19 20h1v1h-1zM20 20h1v1h-1zM0 0h7v7h-7zM1 1v5h5v-5zM2 2h3v3h-3zM14 0h7v7h-7zM15 1v5h5v-5zM16 2h3v3h-3zM0 14h7v7h-7zM1 15v5h5v-5zM2 16h3v3h-3z"/></svg><p>Peka med mobilen. AR direkt i webbläsaren, utan app.</p></div>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#ebe7e0"></i><b>Wall</b><span>#EBE7E0</span></div>
+            <div class="sw"><i style="background:#a67b52"></i><b>Table</b><span>#A67B52</span></div>
+            <div class="sw"><i style="background:#171615"></i><b>Ink</b><span>#171615</span></div>
+            <div class="sw"><i style="background:#ffffff"></i><b>Camera UI</b><span>#FFFFFF</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:'Bricolage Grotesque';font-weight:800">Bricolage Grotesque 800</b> for headings, a friendlier grotesque with a bit of character; the same at 400 for text.</p></div>
+          <div><h4>Composition &amp; immersion</h4><p>The most literal immersion: the visitor's own room is the stage. The page is built like a camera app (corner brackets, a placement ring) so the step into AR feels natural. After placing, labels appear around the object in your room. Motion verb: <i>place</i>.</p></div>
+          <div><h4>What it carries over</h4><p>AR first, then in your room: points of interest, moving parts and configurations. "This film was made from the same model" brings in product film; "the model was prepared with my own add-on" brings in tools. The FAQ answers "Does my customer need an app?" up front: no.</p></div>
+          <div><h4>What people remember</h4><p>"Their website put the product on my kitchen table." Something people show the person next to them.</p></div>
+          <div><h4>Risk</h4><p>AR support differs between iPhone and Android and needs a solid fallback (a 3D viewer). On a computer it's one step removed, so the desktop hero must look great on its own.</p></div>
+          <div><h4>Scores</h4><p class="scores">Memorable 5 · Fit 4 · Buildable 3 · Portable 4</p></div>
+        </div>
+      </section></div>
+        <aside class="tagbox" data-dir="N" aria-label="Tags for direction N"></aside>
+      </article>
+      <section class="overall" aria-labelledby="overall-title">
+        <h2 class="part" id="overall-title" style="margin-top:0">Overall</h2>
+        <p style="color:var(--muted);max-width:66ch">Anything that applies to all of them: what's missing, a site you love, a feeling none of them hit.</p>
+        <textarea id="overall" aria-labelledby="overall-title" placeholder="For example: none of them feel like us because… / a site that gets it right is…"></textarea>
+      </section>
+      <section id="out" hidden aria-labelledby="out-title">
+        <h2 id="out-title" style="font-size:1.2rem;margin:0 0 8px">Your feedback</h2>
+        <p id="out-note" style="color:var(--muted)"></p>
+        <textarea id="out-text" readonly aria-labelledby="out-title"></textarea>
+      </section>
+    </div>
+    <div class="bar">
+      <span class="status" id="status" aria-live="polite"></span>
+      <button type="button" class="ghost" id="reset">Clear all</button>
+      <button type="button" id="copy">Copy feedback</button>
+    </div>
+    <script>
+      const DIRECTIONS = [{"id":"D","round":4,"name":"Varvet"},{"id":"E","round":4,"name":"Asken"},{"id":"F","round":4,"name":"Meningen"},{"id":"G","round":4,"name":"Foto eller 3D?"},{"id":"H","round":4,"name":"Provbitarna"},{"id":"J","round":4,"name":"Tiopotenser"},{"id":"K","round":4,"name":"Just nu"},{"id":"L","round":4,"name":"Katalogen"},{"id":"M","round":4,"name":"Färgkartan"},{"id":"N","round":4,"name":"På ditt bord"}];
+      const KEY = "direction-feedback-v4";
+      const GROUPS = [
+        { label: "Feel: how it comes across", tags: ["Premium", "Playful", "Serious", "Calm", "Bold", "Warm", "Cold", "Friendly", "Technical", "Artistic", "Corporate", "Personal", "Modern", "Timeless", "Trendy", "Nordic"] },
+        { label: "Idea", tags: ["Clear in 3 seconds", "Needs explaining", "Memorable", "Forgettable", "Original", "Seen it before", "Shows the process", "Shows the results", "Shows the person behind it", "Works for any field", "Too narrow", "Too abstract", "Too literal", "Gimmicky"] },
+        { label: "Fit with clients and the company", tags: ["Clients would get it", "Only 3D people would get it", "Builds trust", "Sells the work", "On brand", "Off brand", "Fits product companies", "Fits medicine & education", "Fits industry", "Fits Blender add-on buyers", "Too safe", "Too risky"] },
+        { label: "Look", tags: ["Right colours", "Wrong colours", "Too dark", "Too light", "Too colourful", "Too grey", "Right type", "Wrong type", "Too busy", "Too empty", "Looks expensive", "Looks cheap", "Looks like a template"] },
+        { label: "Motion & 3D", tags: ["Right amount of motion", "Too much motion", "Too little motion", "Signature moment works", "Signature moment is weak", "Good use of 3D", "3D feels forced", "Popcorn should stay", "Popcorn should go"] },
+        { label: "Carry forward", tags: ["Keep the idea", "Keep the palette", "Keep the type", "Keep the motion", "Keep the headline", "Combine with another direction", "Drop it"] },
+      ];
+      let state = load();
+      function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.dirs) return s; } catch (e) {} return { dirs: {}, overall: "" }; }
+      function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} renderJump(); }
+      function dir(id) { return (state.dirs[id] = state.dirs[id] || { tags: {}, score: 0, note: "" }); }
+      function count(id) { const d = state.dirs[id]; return d ? Object.keys(d.tags).length + (d.score ? 1 : 0) + (d.note && d.note.trim() ? 1 : 0) : 0; }
+      function el(tag, props = {}, ...kids) { const e = document.createElement(tag); Object.assign(e, props); e.append(...kids); return e; }
+
+      function renderJump() {
+        const nav = document.getElementById("jump"); nav.innerHTML = "";
+        DIRECTIONS.forEach((d) => {
+          const a = el("a", { href: "#dir-" + d.id, textContent: d.id + ". " + d.name });
+          const n = count(d.id); if (n) a.append(el("span", { className: "n", textContent: "(" + n + ")" }));
+          nav.append(a);
+        });
+        nav.append(el("a", { href: "#overall-title", textContent: "Overall" }));
+      }
+
+      function renderBox(box) {
+        const id = box.dataset.dir; const d = DIRECTIONS.find((x) => x.id === id); const st = dir(id);
+        box.innerHTML = "";
+        box.append(el("h3", { textContent: "Tags for " + d.id + ". " + d.name }));
+        GROUPS.forEach((g) => {
+          const wrap = el("div", { className: "tags" });
+          g.tags.forEach((t) => {
+            const b = el("button", { type: "button", className: "tag", textContent: t });
+            if (st.tags[t]) b.dataset.state = st.tags[t];
+            const label = () => b.setAttribute("aria-label", t + ": " + (b.dataset.state === "yes" ? "true" : b.dataset.state === "no" ? "wrong for us" : "not marked"));
+            label();
+            b.addEventListener("click", () => {
+              const next = !b.dataset.state ? "yes" : b.dataset.state === "yes" ? "no" : "";
+              if (next) { b.dataset.state = next; st.tags[t] = next; } else { delete b.dataset.state; delete st.tags[t]; }
+              label(); save();
+            });
+            wrap.append(b);
+          });
+          box.append(el("fieldset", {}, el("legend", { textContent: g.label }), wrap));
+        });
+        const rate = el("div", { className: "rating" });
+        for (let i = 1; i <= 5; i++) {
+          const b = el("button", { type: "button", textContent: String(i) });
+          b.setAttribute("aria-pressed", String(st.score === i)); b.setAttribute("aria-label", "Score " + i + " of 5");
+          b.addEventListener("click", () => { st.score = st.score === i ? 0 : i; rate.querySelectorAll("button").forEach((x, k) => x.setAttribute("aria-pressed", String(st.score === k + 1))); save(); });
+          rate.append(b);
+        }
+        box.append(el("fieldset", {}, el("legend", { textContent: "Score: how close is it, 1 to 5" }), rate));
+        const ta = el("textarea", { value: st.note || "", placeholder: "Anything the tags don't say" });
+        ta.setAttribute("aria-label", "Note for " + d.name);
+        ta.addEventListener("input", () => { st.note = ta.value; save(); });
+        box.append(el("fieldset", {}, el("legend", { textContent: "Note" }), ta));
+      }
+
+      function renderAll() {
+        document.querySelectorAll(".tagbox").forEach(renderBox);
+        document.getElementById("overall").value = state.overall || "";
+        renderJump();
+      }
+      document.getElementById("overall").addEventListener("input", (e) => { state.overall = e.target.value; save(); });
+
+      function compile() {
+        const lines = ["DIRECTION FEEDBACK (site refresh)", ""];
+        DIRECTIONS.forEach((d) => {
+          const st = state.dirs[d.id];
+          if (!st || (!Object.keys(st.tags).length && !st.score && !(st.note || "").trim())) return;
+          lines.push(d.id + ". " + d.name + " (round " + d.round + ")" + (st.score ? ", score " + st.score + "/5" : ""));
+          GROUPS.forEach((g) => {
+            const yes = g.tags.filter((t) => st.tags[t] === "yes"); const no = g.tags.filter((t) => st.tags[t] === "no");
+            if (!yes.length && !no.length) return;
+            const parts = []; if (yes.length) parts.push("+ " + yes.join(", ")); if (no.length) parts.push("− " + no.join(", "));
+            lines.push("  " + g.label.split(":")[0] + ": " + parts.join(" | "));
+          });
+          if ((st.note || "").trim()) lines.push("  Note: " + st.note.trim());
+          lines.push("");
+        });
+        if ((state.overall || "").trim()) lines.push("OVERALL: " + state.overall.trim());
+        return lines.join("\n").trim();
+      }
+      const status = document.getElementById("status");
+      document.getElementById("copy").addEventListener("click", async () => {
+        const text = compile(); const out = document.getElementById("out"); const ta = document.getElementById("out-text");
+        ta.value = text; out.hidden = false; let ok = false;
+        try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {}
+        if (!ok) { ta.focus(); ta.select(); try { ok = document.execCommand("copy"); } catch (e) {} }
+        document.getElementById("out-note").textContent = ok ? "Copied to the clipboard. Paste it to me in the chat." : "Couldn't copy automatically: the text below is selected, press Ctrl+C.";
+        status.textContent = ok ? "Copied" : "Select and copy below";
+        out.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      document.getElementById("reset").addEventListener("click", () => {
+        if (!confirm("Clear every tag, score and note?")) return;
+        state = { dirs: {}, overall: "" }; save(); renderAll();
+        document.getElementById("out").hidden = true; status.textContent = "Cleared";
+      });
+      renderAll();
+    </script>
+  </body>
+</html>
