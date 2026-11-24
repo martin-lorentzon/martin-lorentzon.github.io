@@ -444,12 +444,151 @@
           return { pivot, w, front, x, z, r };
         });
 
-        // Boat parts: a hull with a pointed bow and an outboard motor. They unfold when the car drives into the river.
+        // Speedboat (classic-modern performance runabout): lofted V-hull, sculpted foredeck with stripes, swept windshield & steerable outboard.
         const hull = new THREE.Group(); hull.visible = false; hull.scale.setScalar(0.001); carBody.add(hull);
-        slab(hull, 0, -0.15, 1.9, 2.6, 0.5, 0.3, mat(0xf7f4ee));
-        const bow = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.5, 3), mat(0xf7f4ee)); bow.position.set(0, 0.3, 1.15); bow.scale.z = 1.3; hull.add(bow);
-        slab(hull, 0, -0.15, 1.94, 2.64, 0.12, 0.48, blueMat);
-        slab(hull, 0, -1.62, 0.42, 0.42, 0.85, 0.62, mat(0x1a1a1a));
+        const woodMat = new THREE.MeshPhongMaterial({ color: 0xa46e3f, shininess: 75, specular: 0x5c4328 });
+        const seatMat = new THREE.MeshPhongMaterial({ color: 0xdfd2bc, shininess: 25, specular: 0x333333 });
+        const brassMat = new THREE.MeshPhongMaterial({ color: 0xd9ad4e, shininess: 130, specular: 0xfff0c2 });
+        let outboardPivot = null, boatProp = null;
+        (function buildSpeedboat() {
+          // Stations: [z, sheerX, chineX, keelY, chineY, sheerY, crownY]
+          const ST = [
+            [-1.82, 0.78, 0.70, 0.14, 0.36, 0.72, 0.78],
+            [-1.00, 0.90, 0.80, 0.12, 0.35, 0.75, 0.83],
+            [0.05,  0.96, 0.84, 0.12, 0.36, 0.79, 0.88],
+            [0.88,  0.80, 0.66, 0.18, 0.41, 0.85, 0.94],
+            [1.62,  0.46, 0.32, 0.36, 0.54, 0.91, 0.97],
+            [2.24,  0.03, 0.02, 0.70, 0.79, 0.96, 0.97]
+          ];
+          function pushQuad(arr, a, b, c, d) {
+            arr.push(a[0], a[1], a[2], c[0], c[1], c[2], b[0], b[1], b[2], a[0], a[1], a[2], d[0], d[1], d[2], c[0], c[1], c[2]);
+          }
+          function meshFromTris(tris, m) {
+            const g = new THREE.BufferGeometry();
+            g.setAttribute("position", new THREE.Float32BufferAttribute(tris, 3));
+            g.computeVertexNormals();
+            const o = new THREE.Mesh(g, m);
+            hull.add(o);
+            return o;
+          }
+          const lowerTris = [], sideTris = [], deckTris = [];
+          for (let i = 0; i < ST.length - 1; i++) {
+            const s0 = ST[i], s1 = ST[i + 1];
+            const p0 = [[s0[1], s0[5], s0[0]], [s0[2], s0[4], s0[0]], [0, s0[3], s0[0]], [-s0[2], s0[4], s0[0]], [-s0[1], s0[5], s0[0]]];
+            const p1 = [[s1[1], s1[5], s1[0]], [s1[2], s1[4], s1[0]], [0, s1[3], s1[0]], [-s1[2], s1[4], s1[0]], [-s1[1], s1[5], s1[0]]];
+            // Upper topsides (blue): port sheer->chine and starboard chine->sheer
+            pushQuad(sideTris, p0[0], p0[1], p1[1], p1[0]);
+            pushQuad(sideTris, p0[3], p0[4], p1[4], p1[3]);
+            // Lower V-hull bottom (cream): port chine->keel and keel->starboard chine
+            pushQuad(lowerTris, p0[1], p0[2], p1[2], p1[1]);
+            pushQuad(lowerTris, p0[2], p0[3], p1[3], p1[2]);
+            // Top deck surface (foredeck & aft sunpad; cockpit opening spans station 1..2)
+            if (i !== 1) {
+              const c0 = [0, s0[6], s0[0]], c1 = [0, s1[6], s1[0]];
+              pushQuad(deckTris, p0[4], c0, c1, p1[4]);
+              pushQuad(deckTris, c0, p0[0], p1[0], c1);
+            } else {
+              // Gunwale side decks flanking the open cockpit
+              const g0L = [s0[1] - 0.18, s0[5] + 0.02, s0[0]], g1L = [s1[1] - 0.18, s1[5] + 0.02, s1[0]];
+              const g0R = [-s0[1] + 0.18, s0[5] + 0.02, s0[0]], g1R = [-s1[1] + 0.18, s1[5] + 0.02, s1[0]];
+              pushQuad(deckTris, g0L, p0[0], p1[0], g1L);
+              pushQuad(deckTris, p0[4], g0R, g1R, p1[4]);
+            }
+          }
+          // Stern transom cap (facing -z)
+          const t0 = ST[0];
+          const tp = [[t0[1], t0[5], t0[0]], [t0[2], t0[4], t0[0]], [0, t0[3], t0[0]], [-t0[2], t0[4], t0[0]], [-t0[1], t0[5], t0[0]], [0, t0[6], t0[0]]];
+          sideTris.push(
+            tp[0][0], tp[0][1], tp[0][2], tp[1][0], tp[1][1], tp[1][2], tp[5][0], tp[5][1], tp[5][2],
+            tp[5][0], tp[5][1], tp[5][2], tp[1][0], tp[1][1], tp[1][2], tp[3][0], tp[3][1], tp[3][2],
+            tp[5][0], tp[5][1], tp[5][2], tp[3][0], tp[3][1], tp[3][2], tp[4][0], tp[4][1], tp[4][2]
+          );
+          lowerTris.push(tp[1][0], tp[1][1], tp[1][2], tp[2][0], tp[2][1], tp[2][2], tp[3][0], tp[3][1], tp[3][2]);
+          meshFromTris(lowerTris, creamMat);
+          meshFromTris(sideTris, blueMat);
+          meshFromTris(deckTris, blueMat);
+
+          // Chrome sheer rub-rail segments along both sides
+          for (let i = 0; i < ST.length - 1; i++) {
+            const s0 = ST[i], s1 = ST[i + 1];
+            for (const side of [-1, 1]) {
+              const x0 = side * (s0[1] + 0.015), y0 = s0[5], z0 = s0[0];
+              const x1 = side * (s1[1] + 0.015), y1 = s1[5], z1 = s1[0];
+              const len = Math.hypot(x1 - x0, y1 - y0, z1 - z0);
+              const rail = slab(hull, (x0 + x1) / 2, (z0 + z1) / 2, 0.045, len + 0.04, 0.055, (y0 + y1) / 2, chromeMat);
+              rail.lookAt(x1, y1, z1);
+            }
+          }
+
+          // Foredeck warm teak center inlay + twin tapered cream racing stripes + chrome bow cleat
+          const foreWood = slab(hull, 0, 1.15, 0.20, 1.65, 0.025, 0.945, woodMat); foreWood.rotation.x = -0.055;
+          for (const side of [-1, 1]) {
+            const fs = slab(hull, side * 0.24, 1.05, 0.14, 1.48, 0.025, 0.925, creamMat);
+            fs.rotation.x = -0.055; fs.rotation.y = -side * 0.10;
+            const as = slab(hull, side * 0.22, -1.40, 0.16, 0.72, 0.025, 0.825, creamMat);
+            as.rotation.x = -0.05;
+          }
+          slab(hull, 0, 1.98, 0.07, 0.20, 0.05, 0.98, chromeMat); // bow cleat
+          // Navigation bow lights (port red, starboard green)
+          slab(hull, 0.38, 1.65, 0.06, 0.10, 0.04, 0.93, tailLightMat);
+          slab(hull, -0.38, 1.65, 0.06, 0.10, 0.04, 0.93, new THREE.MeshBasicMaterial({ color: 0x2ec468 }));
+
+          // Recessed cockpit tub, twin bolster bucket seats, dashboard & steering wheel
+          slab(hull, 0, -0.45, 1.46, 1.10, 0.14, 0.42, darkTrimMat); // cockpit floor
+          slab(hull, 0, 0.08, 1.44, 0.16, 0.36, 0.66, darkTrimMat);  // front dash bulkhead
+          slab(hull, 0, -0.96, 1.44, 0.16, 0.34, 0.64, darkTrimMat); // rear bulkhead
+          for (const sx of [-0.36, 0.36]) {
+            slab(hull, sx, -0.48, 0.50, 0.48, 0.14, 0.54, seatMat); // seat base
+            const bk = slab(hull, sx, -0.72, 0.50, 0.14, 0.44, 0.74, seatMat); bk.rotation.x = -0.22; // backrest
+            slab(hull, sx, -0.52, 0.54, 0.46, 0.12, 0.60, blueMat); // side bolster accent
+          }
+          // Steering wheel on port/starboard dash
+          const sw = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.025, 8, 16), chromeMat);
+          sw.position.set(-0.34, 0.84, -0.02); sw.rotation.x = -0.35; hull.add(sw);
+          // Rear engine hatch chrome louvers
+          for (let i = 0; i < 3; i++) slab(hull, 0, -1.16 - i * 0.22, 0.28, 0.08, 0.03, 0.835 - i * 0.01, darkTrimMat);
+
+          // Swept wraparound V-windshield with chrome frame
+          for (const side of [-1, 1]) {
+            const pane = slab(hull, side * 0.36, 0.28, 0.76, 0.04, 0.42, 0.98, glassMat);
+            pane.rotation.order = "YXZ"; pane.rotation.y = -side * 0.38; pane.rotation.x = -0.72;
+            const topBar = slab(hull, side * 0.36, 0.16, 0.78, 0.045, 0.045, 1.13, chromeMat);
+            topBar.rotation.order = "YXZ"; topBar.rotation.y = -side * 0.38; topBar.rotation.x = -0.15;
+            const wing = slab(hull, side * 0.75, -0.16, 0.04, 0.64, 0.32, 0.96, glassMat);
+            wing.rotation.z = side * 0.20; wing.rotation.x = -0.14;
+            const wingBar = slab(hull, side * 0.74, -0.18, 0.045, 0.66, 0.045, 1.10, chromeMat);
+            wingBar.rotation.x = -0.14;
+          }
+
+          // Stern swim step + steerable racing outboard motor with spinning 3-blade brass propeller
+          slab(hull, 0, -1.86, 1.32, 0.14, 0.08, 0.48, woodMat);
+          const portGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.10, 10); portGeo.rotateX(Math.PI / 2);
+          for (const px of [-0.46, 0.46]) addPart(hull, portGeo, chromeMat, px, 0.58, -1.85);
+
+          outboardPivot = new THREE.Group();
+          outboardPivot.position.set(0, 0.60, -1.98);
+          hull.add(outboardPivot);
+          const cowlGeo = extrudeProfile([
+            [-0.24, 0.04], [0.22, 0.04], [0.24, 0.36], [0.10, 0.48], [-0.18, 0.46], [-0.26, 0.32]
+          ], 0.38, 0.03);
+          addPart(outboardPivot, cowlGeo, blueMat);
+          slab(outboardPivot, 0, 0.00, 0.12, 0.34, 0.03, 0.50, creamMat); // top racing stripe
+          slab(outboardPivot, 0, -0.02, 0.16, 0.24, 0.48, -0.18, darkTrimMat); // mid-section leg
+          const bullet = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 0.38, 12), darkTrimMat);
+          bullet.rotation.x = Math.PI / 2; bullet.position.set(0, -0.38, -0.04); outboardPivot.add(bullet);
+          slab(outboardPivot, 0, -0.04, 0.04, 0.22, 0.22, -0.48, darkTrimMat); // skeg
+          boatProp = new THREE.Group();
+          boatProp.position.set(0, -0.38, -0.24);
+          outboardPivot.add(boatProp);
+          const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.045, 0.12, 10), brassMat);
+          hub.rotation.x = Math.PI / 2; boatProp.add(hub);
+          for (let b = 0; b < 3; b++) {
+            const bl = slab(boatProp, 0, 0, 0.06, 0.03, 0.26, 0, brassMat);
+            const a = (b / 3) * Math.PI * 2;
+            bl.position.set(Math.cos(a) * 0.11, Math.sin(a) * 0.11, 0);
+            bl.rotation.z = a - Math.PI / 2; bl.rotation.y = 0.35;
+          }
+        })();
         // Silhouette: where something hides the car, its outline shows through in flat blue. Two extra passes after the scene:
         // 1) mark the car's visible pixels in the stencil buffer, 2) draw the whole car in blue except on those pixels.
         const markMat = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false, transparent: true, stencilWrite: true, stencilRef: 1, stencilFunc: THREE.AlwaysStencilFunc, stencilZPass: THREE.ReplaceStencilOp });
