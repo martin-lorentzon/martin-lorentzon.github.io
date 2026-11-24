@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Visual Directions, Round 2</title>
+    <!-- Internal decision board for the founder, round 2. Not linked from the site. Fonts load from Google Fonts / Fontshare only to preview the type pairings. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Host+Grotesk:wght@400..700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,700,800&f[]=zodiak@400,700&f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet" />
+    <style>
+      :root { --bg: #f4f4f2; --surface: #ffffff; --ink: #17181a; --muted: #5d6066; --line: #dcdcd8; --focus: #1d5fd1; }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) { --bg: #121315; --surface: #1b1c1f; --ink: #ececea; --muted: #a3a6ad; --line: #2e3034; --focus: #7aa7ff; }
+      }
+      :root[data-theme="dark"] { --bg: #121315; --surface: #1b1c1f; --ink: #ececea; --muted: #a3a6ad; --line: #2e3034; --focus: #7aa7ff; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 "Archivo", system-ui, sans-serif; }
+      a { color: inherit; }
+      a:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+      .wrap { max-width: 1180px; margin: 0 auto; padding: 48px 16px 96px; }
+      @media (min-width: 720px) { .wrap { padding: 64px 32px 120px; } }
+      header.top h1 { font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.02; letter-spacing: -0.02em; margin: 0 0 12px; font-weight: 800; font-variation-settings: "wdth" 112; }
+      header.top p { max-width: 64ch; color: var(--muted); margin: 0 0 8px; }
+      h2.part { font-size: 1.5rem; margin: 64px 0 16px; letter-spacing: -0.01em; }
+      .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+      .card ul { margin: 0; padding-left: 1.1em; } .card li { margin: 6px 0; }
+      .dir { margin-top: 48px; }
+      .dir-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin-bottom: 14px; }
+      .dir-head h3 { margin: 0; font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -0.01em; }
+      .dir-head .tag { color: var(--muted); }
+      .rec { display: inline-block; font-size: 0.8rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--ink); color: var(--bg); }
+      .idea { font-size: 1.15rem; max-width: 70ch; margin: 0 0 20px; }
+      .mock { border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; position: relative; border: 1px solid var(--line); }
+      @media (max-width: 640px) { .mock { aspect-ratio: 4 / 5; } }
+      .spec { display: grid; gap: 16px; margin-top: 20px; }
+      @media (min-width: 860px) { .spec { grid-template-columns: repeat(2, 1fr); } }
+      .spec h4 { margin: 0 0 6px; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+      .spec p { margin: 0; }
+      .swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+      .sw { display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; width: 78px; }
+      .sw i { display: block; height: 44px; border-radius: 8px; border: 1px solid var(--line); }
+      .sw b { font-weight: 600; }
+      .sw span { font-family: "JetBrains Mono", monospace; color: var(--muted); }
+      .refs a { margin-right: 14px; }
+      .scores { font-family: "JetBrains Mono", monospace; font-size: 0.9rem; }
+
+      /* ---------- Mock 1: Sketch to finished ---------- */
+      .m1 { background: #f3f3f0; color: #262626; font-family: "Switzer", sans-serif; }
+      .m1 .copy { position: absolute; top: 8%; left: 5%; right: 5%; }
+      .m1 h5 { margin: 0; font-weight: 800; font-size: clamp(1.3rem, 4.4vw, 3.2rem); line-height: 0.95; letter-spacing: -0.03em; }
+      .m1 .row { position: absolute; left: 5%; right: 5%; bottom: 9%; height: 56%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2%; }
+      .m1 .st { position: relative; display: grid; place-items: center; border-top: 1px solid #dadad6; }
+      .m1 .st small { position: absolute; top: 10px; left: 0; font: 400 italic clamp(0.8rem, 1.5vw, 1.15rem)/1 "Zodiak", serif; color: #8c8c88; }
+      .m1 .st small b { font-style: normal; font-family: "Switzer"; font-weight: 700; color: #262626; margin-right: 6px; }
+      .m1 .st.on small { color: #262626; }
+      .m1 .obj { width: 62%; aspect-ratio: 3 / 4; border-radius: 40% 40% 14% 14% / 30% 30% 10% 10%; }
+      .m1 .o1 { border: 1.5px dashed #8c8c88; }
+      .m1 .o2 { background: linear-gradient(110deg, #d5d5d1, #a9a9a5); }
+      .m1 .o3 { background: radial-gradient(90% 70% at 30% 25%, #fff5d6, #d8c79a 40%, #8b7c58 85%); }
+      .m1 .o4 { background: radial-gradient(90% 70% at 30% 25%, #ffffff, #9fb4ff 35%, #1f5bff 70%, #0b1f66); box-shadow: 0 24px 30px -18px #0b1f6688; }
+      .m1 .bar { position: absolute; left: 5%; right: 5%; bottom: 5%; height: 3px; background: #dadad6; }
+      .m1 .bar i { display: block; height: 100%; width: 100%; background: #1f5bff; }
+
+      /* ---------- Mock 2: Make it visible ---------- */
+      .m2 { background: #ffffff; color: #111111; font-family: "General Sans", sans-serif; }
+      .m2 .copy { position: absolute; top: 8%; left: 5%; width: 46%; }
+      .m2 h5 { margin: 0; font-weight: 700; font-size: clamp(1.3rem, 4.2vw, 3rem); line-height: 0.98; letter-spacing: -0.03em; }
+      .m2 p { margin: 12px 0 0; font-size: clamp(0.72rem, 1.3vw, 0.98rem); color: #6b6b6b; max-width: 34ch; }
+      .m2 .thing { position: absolute; right: 7%; top: 14%; width: 40%; aspect-ratio: 1; }
+      .m2 .shell { position: absolute; inset: 0; border-radius: 28% 28% 22% 22%; background: linear-gradient(150deg, #ececec, #bdbdbd 60%, #8e8e8e); }
+      .m2 .lens { position: absolute; left: 30%; top: 22%; width: 52%; aspect-ratio: 1; border-radius: 50%; overflow: hidden; outline: 2px solid #3a3af0; outline-offset: 0; background: #f4f4ff; }
+      .m2 .lens svg { width: 100%; height: 100%; display: block; }
+      .m2 .cap { position: absolute; right: 7%; bottom: 9%; font-size: clamp(0.62rem, 1.05vw, 0.85rem); color: #6b6b6b; text-align: right; }
+      .m2 .cap b { color: #3a3af0; font-weight: 600; }
+      .m2 .fields { position: absolute; left: 5%; bottom: 9%; display: flex; flex-wrap: wrap; gap: 6px; max-width: 46%; }
+      .m2 .fields span { font-size: clamp(0.6rem, 1vw, 0.8rem); border: 1px solid #e4e4e4; border-radius: 999px; padding: 3px 10px; }
+
+      /* ---------- Mock 3: Let it pop ---------- */
+      .m3 { background: #1a1714; color: #fffaf0; font-family: "Host Grotesk", sans-serif; }
+      .m3 .copy { position: absolute; top: 8%; left: 5%; right: 5%; }
+      .m3 h5 { margin: 0; font-family: "Bricolage Grotesque", sans-serif; font-variation-settings: "opsz" 96; font-weight: 800; font-size: clamp(1.4rem, 5vw, 3.6rem); line-height: 0.92; letter-spacing: -0.03em; }
+      .m3 h5 em { font-style: normal; color: #ffd54a; }
+      .m3 .pair { position: absolute; left: 5%; right: 5%; bottom: 9%; height: 52%; display: grid; grid-template-columns: 1fr auto 1.6fr; align-items: center; gap: 3%; }
+      .m3 .kernel { justify-self: center; width: 28%; aspect-ratio: 0.8; border-radius: 50% 50% 46% 46% / 60% 60% 40% 40%; background: radial-gradient(circle at 35% 30%, #f1b25b, #c8741e 55%, #6d3a0c); }
+      .m3 .arrow { width: 44px; height: 2px; background: #6f655a; position: relative; }
+      .m3 .arrow::after { content: ""; position: absolute; right: -2px; top: -4px; border: 5px solid transparent; border-left-color: #6f655a; }
+      .m3 .popped { height: 100%; border-radius: 18px; background: radial-gradient(60% 70% at 40% 35%, #fff6dc, #ffd54a 40%, #ff5a1f 95%); display: flex; align-items: flex-end; padding: 4%; }
+      .m3 .popped span { font-size: clamp(0.62rem, 1.1vw, 0.9rem); color: #1a1714; font-weight: 600; }
+      .m3 .lbl { position: absolute; font-size: clamp(0.6rem, 1vw, 0.8rem); color: #b7ab9b; }
+      @media (max-width: 640px) {
+        .m1 .row { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); height: 60%; }
+        .m2 .copy { width: 90%; } .m2 .thing { width: 58%; top: 40%; right: 6%; } .m2 .fields { display: none; } .m2 .cap { bottom: 4%; }
+        .m3 .pair { grid-template-columns: 1fr; grid-template-rows: 0.6fr auto 1.4fr; justify-items: center; height: 62%; }
+        .m3 .kernel { width: 18%; } .m3 .arrow { display: none; } .m3 .popped { width: 100%; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <h1>Company site: visual directions, round 2</h1>
+        <p>Three new directions from your feedback on round 1. Round 1 is still in <a href="visual-directions.html">visual-directions.html</a>, with the audit.</p>
+      </header>
+
+      <h2 class="part">What changed</h2>
+      <div class="card">
+        <ul>
+          <li><b>Keep from A:</b> show the whole journey from idea to finished result.</li>
+          <li><b>Drop from B:</b> anything tied to one industry. Each direction has to work for a product film, a medical animation, a web 3D viewer and a Blender add-on alike.</li>
+          <li><b>Drop from C:</b> insider 3D or developer language. Every stage and label is in words a client uses: sketch, shape, light, done.</li>
+        </ul>
+      </div>
+
+      <!-- ===== 1 ===== -->
+      <section class="dir" aria-labelledby="d1-title">
+        <div class="dir-head"><h3 id="d1-title">1. Skiss → Klart</h3><span class="tag">Sketch to finished. Round 1's A, in plain words</span> <span class="rec">Recommended</span></div>
+        <p class="idea">One object travels down the page and is finished in four steps anyone recognises: sketch, shape, light, done. Each case study runs the same four steps with the client's own object, so a product, a heart valve or a tool all tell the same story.</p>
+        <div class="mock m1" role="img" aria-label="Mock of direction 1: light page, headline 'Från skiss till klart', one object shown in four steps labelled Skiss, Form, Ljus and Klart, with a progress bar underneath.">
+          <div class="copy"><h5>Från skiss<br />till klart.</h5></div>
+          <div class="row">
+            <div class="st"><small><b>1</b>Skiss</small><div class="obj o1"></div></div>
+            <div class="st"><small><b>2</b>Form</small><div class="obj o2"></div></div>
+            <div class="st"><small><b>3</b>Ljus</small><div class="obj o3"></div></div>
+            <div class="st on"><small><b>4</b>Klart</small><div class="obj o4"></div></div>
+          </div>
+          <div class="bar"><i></i></div>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#f3f3f0"></i><b>Paper</b><span>#F3F3F0</span></div>
+            <div class="sw"><i style="background:#262626"></i><b>Graphite</b><span>#262626</span></div>
+            <div class="sw"><i style="background:#8c8c88"></i><b>Pencil</b><span>#8C8C88</span></div>
+            <div class="sw"><i style="background:#dadad6"></i><b>Line</b><span>#DADAD6</span></div>
+            <div class="sw"><i style="background:#ffc44d"></i><b>Studio light</b><span>#FFC44D</span></div>
+            <div class="sw"><i style="background:#1f5bff"></i><b>Done</b><span>#1F5BFF</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:Switzer;font-weight:800">Switzer</b> for headlines and text, <i style="font-family:Zodiak">Zodiak italic</i> only for the four step names (Skiss, Form, Ljus, Klart). Both from Fontshare.</p></div>
+          <div><h4>Motion &amp; 3D</h4><p>Signature: as you scroll, one 3D object is drawn as pencil lines, filled in as grey shape, lit, then shown finished in colour, with a progress bar that fills step by step. The colour arrives only at "Klart". Motion verb: <i>develop</i>, like a photo coming up in the tray. Three.js, which the site already uses. With reduced motion, the four steps sit side by side as stills.</p></div>
+          <div><h4>References</h4><p class="refs"><a href="https://www.apple.com/airpods-pro/">apple.com/airpods-pro</a><a href="https://lusion.co">lusion.co</a><a href="https://igloo.inc">igloo.inc</a></p></div>
+          <div><h4>Risk</h4><p>Close to round 1's A, so it is the safe pick. It needs one good hero object, and each case study needs a few in-between renders (sketch, grey, lit) as well as the final.</p></div>
+          <div><h4>Scores</h4><p class="scores">Originality 3 · Fit 5 · Buildable 5 · Portable 3</p></div>
+        </div>
+      </section>
+
+      <!-- ===== 2 ===== -->
+      <section class="dir" aria-labelledby="d2-title">
+        <div class="dir-head"><h3 id="d2-title">2. Gör det synligt</h3><span class="tag">Make it visible</span></div>
+        <p class="idea">The company's real job is showing what's hard to see: a product before the prototype, the inside of a body, a workflow nobody can picture. The site has a lens: point at anything and it shows what's inside or behind it.</p>
+        <div class="mock m2" role="img" aria-label="Mock of direction 2: white page, headline 'Det du inte ser, gör vi synligt', a grey product shell with a round lens showing its inside, and a row of example fields.">
+          <div class="copy"><h5>Det du inte ser,<br />gör vi synligt.</h5><p>3D-film, interaktiv 3D och verktyg som förklarar produkter, kroppen och processer.</p></div>
+          <div class="thing">
+            <div class="shell"></div>
+            <div class="lens">
+              <svg viewBox="0 0 100 100" aria-hidden="true">
+                <circle cx="50" cy="50" r="22" fill="none" stroke="#3a3af0" stroke-width="2" />
+                <circle cx="50" cy="50" r="9" fill="#3a3af0" />
+                <path d="M50 28 V12 M50 72 V88 M28 50 H12 M72 50 H88" stroke="#3a3af0" stroke-width="2" />
+                <rect x="20" y="64" width="22" height="14" rx="3" fill="none" stroke="#111" stroke-width="1.5" />
+              </svg>
+            </div>
+          </div>
+          <div class="fields"><span>Produkter</span><span>Medicin</span><span>Utbildning</span><span>Industri</span><span>Verktyg</span></div>
+          <div class="cap"><b>Inuti:</b> motor, lager, kretskort</div>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#ffffff"></i><b>Ground</b><span>#FFFFFF</span></div>
+            <div class="sw"><i style="background:#111111"></i><b>Ink</b><span>#111111</span></div>
+            <div class="sw"><i style="background:#6b6b6b"></i><b>Muted</b><span>#6B6B6B</span></div>
+            <div class="sw"><i style="background:#e4e4e4"></i><b>Line</b><span>#E4E4E4</span></div>
+            <div class="sw"><i style="background:#3a3af0"></i><b>Inside</b><span>#3A3AF0</span></div>
+            <div class="sw"><i style="background:#f4f4ff"></i><b>Lens</b><span>#F4F4FF</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:'General Sans';font-weight:700">General Sans</b> for everything, friendly and precise. One colour, ultramarine, is kept for things you can only see through the lens. Fontshare.</p></div>
+          <div><h4>Motion &amp; 3D</h4><p>Signature: a round lens follows the pointer over the hero and the case images and shows the inside view: a cutaway, the organ under the skin, the steps behind a button. On phones it follows the scroll. Motion verb: <i>reveal</i>, a soft circle that opens. Mostly two stacked images and a CSS mask; Three.js only in the hero.</p></div>
+          <div><h4>References</h4><p class="refs"><a href="https://ciechanow.ski">ciechanow.ski</a><a href="https://www.apple.com/iphone/">apple.com/iphone</a><a href="https://lusion.co">lusion.co</a></p></div>
+          <div><h4>Risk</h4><p>Every showcase needs a matching outside and inside image. A great fit for products and medicine; it takes more thought for tools and add-ons (the "inside" is the workflow they replace).</p></div>
+          <div><h4>Scores</h4><p class="scores">Originality 4 · Fit 4 · Buildable 4 · Portable 2</p></div>
+        </div>
+      </section>
+
+      <!-- ===== 3 ===== -->
+      <section class="dir" aria-labelledby="d3-title">
+        <div class="dir-head"><h3 id="d3-title">3. Låt den poppa</h3><span class="tag">Let it pop. Your own line, taken all the way</span></div>
+        <p class="idea">"Låt din idé poppa" becomes the whole site. Every idea starts as a small, hard kernel (a brief, a sketch, a CAD file) and pops into the finished result when you reach it. Everyone knows popcorn, so it works in any field.</p>
+        <div class="mock m3" role="img" aria-label="Mock of direction 3: dark warm page, headline 'Låt din idé poppa', a small amber kernel labelled with a brief, an arrow, and a large bright popped panel showing the finished result.">
+          <div class="copy"><h5>Låt din idé <em>poppa</em>.</h5></div>
+          <div class="pair">
+            <div class="kernel"></div>
+            <div class="arrow"></div>
+            <div class="popped"><span>Produktfilm, 45 s, klar för lansering</span></div>
+          </div>
+          <span class="lbl" style="left:5%;bottom:5%">Före: en skiss och tre CAD-filer</span>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#1a1714"></i><b>Ground</b><span>#1A1714</span></div>
+            <div class="sw"><i style="background:#fffaf0"></i><b>Ink</b><span>#FFFAF0</span></div>
+            <div class="sw"><i style="background:#b7ab9b"></i><b>Muted</b><span>#B7AB9B</span></div>
+            <div class="sw"><i style="background:#c8741e"></i><b>Kernel</b><span>#C8741E</span></div>
+            <div class="sw"><i style="background:#ffd54a"></i><b>Butter</b><span>#FFD54A</span></div>
+            <div class="sw"><i style="background:#ff5a1f"></i><b>Pop</b><span>#FF5A1F</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:'Bricolage Grotesque';font-weight:800">Bricolage Grotesque</b> for headlines, which have a bit of bounce, and <span style="font-family:'Host Grotesk'">Host Grotesk</span> for text. Google Fonts.</p></div>
+          <div><h4>Motion &amp; 3D</h4><p>Signature: the existing popcorn hero, and every case study is a "kernel" card (the brief, in the client's words) that pops open into the finished film or viewer when you reach it. Motion verb: <i>pop</i>, a short squash then a springy burst. Reuses the Three.js popcorn you already have.</p></div>
+          <div><h4>References</h4><p class="refs"><a href="https://cuberto.com">cuberto.com</a><a href="https://locomotive.ca">locomotive.ca</a><a href="https://lusion.co">lusion.co</a></p></div>
+          <div><h4>Risk</h4><p>Playful by nature. Fine for products and launches, but it may feel light for medical or industrial buyers. Keep the case-study pages calm and let the pop happen once per project.</p></div>
+          <div><h4>Scores</h4><p class="scores">Originality 4 · Fit 4 · Buildable 5 · Portable 1</p></div>
+        </div>
+      </section>
+
+      <h2 class="part">Recommendation</h2>
+      <div class="card">
+        <p style="margin-top:0"><b>Go with 1, Skiss → Klart.</b> It keeps what you liked in round 1's A (the whole journey from idea to finished result), but in four words any client understands. The same four steps work for every kind of assignment, and they give each case study a ready structure.</p>
+        <p style="margin-bottom:0">Borrow from the other two for details: the lens from 2 on case-study images, and the popcorn from 3 as the loader and the 404 page ("Den här idén poppade aldrig").</p>
+      </div>
+    </div>
+  </body>
+</html>
