@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Visual Directions, Round 5</title>
+    <!-- Internal decision board for the founder, round 5: five practical concepts that combine with H and L. Not linked from the site. Fonts load from Google Fonts only to preview the type. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Inter+Tight:wght@400..700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+      :root { --bg: #f4f4f2; --surface: #ffffff; --ink: #17181a; --muted: #5d6066; --line: #dcdcd8; --focus: #1d5fd1; }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) { --bg: #121315; --surface: #1b1c1f; --ink: #ececea; --muted: #a3a6ad; --line: #2e3034; --focus: #7aa7ff; }
+      }
+      :root[data-theme="dark"] { --bg: #121315; --surface: #1b1c1f; --ink: #ececea; --muted: #a3a6ad; --line: #2e3034; --focus: #7aa7ff; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 "Archivo", system-ui, sans-serif; }
+      a { color: inherit; }
+      a:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+      .wrap { max-width: 1180px; margin: 0 auto; padding: 48px 16px 96px; }
+      @media (min-width: 720px) { .wrap { padding: 64px 32px 120px; } }
+      header.top h1 { font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.02; letter-spacing: -0.02em; margin: 0 0 12px; font-weight: 800; font-variation-settings: "wdth" 112; }
+      header.top p { max-width: 64ch; color: var(--muted); margin: 0 0 8px; }
+      h2.part { font-size: 1.5rem; margin: 64px 0 16px; letter-spacing: -0.01em; }
+      .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+      .card ul { margin: 0; padding-left: 1.1em; } .card li { margin: 6px 0; }
+      .dir { margin-top: 48px; }
+      .dir-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin-bottom: 14px; }
+      .dir-head h3 { margin: 0; font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -0.01em; }
+      .dir-head .tag { color: var(--muted); }
+      .rec { display: inline-block; font-size: 0.8rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--ink); color: var(--bg); }
+      .idea { font-size: 1.15rem; max-width: 70ch; margin: 0 0 20px; }
+      .mock { border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; position: relative; border: 1px solid var(--line); }
+      @media (max-width: 640px) { .mock { aspect-ratio: 4 / 5; } }
+      .spec { display: grid; gap: 16px; margin-top: 20px; }
+      @media (min-width: 860px) { .spec { grid-template-columns: repeat(2, 1fr); } }
+      .spec h4 { margin: 0 0 6px; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+      .spec p { margin: 0; }
+      .swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+      .sw { display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; width: 78px; }
+      .sw i { display: block; height: 44px; border-radius: 8px; border: 1px solid var(--line); }
+      .sw b { font-weight: 600; }
+      .sw span { font-family: "JetBrains Mono", monospace; color: var(--muted); }
+      .refs a { margin-right: 14px; }
+      .scores { font-family: "JetBrains Mono", monospace; font-size: 0.9rem; }
+      .mono { font-family: "JetBrains Mono", monospace; }
+      .combo { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+      .combo th, .combo td { text-align: left; padding: 10px 12px 10px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+      .combo th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+      @media (max-width: 640px) { .combo, .combo tbody, .combo tr, .combo td { display: block; } .combo thead { display: none; } .combo td { border: 0; padding: 2px 0; } .combo tr { border-bottom: 1px solid var(--line); padding: 10px 0; } .combo td:first-child { font-weight: 700; } }
+
+      /* ---------- Mock O: On your site ---------- */
+      .mO { background: #e7e1d7; color: #1a1a1a; font-family: "Inter Tight", sans-serif; container-type: inline-size; }
+      .mO .tabs { position: absolute; left: 5%; top: 5.5%; display: flex; flex-wrap: wrap; gap: 0.8cqi; font-size: clamp(0.55rem, 1.2cqi, 0.85rem); }
+      .mO .tabs span { padding: 0.5cqi 1.4cqi; border: 1px solid #1a1a1a40; border-radius: 999px; }
+      .mO .tabs .on { background: #1a1a1a; color: #f2eee7; border-color: #1a1a1a; }
+      .mO .cap { position: absolute; right: 5%; top: 6.5%; font: 400 clamp(0.5rem, 1.05cqi, 0.75rem)/1 "JetBrains Mono", monospace; color: #6c665d; }
+      .mO .win { position: absolute; left: 5%; right: 5%; top: 15%; bottom: 6%; background: #fff; border: 1px solid #1a1a1a30; border-radius: 1cqi; overflow: hidden; }
+      .mO .chrome { height: 8%; background: #f1efeb; border-bottom: 1px solid #1a1a1a1a; display: flex; align-items: center; gap: 0.6cqi; padding: 0 1.4cqi; }
+      .mO .chrome i { width: 0.9cqi; aspect-ratio: 1; border-radius: 50%; background: #cfcac2; }
+      .mO .chrome span { margin-left: 2cqi; flex: 0 1 44%; background: #fff; border-radius: 999px; padding: 0.3cqi 1.2cqi; font: 400 clamp(0.45rem, 1cqi, 0.7rem)/1.4 "JetBrains Mono", monospace; color: #6c665d; white-space: nowrap; overflow: hidden; }
+      .mO .shop { position: absolute; left: 0; right: 0; top: 8%; bottom: 0; display: grid; grid-template-columns: 1.3fr 1fr; }
+      .mO .view { position: relative; margin: 3cqi; border-radius: 0.6cqi; background: linear-gradient(180deg, #f4f2ee, #e4e0d8); outline: 0.2cqi dashed #1a1a1a; outline-offset: 0.8cqi; }
+      .mO .view::before { content: ""; position: absolute; left: 31%; bottom: 24%; width: 38%; height: 20%; border-radius: 1.4cqi; background: linear-gradient(100deg, #6f4c2d, #ac8253 32%, #d4ad7e 48%, #94693f 78%); }
+      .mO .view::after { content: ""; position: absolute; left: 33%; bottom: 43%; width: 34%; height: 30%; border-radius: 2cqi 2cqi 0.6cqi 0.6cqi; background: linear-gradient(100deg, #5e3f24, #94693f 35%, #b58a5c 52%, #7a5634); }
+      .mO .view .who { position: absolute; left: 1.6cqi; top: 1.4cqi; background: #fff; padding: 0.5cqi 0.8cqi; border-radius: 0.3cqi; font: 600 clamp(0.45rem, 1cqi, 0.72rem)/1 "JetBrains Mono", monospace; }
+      .mO .view .hs { position: absolute; width: 1.8cqi; aspect-ratio: 1; border-radius: 50%; background: #fff; border: 0.35cqi solid #1a1a1a; z-index: 1; }
+      .mO .view .badge { position: absolute; left: 2cqi; bottom: 1.6cqi; font: 400 clamp(0.45rem, 1cqi, 0.72rem)/1 "JetBrains Mono", monospace; color: #6c665d; }
+      .mO .view .ar { position: absolute; right: 1.6cqi; bottom: 1.2cqi; font-size: clamp(0.5rem, 1.05cqi, 0.75rem); background: #fff; border: 1px solid #1a1a1a40; border-radius: 999px; padding: 0.5cqi 1.2cqi; }
+      .mO .info { padding: 3cqi 3cqi 3cqi 0; display: flex; flex-direction: column; gap: 1.2cqi; font-size: clamp(0.55rem, 1.2cqi, 0.85rem); }
+      .mO .info small { font: 400 clamp(0.45rem, 1cqi, 0.72rem)/1 "JetBrains Mono", monospace; color: #6c665d; }
+      .mO .info h6 { margin: 0; font: 600 2.8cqi/1 "Inter Tight", sans-serif; letter-spacing: -0.02em; }
+      .mO .ln { height: 0.7cqi; background: #ece9e4; border-radius: 2px; }
+      .mO .dots { display: flex; gap: 0.9cqi; }
+      .mO .dots i { width: 2.4cqi; aspect-ratio: 1; border-radius: 50%; border: 1px solid #1a1a1a30; }
+      .mO .dots i:first-child { outline: 1.5px solid #1a1a1a; outline-offset: 2px; }
+      .mO .buy { margin-top: auto; background: #1a1a1a; color: #fff; text-align: center; padding: 1.3cqi; border-radius: 0.5cqi; font-weight: 600; }
+      @container (max-width: 520px) { .mO .cap { display: none; } .mO .tabs { font-size: 2.8cqi; gap: 1.6cqi; } .mO .tabs span { padding: 1cqi 2.6cqi; } .mO .win { top: 20%; } .mO .chrome { height: 6%; } .mO .chrome span { font-size: 2.2cqi; flex-basis: 70%; } .mO .shop { top: 6%; grid-template-columns: 1fr; grid-template-rows: 1.4fr 1fr; } .mO .view { margin: 4cqi 5cqi 3cqi; } .mO .view .who { font-size: 2.2cqi; } .mO .view .badge, .mO .view .ar { font-size: 2.2cqi; } .mO .info { padding: 2cqi 5cqi 5cqi; font-size: 2.8cqi; gap: 2cqi; } .mO .info h6 { font-size: 5.4cqi; } .mO .ln { display: none; } .mO .dots i { width: 5cqi; } .mO .info small { font-size: 2.2cqi; } }
+
+      /* ---------- Mock P: The brief builder ---------- */
+      .mP { background: #f2eee7; color: #1a1a1a; font-family: "Inter Tight", sans-serif; container-type: inline-size; }
+      .mP h5 { position: absolute; left: 5%; top: 7%; margin: 0; font: 800 4cqi/1 "Archivo", sans-serif; letter-spacing: -0.03em; }
+      .mP h5 span { display: block; font: 400 clamp(0.55rem, 1.3cqi, 0.9rem)/1.3 "Inter Tight", sans-serif; letter-spacing: 0; color: #6c665d; margin-top: 1cqi; }
+      .mP .opts { position: absolute; left: 5%; top: 24%; width: 50%; display: grid; gap: 1cqi; margin: 0; padding: 0; list-style: none; font-size: clamp(0.55rem, 1.3cqi, 0.92rem); }
+      .mP .opts li { display: flex; align-items: center; gap: 1.4cqi; padding: 1cqi 1.4cqi; border: 1px solid #1a1a1a26; border-radius: 0.6cqi; background: #fff; }
+      .mP .opts li.on { border-color: #1a1a1a; }
+      .mP .opts b { font-weight: 600; }
+      .mP .opts li > span:last-child { margin-left: auto; color: #6c665d; font: 400 clamp(0.5rem, 1.05cqi, 0.75rem)/1 "JetBrains Mono", monospace; white-space: nowrap; }
+      .mP .box { width: 1.9cqi; aspect-ratio: 1; border: 1.5px solid #1a1a1a; border-radius: 0.3cqi; flex: none; display: grid; place-items: center; font-size: 1.3cqi; line-height: 1; }
+      .mP .on .box { background: #1a1a1a; color: #fff; }
+      .mP .step { display: inline-flex; border: 1px solid #1a1a1a40; border-radius: 0.4cqi; font-family: "JetBrains Mono", monospace; font-size: 0.9em; }
+      .mP .step i { font-style: normal; padding: 0 0.9cqi; }
+      .mP .sum { position: absolute; right: 5%; top: 7%; bottom: 7%; width: 34%; background: #1a1a1a; color: #f2eee7; border-radius: 1cqi; padding: 2.6cqi; display: flex; flex-direction: column; gap: 1.5cqi; font-size: clamp(0.55rem, 1.2cqi, 0.88rem); line-height: 1.35; }
+      .mP .sum small { display: block; font: 400 clamp(0.45rem, 0.95cqi, 0.7rem)/1.4 "JetBrains Mono", monospace; color: #a8a197; text-transform: uppercase; letter-spacing: 0.05em; }
+      .mP .big { font: 800 3.4cqi/1 "Archivo", sans-serif; letter-spacing: -0.02em; }
+      .mP .sum .btn { margin-top: auto; background: #f2eee7; color: #1a1a1a; text-align: center; padding: 1.2cqi; border-radius: 0.5cqi; font-weight: 600; }
+      @container (max-width: 520px) { .mP h5 { font-size: 7cqi; top: 5%; } .mP h5 span { font-size: 3cqi; } .mP .opts { top: 19%; width: 90%; font-size: 3cqi; gap: 1.6cqi; } .mP .opts li { padding: 2cqi 2.6cqi; } .mP .opts li > span:last-child { font-size: 2.4cqi; } .mP .opts li:nth-child(n+5) { display: none; } .mP .box { width: 4cqi; font-size: 2.8cqi; } .mP .sum { left: 5%; right: 5%; width: auto; top: auto; bottom: 4%; padding: 4cqi; font-size: 2.8cqi; gap: 2cqi; } .mP .sum .hide { display: none; } .mP .big { font-size: 6.4cqi; } .mP .sum small { font-size: 2.2cqi; } .mP .sum .btn { padding: 2.6cqi; } }
+
+      /* ---------- Mock Q: The archive ---------- */
+      .mQ { background: #f2eee7; color: #1a1a1a; font-family: "Inter Tight", sans-serif; container-type: inline-size; }
+      .mQ .bar { position: absolute; left: 4%; right: 4%; top: 6%; display: flex; flex-wrap: wrap; gap: 0.8cqi; align-items: center; font-size: clamp(0.5rem, 1.15cqi, 0.82rem); }
+      .mQ .bar span { padding: 0.5cqi 1.3cqi; border-radius: 999px; border: 1px solid #1a1a1a33; white-space: nowrap; }
+      .mQ .bar .on { background: #1a1a1a; color: #f2eee7; border-color: #1a1a1a; }
+      .mQ .bar .sep { border: 0; width: 1px; height: 2.4cqi; background: #1a1a1a33; padding: 0; }
+      .mQ .bar .n { margin-left: auto; border: 0; font-family: "JetBrains Mono", monospace; color: #6c665d; }
+      .mQ .grid { position: absolute; left: 4%; right: 4%; top: 16%; bottom: 5%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.8cqi; }
+      .mQ .c { display: flex; flex-direction: column; gap: 0.7cqi; font-size: clamp(0.5rem, 1.05cqi, 0.78rem); min-height: 0; }
+      .mQ .im { flex: 1; border-radius: 0.4cqi; position: relative; overflow: hidden; }
+      .mQ .c1 .im { background: radial-gradient(18% 34% at 50% 52%, #4c4c4c, #1b1b1b 70%, transparent 72%), linear-gradient(180deg, #f2eee7, #d9d2c6); }
+      .mQ .c2 .im { background: radial-gradient(circle at 50% 50%, transparent 0 14%, #c9d3dd 15% 19%, transparent 20% 27%, #8fa3b5 28% 31%, transparent 32%), linear-gradient(160deg, #2b3a4a, #121a23); }
+      .mQ .c3 .im { background: linear-gradient(100deg, #6f4c2d, #ac8253 32%, #d4ad7e 48%, #94693f 78%) 50% 66%/46% 18% no-repeat, linear-gradient(100deg, #5e3f24, #94693f 40%, #7a5634) 50% 34%/40% 30% no-repeat, linear-gradient(180deg, #f2eee7, #ddd6ca); }
+      .mQ .c4 .im { background: linear-gradient(#3a3d42, #3a3d42) 8% 14%/40% 4% no-repeat, linear-gradient(#55595f, #55595f) 8% 24%/60% 3% no-repeat, linear-gradient(#55595f, #55595f) 8% 32%/52% 3% no-repeat, linear-gradient(#b9bdc1, #b9bdc1) 8% 44%/30% 6% no-repeat, linear-gradient(#55595f, #55595f) 8% 56%/66% 3% no-repeat, #26282c; }
+      .mQ h6 { margin: 0; font: 600 1.55cqi/1.15 "Inter Tight", sans-serif; letter-spacing: -0.01em; }
+      .mQ .t { display: flex; gap: 0.5cqi; flex-wrap: wrap; }
+      .mQ .t span { font-family: "JetBrains Mono", monospace; font-size: 0.88em; padding: 0.2cqi 0.7cqi; background: #e7e1d7; border-radius: 0.3cqi; }
+      .mQ .s { color: #6c665d; font-variant-numeric: tabular-nums; }
+      @container (max-width: 520px) { .mQ .bar { font-size: 2.6cqi; gap: 1.6cqi; } .mQ .bar span { padding: 1cqi 2.4cqi; } .mQ .bar .sep, .mQ .bar .x { display: none; } .mQ .grid { top: 24%; grid-template-columns: 1fr 1fr; gap: 4cqi; } .mQ .c { font-size: 2.4cqi; gap: 1.2cqi; } .mQ h6 { font-size: 3.4cqi; } .mQ .s { display: none; } }
+
+      /* ---------- Mock R: The map ---------- */
+      .mR { background: #9fbcc2; color: #1a1a1a; font-family: "Archivo", sans-serif; container-type: inline-size; }
+      .mR .land { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0 5.6cqi, #f7f4ee 5.6cqi 6cqi), repeating-linear-gradient(0deg, transparent 0 4.2cqi, #f7f4ee 4.2cqi 4.6cqi), #ddd5c6; }
+      .mR .n { clip-path: polygon(0 0, 100% 0, 100% 30%, 76% 38%, 58% 50%, 38% 58%, 18% 62%, 0 64%); }
+      .mR .s { clip-path: polygon(0 80%, 20% 77%, 42% 72%, 62% 63%, 80% 52%, 100% 45%, 100% 100%, 0 100%); }
+      .mR .park { position: absolute; border-radius: 1.2cqi; background: #b6c2a0; }
+      .mR .road { position: absolute; height: 1.1cqi; background: #fff; border-top: 1px solid #c9c0af; border-bottom: 1px solid #c9c0af; transform-origin: left center; }
+      .mR .dl { position: absolute; font-weight: 800; font-variation-settings: "wdth" 62; font-size: 1.9cqi; letter-spacing: 0.14em; color: #1a1a1a8c; text-transform: uppercase; white-space: nowrap; }
+      .mR .river { position: absolute; left: 44%; top: 66%; transform: rotate(-21deg); font-style: italic; font-weight: 600; letter-spacing: 0.3em; color: #4f727a; font-size: 1.5cqi; }
+      .mR .pin { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 0.5cqi; transform: translate(-50%, -50%); }
+      .mR .pin i { width: 4cqi; aspect-ratio: 1; border-radius: 0.8cqi; background: #1a1a1a; color: #f2eee7; display: grid; place-items: center; font-style: normal; font-size: 1.8cqi; border: 0.35cqi solid #fff; }
+      .mR .pin b { font: 700 clamp(0.5rem, 1.1cqi, 0.8rem)/1 "Inter Tight", sans-serif; background: #fff; padding: 0.35cqi 0.8cqi; border-radius: 0.3cqi; white-space: nowrap; }
+      .mR .case { position: absolute; width: 2.4cqi; aspect-ratio: 1; border-radius: 50%; background: #fff; border: 0.3cqi solid #1a1a1a; font: 600 0.95cqi/1 "JetBrains Mono", monospace; display: grid; place-items: center; transform: translate(-50%, -50%); }
+      .mR .you { position: absolute; left: 30%; top: 44%; width: 2cqi; aspect-ratio: 1; border-radius: 50%; background: #2b4cc4; outline: 0.9cqi solid #2b4cc440; }
+      .mR .you span { position: absolute; left: 160%; top: -10%; font: 600 clamp(0.45rem, 1cqi, 0.72rem)/1 "JetBrains Mono", monospace; color: #2b4cc4; white-space: nowrap; }
+      .mR .ttl { position: absolute; left: 3%; top: 4%; background: #1a1a1a; color: #f2eee7; padding: 1cqi 1.6cqi; font-weight: 800; font-variation-settings: "wdth" 62; font-size: 2.2cqi; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1.05; }
+      .mR .ttl small { display: block; font: 400 clamp(0.45rem, 0.95cqi, 0.7rem)/1.4 "JetBrains Mono", monospace; letter-spacing: 0; text-transform: none; color: #b9b2a6; }
+      .mR .leg { position: absolute; left: 3%; bottom: 4%; background: #f2eee7; border: 1.5px solid #1a1a1a; padding: 1.2cqi 1.6cqi; display: grid; gap: 0.6cqi; font: 400 clamp(0.45rem, 1cqi, 0.72rem)/1.2 "JetBrains Mono", monospace; }
+      .mR .leg b { font-family: "Archivo", sans-serif; font-variation-settings: "wdth" 62; text-transform: uppercase; letter-spacing: 0.1em; font-size: 1.1em; }
+      .mR .ctl { position: absolute; right: 3%; bottom: 4%; display: flex; gap: 0.8cqi; font: 600 clamp(0.5rem, 1.1cqi, 0.8rem)/1 "Inter Tight", sans-serif; }
+      .mR .ctl span { background: #fff; border: 1.5px solid #1a1a1a; padding: 0.8cqi 1.2cqi; border-radius: 0.4cqi; }
+      @container (max-width: 520px) { .mR .ttl { font-size: 4.2cqi; } .mR .ttl small { font-size: 2.2cqi; } .mR .pin i { width: 8cqi; font-size: 3.6cqi; } .mR .pin b { font-size: 2.6cqi; } .mR .dl { font-size: 3cqi; } .mR .case { width: 5cqi; font-size: 2cqi; } .mR .case.x, .mR .leg, .mR .river { display: none; } .mR .ctl span { font-size: 2.6cqi; padding: 2cqi 2.6cqi; } .mR .you { width: 3.6cqi; } .mR .you span { font-size: 2.4cqi; } }
+
+      /* ---------- Mock S: The data sheet ---------- */
+      .mS { background: #e7e1d7; color: #1a1a1a; font-family: "Inter Tight", sans-serif; container-type: inline-size; }
+      .mS .sheet { position: absolute; left: 6%; right: 6%; top: 6%; bottom: 0; background: #fff; border: 1px solid #1a1a1a22; border-bottom: 0; padding: 2.4cqi 3cqi; display: grid; grid-template-columns: 1.1fr 1fr; grid-template-rows: auto 1fr; gap: 2cqi 3cqi; }
+      .mS .hd { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: flex-end; gap: 2cqi; border-bottom: 2px solid #1a1a1a; padding-bottom: 1.2cqi; }
+      .mS .hd small { display: block; font: 400 clamp(0.45rem, 1cqi, 0.72rem)/1.6 "JetBrains Mono", monospace; color: #6c665d; letter-spacing: 0.05em; }
+      .mS .hd h6 { margin: 0; font: 800 3cqi/1 "Archivo", sans-serif; letter-spacing: -0.02em; }
+      .mS .hd .pdf { font: 600 clamp(0.5rem, 1.1cqi, 0.8rem)/1 "Inter Tight", sans-serif; border: 1.5px solid #1a1a1a; border-radius: 0.4cqi; padding: 0.8cqi 1.2cqi; white-space: nowrap; }
+      .mS .vw { position: relative; border-radius: 0.4cqi; background: linear-gradient(180deg, #f4f2ee, #e2ddd4); min-height: 0; }
+      .mS .vw::before { content: ""; position: absolute; left: 18%; right: 18%; top: 47%; height: 14%; background: linear-gradient(180deg, #d9dde1, #8e959c 60%, #5f666d); border-radius: 0.4cqi; }
+      .mS .vw::after { content: ""; position: absolute; left: 50%; top: 52%; width: 28%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle at 38% 32%, #eef1f3, #a7aeb5 45%, #4d545b 80%); }
+      .mS .vw span { position: absolute; left: 1.6cqi; bottom: 1.4cqi; font: 400 clamp(0.45rem, 1cqi, 0.72rem)/1 "JetBrains Mono", monospace; color: #6c665d; }
+      .mS .vw b { position: absolute; z-index: 1; width: 1.8cqi; aspect-ratio: 1; border-radius: 50%; background: #fff; border: 0.35cqi solid #1a1a1a; }
+      .mS dl { margin: 0; display: grid; grid-template-columns: auto 1fr; font-size: clamp(0.5rem, 1.12cqi, 0.82rem); line-height: 1.35; align-content: start; }
+      .mS dt, .mS dd { border-bottom: 1px solid #1a1a1a1a; padding: 0.85cqi 0; }
+      .mS dt { font: 400 clamp(0.45rem, 0.95cqi, 0.7rem)/1.6 "JetBrains Mono", monospace; color: #6c665d; text-transform: uppercase; letter-spacing: 0.04em; }
+      .mS dd { margin: 0; padding-left: 2cqi; }
+      @container (max-width: 520px) { .mS .sheet { left: 4%; right: 4%; top: 4%; grid-template-columns: 1fr; grid-template-rows: auto 34% 1fr; padding: 4cqi; gap: 3cqi; } .mS .hd { flex-wrap: wrap; } .mS .hd h6 { font-size: 5.6cqi; } .mS .hd small { font-size: 2.2cqi; } .mS .hd .pdf { font-size: 2.6cqi; padding: 1.6cqi 2.4cqi; } .mS dl { font-size: 2.7cqi; } .mS dt { font-size: 2.1cqi; } .mS .opt { display: none; } .mS .vw span { font-size: 2.2cqi; } .mS .vw b { width: 3.6cqi; } }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <h1>Company site: visual directions, round 5</h1>
+        <p>Five more practical concepts, built to sit next to H (Provbitarna) and L (Katalogen) in one sleek site. Each one is a tool a buyer can use, not a show. All of them scroll normally: no scroll-jacking anywhere.</p>
+        <p>These are still pictures of one screen, not working pages. Tag them on <a href="direction-feedback-v5.html">the round 5 tag page</a>.</p>
+      </header>
+
+      <h2 class="part">What I took from round 4</h2>
+      <div class="card">
+        <ul>
+          <li><b>More of:</b> H's hands-on, practical configurator, L's clear, catalogue-like offer, and J's map look.</li>
+          <li><b>Less of:</b> scroll-jacking (D), luxury packaging (E), anything too personal (F), showing off (G) and the half-finished render (K).</li>
+          <li><b>New rule for this round:</b> every concept answers a buyer's real question: what will it look like on my site, what do I need to send, have you done my kind of job, how long does it take.</li>
+          <li><b>One shared system</b>, so everything combines: <b style="font-family:Archivo;font-weight:800">Archivo 800</b> headings (from H), <span style="font-family:'Inter Tight'">Inter Tight</span> text (from L), <span class="mono">JetBrains Mono</span> labels. Colours are L's sand and ink, with H's material colours as the only accents.</li>
+        </ul>
+        <div class="swatches" style="margin-top:16px">
+          <div class="sw"><i style="background:#e7e1d7"></i><b>Sand</b><span>#E7E1D7</span></div>
+          <div class="sw"><i style="background:#f2eee7"></i><b>Seamless</b><span>#F2EEE7</span></div>
+          <div class="sw"><i style="background:#1a1a1a"></i><b>Ink</b><span>#1A1A1A</span></div>
+          <div class="sw"><i style="background:#6c665d"></i><b>Caption</b><span>#6C665D</span></div>
+          <div class="sw"><i style="background:#ac8253"></i><b>Oak</b><span>#AC8253</span></div>
+          <div class="sw"><i style="background:#59655d"></i><b>Felt</b><span>#59655D</span></div>
+          <div class="sw"><i style="background:#b9bdc1"></i><b>Alu</b><span>#B9BDC1</span></div>
+        </div>
+      </div>
+
+      <!-- ===== O ===== -->
+      <section class="dir" aria-labelledby="o-title">
+        <div class="dir-head"><h3 id="o-title">O. På din sajt</h3><span class="tag">On your site. See the 3D where it would actually live</span></div>
+        <p class="idea">Clients don't buy "a 3D viewer"; they buy a better product page. So the site shows one: a realistic web shop page with the 3D viewer in place, its hotspots and its AR button. Pick your field (web shop, industry, medical, education) and the page around the viewer changes to match. A dashed line marks the part Martin delivers.</p>
+        <div class="mock mO" role="img" aria-label="Mock of direction O: field tabs (E-handel selected, Industri, Medicin, Utbildning) above a browser window showing a web shop product page for an oak armchair; the 3D viewer is outlined with a dashed line labelled 'Lorentzon levererar den här rutan', with hotspots, an AR button, colour options and a buy button.">
+          <div class="tabs"><span class="on">E-handel</span><span>Industri</span><span>Medicin</span><span>Utbildning</span></div>
+          <span class="cap">byt bransch, sidan runt visaren byts</span>
+          <div class="win">
+            <div class="chrome"><i></i><i></i><i></i><span>dinbutik.se/produkt/fatolj-ek</span></div>
+            <div class="shop">
+              <div class="view"><span class="who">LORENTZON LEVERERAR DEN HÄR RUTAN</span><span class="hs" style="left:46%;top:36%"></span><span class="hs" style="left:64%;top:62%"></span><span class="badge">3D · dra för att vrida</span><span class="ar">Visa i ditt rum</span></div>
+              <div class="info"><small>MÖBLER / FÅTÖLJER</small><h6>Fåtölj Ek</h6><div class="ln" style="width:80%"></div><div class="ln" style="width:64%"></div><div class="ln" style="width:72%"></div><small>Klädsel</small><div class="dots"><i style="background:#ac8253"></i><i style="background:#59655d"></i><i style="background:#b9bdc1"></i><i style="background:#1d1f22"></i></div><span class="buy">Lägg i varukorgen</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="spec">
+          <div><h4>How it works</h4><p>Four tabs swap a lightweight page template around the same live viewer: a web shop page, an industrial product sheet, a medical device page, a lesson page. The viewer is real (rotate, tap hotspots, change fabric, open AR). Ordinary page; the mock is one section of it.</p></div>
+          <div><h4>What it carries over</h4><p>Everything today's site says about interactive 3D: configurations, points of interest, moving parts, AR mode, in the browser with no app, fitted into the client's own site. The "fitted into your site" promise becomes visible instead of a sentence.</p></div>
+          <div><h4>Combines with</h4><p>It is the natural page behind L's No. 02 Interaktiv 3D, with H's sample kit as the colour picker inside the viewer.</p></div>
+          <div><h4>Risk</h4><p>The page templates must look like real sites without copying any real brand. Four templates is the limit before it gets heavy.</p></div>
+          <div><h4>Scores</h4><p class="scores">Practical 5 · Fit 5 · Buildable 4 · Memorable 4</p></div>
+        </div>
+      </section>
+
+      <!-- ===== P ===== -->
+      <section class="dir" aria-labelledby="p-title">
+        <div class="dir-head"><h3 id="p-title">P. Underlaget</h3><span class="tag">The brief builder. Tick what you need, get a plan</span></div>
+        <p class="idea">The contact page is a checklist instead of a form. Tick what you need (a film, stills, a 3D viewer, AR, a Blender tool), and a panel beside it builds a plan: about how long it takes, exactly which files to send, and what happens next. You send the plan, not a blank message. Practical for the buyer, and Martin gets a brief he can quote from.</p>
+        <div class="mock mP" role="img" aria-label="Mock of direction P: the heading 'Vad behöver du?', a checklist with Produktfilm and Interaktiv 3D-visare ticked and a stepper for 6 stills, and a black panel showing 'Ungefär 3–4 veckor', the files to send (STEP or IGES, references, logo), the next steps, and a 'Skicka underlaget' button.">
+          <h5>Vad behöver du?<span>Bocka i. Planen till höger byggs medan du väljer.</span></h5>
+          <ul class="opts">
+            <li class="on"><span class="box">✓</span><b>Produktfilm</b><span>30–60 s</span></li>
+            <li class="on"><span class="box">✓</span><b>Stillbilder</b><span class="step"><i>−</i>6<i>+</i></span></li>
+            <li class="on"><span class="box">✓</span><b>Interaktiv 3D-visare</b><span>i din sajt</span></li>
+            <li><span class="box"></span><b>AR-läge</b><span>iPhone + Android</span></li>
+            <li><span class="box"></span><b>Animation för utbildning</b><span>teknisk / medicin</span></li>
+            <li><span class="box"></span><b>Blender-verktyg</b><span>tillägg, pipeline</span></li>
+          </ul>
+          <div class="sum">
+            <div><small>Ungefärlig tid</small><span class="big">3–4 veckor</span></div>
+            <div><small>Skicka med</small>STEP- eller IGES-filer, referensbilder, logotyp och färgkoder.</div>
+            <div class="hide"><small>Bra att veta</small>Filmen och visaren byggs på samma modell, så den andra delen går fortare.</div>
+            <div class="hide"><small>Sen då?</small>Ett kort samtal, en offert, avstämningar varje vecka.</div>
+            <span class="btn">Skicka underlaget →</span>
+          </div>
+        </div>
+        <div class="spec">
+          <div><h4>How it works</h4><p>Plain checkboxes and steppers, so it works with keyboard and screen readers. The panel's rules are simple and written by Martin (each item adds time and files; some items share work). Sending opens e-mail or SMS with the plan filled in, or posts it to a form. No prices unless you want them.</p></div>
+          <div><h4>What it carries over</h4><p>Today's FAQ, made useful: the short call, the quote, regular check-ins; STEP or IGES; a couple of weeks for simpler jobs; SMS or e-mail preferred. The services list is the checklist.</p></div>
+          <div><h4>Combines with</h4><p>The contact page for the whole site. L's catalogue articles each get an "Add to brief" button, like a basket.</p></div>
+          <div><h4>Risk</h4><p>Time estimates must be honest ranges, or they become promises. Keep it to six options.</p></div>
+          <div><h4>Scores</h4><p class="scores">Practical 5 · Fit 5 · Buildable 5 · Memorable 3</p></div>
+        </div>
+      </section>
+
+      <!-- ===== Q ===== -->
+      <section class="dir" aria-labelledby="q-title">
+        <div class="dir-head"><h3 id="q-title">Q. Arkivet</h3><span class="tag">The archive. Work you can filter like a product range</span></div>
+        <p class="idea">The work page behaves like a good web shop listing: filter by what was made (film, interactive 3D, tools) and by field (industry, medical, education, consumer), and the grid narrows down. Each card says what was delivered and how long it took. A buyer from a medical company finds medical work in two clicks.</p>
+        <div class="mock mQ" role="img" aria-label="Mock of direction Q: filter chips (Alla, Produktfilm, Interaktiv 3D selected, Verktyg, then Industri selected, Medicin, Utbildning, Konsument) and '4 av 14 projekt', above four project cards with images, titles, tags and delivery specs.">
+          <div class="bar"><span>Alla</span><span>Produktfilm</span><span class="on">Interaktiv 3D</span><span>Verktyg</span><span class="sep"></span><span class="on">Industri</span><span>Medicin</span><span class="x">Utbildning</span><span class="x">Konsument</span><span class="n">4 av 14 projekt</span></div>
+          <div class="grid">
+            <div class="c c1"><div class="im"></div><h6>Högtalare, lansering</h6><div class="t"><span>Film</span><span>3D</span></div><span class="s">45 s film + visare · 3 v</span></div>
+            <div class="c c2"><div class="im"></div><h6>Ventil, säljstöd</h6><div class="t"><span>3D</span><span>Industri</span></div><span class="s">Visare, 4 intressepunkter · 2 v</span></div>
+            <div class="c c3"><div class="im"></div><h6>Fåtölj, konfigurator</h6><div class="t"><span>3D</span><span>AR</span></div><span class="s">12 tyger, AR · 4 v</span></div>
+            <div class="c c4"><div class="im"></div><h6>Exportverktyg</h6><div class="t"><span>Verktyg</span><span>Blender</span></div><span class="s">Sparar 6 h per vecka</span></div>
+          </div>
+        </div>
+        <div class="spec">
+          <div><h4>How it works</h4><p>Two rows of filter buttons that change the address (so a filtered view can be shared: /arbeten?typ=3d&amp;bransch=industri). Works without JavaScript as a plain list. Cards open L-style article pages or S's data sheets.</p></div>
+          <div><h4>What it carries over</h4><p>The three services become the first filter row; the fields today's site names (industry, education, medicine, products) become the second. Blender add-ons sit in the same grid as client work.</p></div>
+          <div><h4>Combines with</h4><p>The "Arbeten" page of the combined site. Every card opens an S data sheet.</p></div>
+          <div><h4>Risk</h4><p>Needs about 12 real projects to feel full; with fewer, hide the field filter until it's useful. The mock's projects are placeholders.</p></div>
+          <div><h4>Scores</h4><p class="scores">Practical 5 · Fit 5 · Buildable 5 · Memorable 2</p></div>
+        </div>
+      </section>
+
+      <!-- ===== R ===== -->
+      <section class="dir" aria-labelledby="r-title">
+        <div class="dir-head"><h3 id="r-title">R. Kartan</h3><span class="tag">The map. The whole studio as a game-style city map</span></div>
+        <p class="idea">J's zoom, made practical. The overview is a flat, top-down city map in the style of open-world game maps: a river through the middle, three districts named after the services, a marker for each project and a "You are here" dot. Hover a marker for a preview, click to open it. It's a sitemap people actually want to use, with a list view one click away.</p>
+        <div class="mock mR" role="img" aria-label="Mock of direction R: a flat top-down city map with a river, three districts labelled Filmkvarteret, 3D-hamnen and Verkstaden, black square markers for Produktfilm, Interaktiv 3D and Verktyg, round numbered project markers, a blue 'Du är här' dot, a legend at bottom left, and zoom and 'Visa som lista' buttons at bottom right.">
+          <div class="land n"></div><div class="land s"></div>
+          <div class="park" style="left:8%;top:30%;width:12%;height:16%"></div>
+          <div class="park" style="left:70%;top:72%;width:14%;height:14%"></div>
+          <div class="road" style="left:0;top:20%;width:110%;transform:rotate(9deg)"></div>
+          <div class="road" style="left:55%;top:0;width:60%;transform:rotate(78deg)"></div>
+          <div class="ttl">Karta<small>Lorentzon Visualisation, Göteborg</small></div>
+          <span class="dl" style="left:22%;top:13%">Filmkvarteret</span>
+          <span class="dl" style="left:63%;top:9%">3D-hamnen</span>
+          <span class="dl" style="left:40%;top:88%">Verkstaden</span>
+          <span class="river">ÄLVEN</span>
+          <div class="pin" style="left:26%;top:28%"><i>▶</i><b>Produktfilm</b></div>
+          <div class="pin" style="left:70%;top:24%"><i>◆</i><b>Interaktiv 3D</b></div>
+          <div class="pin" style="left:52%;top:82%"><i>⚙</i><b>Verktyg</b></div>
+          <span class="case" style="left:40%;top:36%">03</span><span class="case x" style="left:16%;top:52%">07</span><span class="case" style="left:84%;top:16%">11</span><span class="case x" style="left:60%;top:36%">12</span><span class="case" style="left:30%;top:88%">14</span><span class="case x" style="left:86%;top:62%">09</span>
+          <div class="you"><span>Du är här</span></div>
+          <div class="leg"><b>Teckenförklaring</b><span>▶ Film &amp; animation</span><span>◆ Interaktiv 3D</span><span>⚙ Verktyg &amp; tillägg</span><span>◯ Projekt</span></div>
+          <div class="ctl"><span>+</span><span>−</span><span>Visa som lista</span></div>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#9fbcc2"></i><b>River</b><span>#9FBCC2</span></div>
+            <div class="sw"><i style="background:#ddd5c6"></i><b>Land</b><span>#DDD5C6</span></div>
+            <div class="sw"><i style="background:#b6c2a0"></i><b>Park</b><span>#B6C2A0</span></div>
+            <div class="sw"><i style="background:#1a1a1a"></i><b>Marker</b><span>#1A1A1A</span></div>
+            <div class="sw"><i style="background:#2b4cc4"></i><b>You</b><span>#2B4CC4</span></div>
+          </div></div>
+          <div><h4>How it works</h4><p>The map is one component on a normal page; it pans and zooms only when you use it (drag, pinch, + and −), never by hijacking the page scroll. Three zoom levels: city, district, project. "Visa som lista" shows the same content as Q's list, which is also what screen readers get.</p></div>
+          <div><h4>What it carries over</h4><p>Each district is a service, and each marker is a project placed in its district. Verkstaden (the workshop) holds the Blender add-ons. Martin's studio is a marker of its own (About). The river nods to Göta älv without being a real map.</p></div>
+          <div><h4>Combines with</h4><p>The overview page and the footer of the combined site; also a good 404 page ("you've left the map").</p></div>
+          <div><h4>Risk</h4><p>The game-map look must stay generic: our own drawing style and icons, nothing taken from GTA or any other game. Needs enough projects to fill the districts.</p></div>
+          <div><h4>Scores</h4><p class="scores">Practical 4 · Fit 4 · Buildable 3 · Memorable 5</p></div>
+        </div>
+      </section>
+
+      <!-- ===== S ===== -->
+      <section class="dir" aria-labelledby="s-title">
+        <div class="dir-head"><h3 id="s-title">S. Databladet</h3><span class="tag">The data sheet. Every project on one page you can forward</span></div>
+        <p class="idea">Each case study is a one-page data sheet, like the ones industrial buyers already read: a live 3D view at the top, then a table of facts (the job, what the client sent, what was delivered, how long it took, which tools were used, what it was used for). One button saves it as a PDF, so the person who found the site can forward it to the person who decides.</p>
+        <div class="mock mS" role="img" aria-label="Mock of direction S: a white data sheet titled 'Reglerventil, säljstöd' with a 'Ladda ner PDF' button, a 3D view of a valve with hotspots, and a fact table: Uppdrag, Indata, Leverans, Tid, Verktyg, Användning.">
+          <div class="sheet">
+            <div class="hd"><div><small>DATABLAD · PROJEKT 07 · INDUSTRI · EXEMPEL</small><h6>Reglerventil, säljstöd</h6></div><span class="pdf">↓ Ladda ner PDF</span></div>
+            <div class="vw"><b style="left:44%;top:30%"></b><b style="left:72%;top:46%"></b><span>3D · dra för att vrida</span></div>
+            <dl>
+              <dt>Uppdrag</dt><dd>Film och 3D-visare till mässa och säljmöten</dd>
+              <dt>Indata</dt><dd>STEP-filer från konstruktören, inga foton</dd>
+              <dt>Leverans</dt><dd>Film 60 s i 4K, 8 stillbilder, visare med 4 intressepunkter</dd>
+              <dt>Tid</dt><dd>3 veckor, avstämning varje fredag</dd>
+              <dt class="opt">Verktyg</dt><dd class="opt">Eget Blender-tillägg för snittvyer</dd>
+              <dt class="opt">Användning</dt><dd class="opt">Visades för kunder innan prototypen fanns</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="spec">
+          <div><h4>How it works</h4><p>An ordinary page with a print stylesheet that lays it out as an A4 sheet; "Download PDF" is the browser's print-to-PDF with that layout, so there's no PDF to maintain. The fact table is the same on every project, so they're easy to compare.</p></div>
+          <div><h4>What it carries over</h4><p>Today's FAQ answers, shown per project: which files were accepted, how long it took, how check-ins worked. The "before a prototype exists" promise shows up as a fact, not a claim. Tools rows quietly advertise the Blender add-ons.</p></div>
+          <div><h4>Combines with</h4><p>Every project page in the combined site. It's L's catalogue spec, scaled up to a whole case.</p></div>
+          <div><h4>Risk</h4><p>Dry if the 3D view and images aren't strong. Client names and numbers need permission; the mock's project is an example.</p></div>
+          <div><h4>Scores</h4><p class="scores">Practical 5 · Fit 5 · Buildable 5 · Memorable 3</p></div>
+        </div>
+      </section>
+
+      <h2 class="part">How it all combines into one site</h2>
+      <div class="card">
+        <table class="combo">
+          <thead><tr><th>Page</th><th>Built from</th><th>What the buyer gets</th></tr></thead>
+          <tbody>
+            <tr><td>Start</td><td>L Katalogen</td><td>The three services as numbered articles with a short spec: clear in 3 seconds.</td></tr>
+            <tr><td>No. 02 Interaktiv 3D</td><td>O På din sajt + H Provbitarna</td><td>A live viewer inside a page like theirs, with material samples to drag onto it.</td></tr>
+            <tr><td>No. 01 Film, No. 03 Verktyg</td><td>L Katalogen spreads</td><td>A film or a tool demo up top, then specs and examples.</td></tr>
+            <tr><td>Arbeten</td><td>Q Arkivet</td><td>Filter by service and field; find their kind of job in two clicks.</td></tr>
+            <tr><td>Each project</td><td>S Databladet</td><td>One sheet of facts and a 3D view, saved as a PDF for whoever decides.</td></tr>
+            <tr><td>Kontakt</td><td>P Underlaget</td><td>Tick what they need; get time, files to send and next steps, then send it.</td></tr>
+            <tr><td>Overview, footer, 404</td><td>R Kartan</td><td>The memorable touch: the whole studio as a map, with a list view one click away.</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-bottom:0">Normal scrolling throughout. Motion only where the visitor acts: drag, tap, hover, filter.</p>
+      </div>
+
+      <h2 class="part">Recommendation</h2>
+      <div class="card">
+        <p style="margin-top:0"><b>Build the combination above.</b> Of the five new ones, <b>O (På din sajt)</b> is the strongest: it answers the buyer's first question, "what would this look like for us?", and it makes interactive 3D, the most valuable service, concrete.</p>
+        <p style="margin-bottom:0"><b>P and S are the workhorses</b> (cheap to build, useful every day), <b>Q</b> becomes worth it once there are about 12 projects, and <b>R</b> is the one people will remember, so keep it for the overview and the 404 page rather than the front door.</p>
+      </div>
+    </div>
+  </body>
+</html>
