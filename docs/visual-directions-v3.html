@@ -82,6 +82,69 @@
         .mY .word { top: 38%; } .mY .bottom { grid-template-columns: 1fr; gap: 8px; }
         .mZ .obj { width: 36%; left: 46%; } .mZ .shadow { left: 6%; width: 46%; } .mZ .cap { flex-direction: column; }
       }
+
+      /* ---------- Mock T: Take over the frame ---------- */
+      .mT { background: #0a0a0a; color: #f4f2ee; font-family: "Archivo", sans-serif; container-type: inline-size; }
+      .mT .frame { position: absolute; left: 0; right: 0; top: 0; bottom: 0; background: radial-gradient(60% 90% at 62% 55%, #6b6660, #2b2926 55%, #121110); overflow: hidden; }
+      .mT .frame::before { content: ""; position: absolute; left: 50%; top: 22%; width: 22%; aspect-ratio: 0.8; border-radius: 46% 46% 16% 16% / 54% 54% 14% 14%; background: radial-gradient(80% 70% at 30% 25%, #fff7ea, #d8cfc2 38%, #6f6960 80%); box-shadow: -40px 50px 50px -30px #000c; }
+      .mT .frame::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 0 66%, #f0c98718 66%); border-left: 0; }
+      .mT .bar { position: absolute; left: 0; right: 34%; height: 13%; background: #0a0a0a; }
+      .mT .bar.t { top: 0; } .mT .bar.b { bottom: 0; }
+      .mT .tc { position: absolute; left: 4%; top: 4.5%; font: 400 clamp(0.55rem, 1.1cqi, 0.8rem)/1 "JetBrains Mono", monospace; color: #8d8a85; }
+      .mT .sub { position: absolute; left: 33%; bottom: 17%; transform: translateX(-50%); text-align: center; font-weight: 500; font-size: clamp(0.7rem, 1.9cqi, 1.25rem); text-shadow: 0 1px 2px #000; max-width: 60%; }
+      .mT h5 { position: absolute; left: 4%; top: 19%; margin: 0; font-weight: 900; font-variation-settings: "wdth" 125; font-size: clamp(1.1rem, 4.6cqi, 3.2rem); line-height: 0.92; letter-spacing: -0.03em; }
+      .mT .grab { position: absolute; left: 76%; top: 42%; width: 9cqi; aspect-ratio: 1; border: 1.5px solid #f4f2ee; border-radius: 50%; display: grid; place-items: center; font-size: clamp(0.9rem, 2.4cqi, 1.6rem); }
+      .mT .grab span { position: absolute; top: 108%; white-space: nowrap; font: 400 clamp(0.55rem, 1.1cqi, 0.8rem)/1 "JetBrains Mono", monospace; color: #f0c987; }
+
+      /* ---------- Mock U: Exploded view ---------- */
+      .mU { background: #eceef0; color: #101214; font-family: "Archivo", sans-serif; container-type: inline-size; }
+      .mU h5 { position: absolute; left: 5%; top: 9%; margin: 0; font-weight: 900; font-variation-settings: "wdth" 125; font-size: clamp(1.1rem, 4.2cqi, 3rem); line-height: 0.93; letter-spacing: -0.03em; max-width: 46%; }
+      .mU .part { position: absolute; left: 50%; width: 22%; height: 11%; border-radius: 40% / 50%; background: linear-gradient(180deg, #ffffff, #c4cad1 70%, #8f98a3); box-shadow: 0 10px 18px -12px #10121499; }
+      .mU .p1 { top: 14%; transform: translateX(10%); height: 7%; }
+      .mU .p2 { top: 30%; transform: translateX(4%); background: linear-gradient(180deg, #1f2327, #3a4047); }
+      .mU .p3 { top: 47%; transform: translateX(-2%); height: 16%; border-radius: 22% / 30%; }
+      .mU .p4 { top: 72%; transform: translateX(-8%); height: 8%; background: linear-gradient(180deg, #0e7c66, #0a5a4a); }
+      .mU .axis { position: absolute; left: 61%; top: 10%; bottom: 10%; border-left: 1px dashed #9aa3ad; transform: rotate(-4deg); }
+      .mU .call { position: absolute; display: flex; align-items: center; gap: 8px; font-size: clamp(0.58rem, 1.35cqi, 0.95rem); white-space: nowrap; }
+      .mU .call b { display: inline-grid; place-items: center; width: 2.6cqi; min-width: 16px; aspect-ratio: 1; border-radius: 50%; background: #0e7c66; color: #fff; font-size: 0.85em; }
+      .mU .call i { display: block; width: 6cqi; height: 1px; background: #0e7c66; }
+      .mU .c1 { left: 76%; top: 16%; } .mU .c2 { left: 76%; top: 32%; } .mU .c3 { left: 76%; top: 52%; } .mU .c4 { left: 74%; top: 74%; }
+      .mU .foot { position: absolute; left: 5%; bottom: 9%; font-size: clamp(0.6rem, 1.3cqi, 0.9rem); color: #687079; max-width: 36%; }
+
+      /* ---------- Mock V: Triptych ---------- */
+      .mV { background: #0f1012; color: #f2f2f0; font-family: "Archivo", sans-serif; container-type: inline-size; display: grid; grid-template-columns: 1fr 3.2fr 1fr; gap: 3px; }
+      .mV .pan { position: relative; overflow: hidden; }
+      .mV .pan.a { background: linear-gradient(160deg, #2a2d31, #16181b); }
+      .mV .pan.b { background: radial-gradient(70% 80% at 55% 45%, #e9ecef, #b9bec4 60%, #7d848c); color: #101214; }
+      .mV .pan.c { background: linear-gradient(160deg, #cfccc6, #9e9a93); color: #101214; }
+      .mV .lab { position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%) rotate(180deg); writing-mode: vertical-rl; white-space: nowrap; font-weight: 800; font-variation-settings: "wdth" 62; font-size: clamp(0.8rem, 2.6cqi, 2rem); letter-spacing: -0.01em; }
+      .mV .num { position: absolute; left: 12%; top: 6%; font: 400 clamp(0.55rem, 1.1cqi, 0.8rem)/1 "JetBrains Mono", monospace; opacity: 0.7; }
+      .mV .pan.b h5 { position: absolute; left: 6%; top: 12%; margin: 0; font-weight: 900; font-variation-settings: "wdth" 125; font-size: clamp(1rem, 4cqi, 2.9rem); line-height: 0.92; letter-spacing: -0.03em; }
+      .mV .pan.b p { position: absolute; left: 6%; bottom: 8%; margin: 0; max-width: 46%; font-size: clamp(0.58rem, 1.3cqi, 0.92rem); color: #3a4047; }
+      .mV .film { position: absolute; right: 6%; bottom: 8%; width: 42%; aspect-ratio: 16 / 9; border-radius: 4px; background: linear-gradient(135deg, #3a4047, #101214); display: grid; place-items: center; color: #f2f2f0; font-size: clamp(0.8rem, 2cqi, 1.4rem); }
+
+      /* ---------- Mock W: The showroom ---------- */
+      .mW { background: #f3f3f1; color: #111; font-family: "Archivo", sans-serif; container-type: inline-size; }
+      .mW .wall { position: absolute; left: 14%; right: 14%; top: 8%; height: 50%; background: linear-gradient(180deg, #f7f6f3, #e3e1dc); }
+      .mW .floor { position: absolute; left: 0; right: 0; top: 58%; bottom: 0; background: linear-gradient(180deg, #c9c6c0, #b2aea7); clip-path: polygon(14% 0, 86% 0, 100% 100%, 0 100%); }
+      .mW .sidel { position: absolute; left: 0; top: 0; width: 14%; height: 100%; background: linear-gradient(90deg, #d8d5cf, #ebe9e4); clip-path: polygon(0 0, 100% 8%, 100% 58%, 0 100%); }
+      .mW .sider { position: absolute; right: 0; top: 0; width: 14%; height: 100%; background: linear-gradient(270deg, #d0cdc7, #e6e4df); clip-path: polygon(0 8%, 100% 0, 100% 100%, 0 58%); }
+      .mW .screen { position: absolute; left: 41%; top: 16%; width: 20%; aspect-ratio: 16 / 9; background: linear-gradient(135deg, #2a2b2d, #0e0f10); border-radius: 2px; display: grid; place-items: center; color: #f3f3f1; font-size: clamp(0.6rem, 1.5cqi, 1rem); }
+      .mW .plinth { position: absolute; left: 21%; top: 50%; width: 13%; height: 24%; background: linear-gradient(180deg, #ffffff, #dcd9d3); border-radius: 2px; }
+      .mW .plinth::before { content: ""; position: absolute; left: 22%; bottom: 100%; width: 56%; aspect-ratio: 0.85; border-radius: 46% 46% 16% 16% / 54% 54% 14% 14%; background: radial-gradient(80% 70% at 30% 25%, #ffffff, #a9b3c0 40%, #3d4652 85%); }
+      .mW .cfg { position: absolute; left: 21%; top: 77%; display: flex; gap: 6px; }
+      .mW .cfg i { width: 1.6cqi; min-width: 10px; aspect-ratio: 1; border-radius: 50%; border: 1px solid #0003; }
+      .mW .bench { position: absolute; right: 18%; top: 55%; width: 16%; height: 6%; background: #2a2b2d; border-radius: 2px; }
+      .mW .bench::before { content: ""; position: absolute; left: 10%; bottom: 140%; width: 80%; height: 260%; background: #fff; border: 1px solid #c9c6c0; border-radius: 3px; background-image: linear-gradient(#e6e4df 1px, transparent 1px); background-size: 100% 22%; }
+      .mW .tag3 { position: absolute; font: 400 clamp(0.52rem, 1.05cqi, 0.78rem)/1.3 "JetBrains Mono", monospace; color: #3a3b3d; }
+      .mW h5 { position: absolute; left: 4%; top: 4%; margin: 0; font-weight: 900; font-variation-settings: "wdth" 125; font-size: clamp(0.9rem, 2.6cqi, 1.9rem); line-height: 0.95; letter-spacing: -0.02em; z-index: 1; }
+      .mW .light { position: absolute; left: 30%; right: 30%; top: 0; height: 60%; background: radial-gradient(50% 60% at 50% 0%, #fff4e080, transparent 70%); pointer-events: none; }
+      @media (max-width: 640px) {
+        .mT h5 { top: 16%; } .mT .sub { max-width: 80%; transform: translateX(-50%); } .mT .grab { left: 70%; top: 52%; width: 14cqi; }
+        .mU h5 { max-width: 90%; } .mU .part { width: 34%; left: 18%; } .mU .axis { left: 35%; } .mU .call { left: 58% !important; } .mU .foot { display: none; }
+        .mV { grid-template-columns: 1fr; grid-template-rows: 1fr 3.2fr 1fr; } .mV .lab { writing-mode: horizontal-tb; transform: translate(-50%, 0); bottom: 28%; } .mV .film { display: none; } .mV .pan.b p { max-width: 88%; }
+        .mW h5 { font-size: 5cqi; } .mW .tag3 { display: none; }
+      }
     </style>
   </head>
   <body>
@@ -188,10 +251,141 @@
         </div>
       </section>
 
+      <h2 class="part">Four more: composition and immersion</h2>
+      <div class="card">
+        <p style="margin-top:0">Each of these is built around how the page is composed and how far it pulls the visitor in, and each one carries what today's site already says:</p>
+        <ul>
+          <li><b>Interaktiv 3D:</b> configurations, points of interest, moving parts and AR mode, in the browser with no app, fitted into the client's own site.</li>
+          <li><b>Infografik &amp; animation:</b> product films and stills from CAD files or sketches before a prototype exists; stylised and technical animation for education and medicine.</li>
+          <li><b>Arbetsflöden &amp; interna verktyg:</b> automating long processes, parametric 3D models, easier asset distribution, reusable components.</li>
+          <li><b>Om mig, kontakt, FAQ:</b> self-taught 3D generalist, Yrgo, the car industry, teaching, own tools company; a short call, then a quote, then regular check-ins; STEP or IGES files; a couple of weeks for simpler jobs; SMS or e-mail preferred.</li>
+        </ul>
+      </div>
+
+      <!-- ===== T ===== -->
+      <section class="dir" aria-labelledby="t-title">
+        <div class="dir-head"><h3 id="t-title">T. Ta över bilden</h3><span class="tag">Take over the frame. A film that hands you the controls</span></div>
+        <p class="idea">The page plays like a film: full-screen, letterboxed, with subtitles carrying the copy in Martin's own voice. At the right moment the black bars slide away and the film becomes a 3D model the visitor can grab and turn. Film and interactive 3D, the two main services, explained in one gesture.</p>
+        <div class="mock mT" role="img" aria-label="Mock of direction T: a letterboxed film frame of a product, subtitle 'Det här är en film. Dra i den.', a timecode, and a round grab cursor on the right where the black bars have slid away.">
+          <div class="frame"></div>
+          <div class="bar t"></div><div class="bar b"></div>
+          <span class="tc">SC 01 · 00:00:14:08</span>
+          <h5>Film du kan<br />ta i.</h5>
+          <p class="sub">Det här är en produktfilm. Dra i den.</p>
+          <div class="grab">↻<span>ta över bilden</span></div>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#0a0a0a"></i><b>Letterbox</b><span>#0A0A0A</span></div>
+            <div class="sw"><i style="background:#f4f2ee"></i><b>Ink</b><span>#F4F2EE</span></div>
+            <div class="sw"><i style="background:#8d8a85"></i><b>Muted</b><span>#8D8A85</span></div>
+            <div class="sw"><i style="background:#2b2926"></i><b>Set</b><span>#2B2926</span></div>
+            <div class="sw"><i style="background:#f0c987"></i><b>Tungsten</b><span>#F0C987</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:Archivo;font-weight:900;font-variation-settings:'wdth' 125">Archivo Expanded 900</b> for scene titles, Archivo 500 at reading size for subtitles, <span style="font-family:'JetBrains Mono'">JetBrains Mono</span> for scene and timecode. Google Fonts.</p></div>
+          <div><h4>Composition &amp; immersion</h4><p>Every section is a full-screen 2.39:1 scene inside black bars; the copy lives only in the subtitle line, so the image always gets the whole frame. Signature: the bars retract and the cursor becomes a grab ring, and the same object is now real-time 3D. Scroll cuts between scenes (hard cuts, like an edit). Motion verb: <i>cut</i>.</p></div>
+          <div><h4>What it carries over</h4><p>Scene 1 is a product film made from CAD files. Scene 2 hands over control: rotate it, open a moving part, tap a point of interest, AR button. Scene 3: an education or medical animation. Scene 4: a timelapse of a tool doing an hour's work in seconds. The About page is the credits roll; the FAQ is "behind the scenes".</p></div>
+          <div><h4>References</h4><p class="refs"><a href="https://activetheory.net">activetheory.net</a><a href="https://a24films.com">a24films.com</a><a href="https://lusion.co">lusion.co</a></p></div>
+          <div><h4>Risk</h4><p>Needs a real film cut and a real-time version of the same object, so it costs the most content. Autoplaying film must stay silent and stop with reduced motion.</p></div>
+          <div><h4>Scores</h4><p class="scores">Originality 5 · Fit 5 · Buildable 3 · Portable 2</p></div>
+        </div>
+      </section>
+
+      <!-- ===== U ===== -->
+      <section class="dir" aria-labelledby="u-title">
+        <div class="dir-head"><h3 id="u-title">U. Sprängskiss</h3><span class="tag">Exploded view. Scroll takes the product apart</span></div>
+        <p class="idea">One pinned, full-screen product comes apart as you scroll, like an assembly drawing. Each layer that floats free is labelled with something today's site promises: configurations, points of interest, moving parts, AR. Then it snaps back together into a finished render. Anyone understands an exploded view, whether it's a speaker, a heart or a machine.</p>
+        <div class="mock mU" role="img" aria-label="Mock of direction U: a product split into four floating layers along a dashed axis, each with a numbered green callout: Konfigurationer, Intressepunkter, Rörliga delar, AR-läge.">
+          <h5>Se hur den fungerar, innan den finns.</h5>
+          <div class="axis"></div>
+          <div class="part p1"></div><div class="part p2"></div><div class="part p3"></div><div class="part p4"></div>
+          <span class="call c1"><i></i><b>1</b>Konfigurationer</span>
+          <span class="call c2"><i></i><b>2</b>Intressepunkter</span>
+          <span class="call c3"><i></i><b>3</b>Rörliga delar</span>
+          <span class="call c4"><i></i><b>4</b>AR-läge</span>
+          <p class="foot">Interaktiv 3D i webbläsaren, utan app. Från dina CAD-filer.</p>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#eceef0"></i><b>Drawing</b><span>#ECEEF0</span></div>
+            <div class="sw"><i style="background:#101214"></i><b>Ink</b><span>#101214</span></div>
+            <div class="sw"><i style="background:#687079"></i><b>Muted</b><span>#687079</span></div>
+            <div class="sw"><i style="background:#cfd4d9"></i><b>Line</b><span>#CFD4D9</span></div>
+            <div class="sw"><i style="background:#0e7c66"></i><b>Callout</b><span>#0E7C66</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:Archivo;font-weight:900;font-variation-settings:'wdth' 125">Archivo Expanded 900</b> for headlines, Archivo for callouts and text. Numbers in the callouts set in Archivo bold. Google Fonts.</p></div>
+          <div><h4>Composition &amp; immersion</h4><p>One object owns the whole viewport for a long, pinned scroll (the pinned full-screen pattern the site already has). Text never sits in a column; it hangs off leader lines attached to the parts. Signature: the scroll-scrubbed explode and re-assemble, with callouts drawing their lines as each part arrives. Motion verb: <i>separate</i>, then <i>click</i> back.</p></div>
+          <div><h4>What it carries over</h4><p>The four callouts are the interactive-3D features word for word. The re-assembled object becomes the first frame of a product film (animation). The tools section explodes a workflow the same way: five manual steps that collapse into one button. The ordering FAQ becomes a four-part assembly: call, quote, work, check-ins.</p></div>
+          <div><h4>References</h4><p class="refs"><a href="https://www.apple.com/airpods-pro/">apple.com/airpods-pro</a><a href="https://teenage.engineering">teenage.engineering</a><a href="https://nothing.tech">nothing.tech</a></p></div>
+          <div><h4>Risk</h4><p>Exploded views are common on product launch pages, so the execution has to be exceptional, and it needs a model built in separable parts. Strongest for products and medicine; tools need the "exploded workflow" twist.</p></div>
+          <div><h4>Scores</h4><p class="scores">Originality 3 · Fit 5 · Buildable 4 · Portable 3</p></div>
+        </div>
+      </section>
+
+      <!-- ===== V ===== -->
+      <section class="dir" aria-labelledby="v-title">
+        <div class="dir-head"><h3 id="v-title">V. Triptyk</h3><span class="tag">Triptych. Three services, three full-height panels</span></div>
+        <p class="idea">The first screen is split into three full-height panels, one per service, each already running a live sample: a 3D viewer, a film loop, a tool at work. Point at one and it opens to fill the screen while the others fold into slim spines. Visitors see everything the company does in three seconds, then step into the one they came for.</p>
+        <div class="mock mV" role="img" aria-label="Mock of direction V: three vertical panels; the left and right are slim with vertical labels 'Interaktiv 3D' and 'Verktyg', the middle is open wide with the headline 'Infografik & animation' and a film frame with a play symbol.">
+          <div class="pan a"><span class="num">01</span><span class="lab">Interaktiv 3D</span></div>
+          <div class="pan b"><span class="num">02</span><h5>Infografik<br />&amp; animation</h5><p>Produktfilm från CAD eller skiss, och teknisk animation för utbildning och medicin.</p><div class="film">▶</div></div>
+          <div class="pan c"><span class="num">03</span><span class="lab">Verktyg</span></div>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#16181b"></i><b>Graphite</b><span>#16181B</span></div>
+            <div class="sw"><i style="background:#e9ecef"></i><b>Mist</b><span>#E9ECEF</span></div>
+            <div class="sw"><i style="background:#cfccc6"></i><b>Stone</b><span>#CFCCC6</span></div>
+            <div class="sw"><i style="background:#101214"></i><b>Ink</b><span>#101214</span></div>
+            <div class="sw"><i style="background:#f2f2f0"></i><b>Paper</b><span>#F2F2F0</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:Archivo;font-weight:800;font-variation-settings:'wdth' 62">Archivo Condensed</b> on the folded spines, <b style="font-family:Archivo;font-weight:900;font-variation-settings:'wdth' 125">Archivo Expanded</b> when a panel opens: the type's width follows the panel's width, one variable font doing the animation. Google Fonts.</p></div>
+          <div><h4>Composition &amp; immersion</h4><p>A three-column grid that is always full-height, with one column taking over. Opening a panel is a shared-element move into that service's page, so the visitor never leaves the composition. Signature: the panel opening while its label stretches from condensed to expanded. Motion verb: <i>unfold</i>. On phones the panels stack and open downward.</p></div>
+          <div><h4>What it carries over</h4><p>The three panels are today's three services with their real copy. Each runs a live sample: the viewer turns and shows a hotspot, the film loops, the tool panel ticks through an automated job. A fourth, thin panel on the far right is "Martin": portrait, Yrgo, the car industry, contact by SMS or e-mail.</p></div>
+          <div><h4>References</h4><p class="refs"><a href="https://locomotive.ca">locomotive.ca</a><a href="https://cuberto.com">cuberto.com</a><a href="https://www.pentagram.com">pentagram.com</a></p></div>
+          <div><h4>Risk</h4><p>Three live samples on one screen are heavy, so only the open panel runs; the spines show stills. The layout is clear but less of a story than T or U.</p></div>
+          <div><h4>Scores</h4><p class="scores">Originality 3 · Fit 5 · Buildable 4 · Portable 3</p></div>
+        </div>
+      </section>
+
+      <!-- ===== W ===== -->
+      <section class="dir" aria-labelledby="w-title">
+        <div class="dir-head"><h3 id="w-title">W. Visningsrummet</h3><span class="tag">The showroom. One continuous 3D room you walk through</span></div>
+        <p class="idea">The whole site is a single, quiet gallery room rendered in 3D. Scrolling walks the camera through it: a product on a plinth you can configure, a screen on the far wall playing a film, a workbench where a tool runs on its own. Every service is shown by being done, in one unbroken space.</p>
+        <div class="mock mW" role="img" aria-label="Mock of direction W: a pale gallery room in perspective with a product on a plinth and colour swatches on the left, a film screen on the back wall, and a workbench with a tool panel on the right, under a soft ceiling light.">
+          <div class="sidel"></div><div class="sider"></div>
+          <div class="wall"></div><div class="floor"></div><div class="light"></div>
+          <div class="screen">▶</div>
+          <div class="plinth"></div>
+          <div class="cfg"><i style="background:#e9ecef"></i><i style="background:#3d4652"></i><i style="background:#0e7c66"></i></div>
+          <div class="bench"></div>
+          <span class="tag3" style="left:21%;top:83%">1 Konfigurera</span>
+          <span class="tag3" style="left:43%;top:40%">2 Produktfilm</span>
+          <span class="tag3" style="right:18%;top:64%">3 Verktyg</span>
+          <h5>Välkommen in.</h5>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#f3f3f1"></i><b>Wall</b><span>#F3F3F1</span></div>
+            <div class="sw"><i style="background:#b9b6b1"></i><b>Concrete</b><span>#B9B6B1</span></div>
+            <div class="sw"><i style="background:#2a2b2d"></i><b>Shadow</b><span>#2A2B2D</span></div>
+            <div class="sw"><i style="background:#111111"></i><b>Ink</b><span>#111111</span></div>
+            <div class="sw"><i style="background:#fff4e0"></i><b>Daylight</b><span>#FFF4E0</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:Archivo;font-weight:900;font-variation-settings:'wdth' 125">Archivo Expanded 900</b> for the few headlines, Archivo for text, <span style="font-family:'JetBrains Mono'">JetBrains Mono</span> for the small wall labels, like a museum. Google Fonts.</p></div>
+          <div><h4>Composition &amp; immersion</h4><p>Maximum immersion: the 3D room is the layout, and text appears as wall labels next to each station, never as page sections. Signature: the camera glides from station to station on scroll and stops; at each stop the visitor can act (pick a colour, press play, run the tool). Motion verb: <i>walk</i>. A plain list view sits one click away for anyone who wants it.</p></div>
+          <div><h4>What it carries over</h4><p>Station 1 is interactive 3D (configure, hotspots, AR button). Station 2 is a film screen: product film and a medical animation. Station 3 is the tools bench: a script batch-builds parametric models. A desk in the corner is "Om mig", with the Yrgo diploma and a phone that says "sms:a helst".</p></div>
+          <div><h4>References</h4><p class="refs"><a href="https://bruno-simon.com">bruno-simon.com</a><a href="https://igloo.inc">igloo.inc</a><a href="https://lusion.co">lusion.co</a></p></div>
+          <div><h4>Risk</h4><p>The heaviest to build and load, and a 3D room can feel like a game. Needs strong art direction (real lighting, real materials), a fast fallback on phones, and the list view for usability.</p></div>
+          <div><h4>Scores</h4><p class="scores">Originality 4 · Fit 5 · Buildable 2 · Portable 2</p></div>
+        </div>
+      </section>
+
       <h2 class="part">Recommendation</h2>
       <div class="card">
         <p style="margin-top:0"><b>Go with X, Signerat.</b> It leads with finished work, which looks expensive and builds trust with any kind of client, and the handwritten notes make it personal without being cute. A's wire-to-render idea survives as the pointer x-ray, and A's type stays.</p>
-        <p style="margin-bottom:0">Borrow from Y for the header and footer (the wide wordmark), and from Z for the About page (a portrait lit by the current Gothenburg light).</p>
+        <p>Borrow from Y for the header and footer (the wide wordmark), and from Z for the About page (a portrait lit by the current Gothenburg light).</p>
+        <p style="margin-bottom:0"><b>Of the four new ones, T (Ta över bilden) is the strongest.</b> It explains the two main services, film and interactive 3D, in a single gesture, and it is the most immersive without becoming a game. It would also pair well with X: X for the work pages, T for the front page.</p>
       </div>
     </div>
   </body>
