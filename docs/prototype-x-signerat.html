@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Signerat Prototyp</title>
+    <!-- Internal draft: a working prototype of direction X's hero (round 3). Not linked from the site.
+         Three.js r128 classic build from cdnjs so it opens straight from disk (ES modules don't load over file://). -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=JetBrains+Mono:wght@400&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root { --ground: #e8e6e3; --ink: #121314; --graphite: #4a4d52; --line: #c9cbce; --pencil: #2342c8; --focus: #2342c8; }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) { --ground: #e8e6e3; }
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: var(--ground); color: var(--ink); }
+      body { font: 16px/1.5 "Archivo", system-ui, sans-serif; min-height: 100svh; }
+      a { color: inherit; }
+      a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+      .skip { position: absolute; left: 16px; top: -60px; background: var(--ink); color: var(--ground); padding: 8px 12px; border-radius: 6px; z-index: 10; }
+      .skip:focus { top: 12px; }
+      header { display: flex; justify-content: space-between; align-items: center; padding: 20px clamp(16px, 4vw, 48px); }
+      .mark { font-weight: 900; font-variation-settings: "wdth" 125; letter-spacing: -0.02em; font-size: 1.05rem; text-decoration: none; }
+      nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: clamp(12px, 2.5vw, 28px); }
+      nav a { text-decoration: none; display: inline-block; padding: 10px 2px; background: linear-gradient(var(--ink), var(--ink)) left bottom / 0 1px no-repeat; transition: background-size 0.35s cubic-bezier(0.2, 0.7, 0.2, 1); }
+      nav a:hover, nav a:focus-visible { background-size: 100% 1px; }
+      main { display: grid; gap: clamp(20px, 3vw, 48px); padding: 0 clamp(16px, 4vw, 48px) 48px; }
+      @media (min-width: 960px) { main { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-items: stretch; min-height: calc(100svh - 92px); } }
+      .stage { position: relative; border-radius: 8px; overflow: hidden; background: radial-gradient(70% 80% at 40% 35%, #fbfbfa, #d7d8da 50%, #9a9ea5); min-height: 62svh; touch-action: pan-y; cursor: none; }
+      @media (hover: none) { .stage { cursor: auto; } }
+      .stage canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; display: block; }
+      #wire { -webkit-mask-image: radial-gradient(circle var(--r, 150px) at var(--x, 70%) var(--y, 50%), #000 98%, transparent 100%); mask-image: radial-gradient(circle var(--r, 150px) at var(--x, 70%) var(--y, 50%), #000 98%, transparent 100%); }
+      .ring { position: absolute; left: var(--x, 70%); top: var(--y, 50%); width: calc(var(--r, 150px) * 2); height: calc(var(--r, 150px) * 2); margin: calc(var(--r, 150px) * -1) 0 0 calc(var(--r, 150px) * -1); border: 1.5px solid var(--pencil); border-radius: 50%; pointer-events: none; }
+      .ring span { position: absolute; left: 50%; top: calc(100% + 8px); transform: translateX(-50%); font: 400 11px/1 "JetBrains Mono", monospace; color: var(--pencil); white-space: nowrap; }
+      .note { position: absolute; font: 700 clamp(1.05rem, 1.8vw, 1.5rem)/1.05 "Caveat", cursive; color: var(--pencil); pointer-events: none; clip-path: inset(0 100% 0 0); transition: clip-path 1.1s cubic-bezier(0.45, 0, 0.2, 1); }
+      .note.on { clip-path: inset(0 0 0 0); }
+      .n1 { left: 6%; top: 8%; } .n2 { right: 6%; bottom: 8%; text-align: right; transition-delay: 0.5s; }
+      .n1 svg, .n2 svg { display: block; overflow: visible; }
+      .copy { display: flex; flex-direction: column; justify-content: space-between; gap: 32px; }
+      h1 { margin: 0; font-weight: 900; font-variation-settings: "wdth" 125; font-size: clamp(2.4rem, 5.2vw, 4.6rem); line-height: 0.92; letter-spacing: -0.035em; }
+      .lede { margin: 20px 0 0; max-width: 36ch; color: var(--graphite); font-size: clamp(1rem, 1.3vw, 1.15rem); }
+      .cta { display: inline-flex; align-items: center; gap: 10px; margin-top: 28px; padding: 14px 20px; min-height: 48px; border-radius: 999px; background: var(--ink); color: var(--ground); text-decoration: none; font-weight: 600; transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1); }
+      .cta:hover { transform: translateY(-2px); }
+      .cta i { width: 18px; height: 1.5px; background: currentColor; position: relative; transition: width 0.35s; }
+      .cta:hover i { width: 26px; }
+      .meta { font: 400 0.8rem/1.6 "JetBrains Mono", monospace; color: var(--graphite); border-top: 1px solid var(--line); padding-top: 12px; }
+      .hint { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); font: 400 11px/1 "JetBrains Mono", monospace; color: #4a4d52; background: #ffffffaa; padding: 6px 10px; border-radius: 999px; transition: opacity 0.4s; }
+      .stage.used .hint { opacity: 0; }
+      .draft { position: fixed; right: 12px; bottom: 12px; font: 400 11px/1.4 "JetBrains Mono", monospace; background: var(--ink); color: var(--ground); padding: 6px 10px; border-radius: 6px; max-width: 46ch; }
+      @media (max-width: 640px) { .draft { position: static; margin: 0 16px 16px; max-width: none; } }
+      @media (prefers-reduced-motion: reduce) { .note { transition: none; } nav a, .cta, .cta i { transition: none; } }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main">Hoppa till innehållet</a>
+    <header>
+      <a class="mark" href="#">LORENTZON</a>
+      <nav aria-label="Huvudmeny"><ul><li><a href="#">Arbeten</a></li><li><a href="#">Om</a></li><li><a href="#">Kontakt</a></li></ul></nav>
+    </header>
+    <main id="main">
+      <div class="stage" id="stage" role="img" aria-label="Färdig produktrendering av en högtalare. En rund lins visar 3D-modellens trådmodell under ytan där pekaren är.">
+        <canvas id="solid"></canvas>
+        <canvas id="wire"></canvas>
+        <div class="ring" aria-hidden="true"><span>trådmodell</span></div>
+        <p class="note n1" aria-hidden="true">ljuset från vänster,<br />som i en butik →</p>
+        <p class="note n2" aria-hidden="true">mjuk skugga, så den<br />står stadigt på bordet ↓</p>
+        <span class="hint" aria-hidden="true">För pekaren över bilden</span>
+      </div>
+      <div class="copy">
+        <div>
+          <h1>3D för det som ska säljas.</h1>
+          <p class="lede">Jag gör produktfilm, interaktiv 3D och verktyg. Varje bild här är min, med en anteckning om varför den ser ut som den gör.</p>
+          <a class="cta" href="#">Se arbeten <i aria-hidden="true"></i></a>
+        </div>
+        <p class="meta">Martin Lorentzon<br />Lorentzon Visualisation AB<br />Göteborg</p>
+      </div>
+    </main>
+    <p class="draft">Utkast: prototyp av riktning X. Objektet är en platshållare för en riktig kundrendering.</p>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+      (function () {
+        const stage = document.getElementById("stage");
+        const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const notes = document.querySelectorAll(".note");
+        requestAnimationFrame(() => setTimeout(() => notes.forEach((n) => n.classList.add("on")), 400));
+        if (!window.THREE) return; // static gradient stays as the fallback
+
+        // Product: a small speaker, turned on a lathe. Placeholder for a real client render.
+        const pts = [[0, -1.2], [0.78, -1.2], [0.9, -1.12], [0.95, -0.9], [0.95, 0.7], [0.9, 0.98], [0.72, 1.12], [0.32, 1.18], [0, 1.18]].map(([x, y]) => new THREE.Vector2(x, y));
+        const body = new THREE.LatheGeometry(pts, 96);
+        const bodyLow = new THREE.LatheGeometry(pts, 28);
+        const grille = new THREE.TorusGeometry(0.55, 0.035, 16, 96);
+        const knob = new THREE.CylinderGeometry(0.11, 0.11, 0.08, 48);
+
+        function makeView(canvas, wire) {
+          const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+          renderer.setPixelRatio(Math.min(devicePixelRatio, matchMedia("(max-width: 768px)").matches ? 1.5 : 2));
+          renderer.outputEncoding = THREE.sRGBEncoding;
+          renderer.physicallyCorrectLights = true;
+          renderer.shadowMap.enabled = !wire;
+          renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+          const scene = new THREE.Scene();
+          if (wire) scene.background = new THREE.Color(0xe8e6e3);
+          const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
+          camera.position.set(0, 0.6, 7.2);
+          camera.lookAt(0, 0, 0);
+          const group = new THREE.Group();
+          const mat = wire
+            ? new THREE.MeshBasicMaterial({ color: 0x2342c8, wireframe: true, transparent: true, opacity: 0.55 })
+            : new THREE.MeshPhysicalMaterial({ color: 0xd9d4cc, roughness: 0.42, clearcoat: 0.6, clearcoatRoughness: 0.25 });
+          const accent = wire ? mat : new THREE.MeshStandardMaterial({ color: 0x1b1d22, roughness: 0.35, metalness: 0.6 });
+          const b = new THREE.Mesh(wire ? bodyLow : body, mat); b.castShadow = true; group.add(b);
+          const g = new THREE.Mesh(grille, accent); g.position.set(0, -0.05, 0.965); group.add(g);
+          const k = new THREE.Mesh(knob, accent); k.rotation.x = Math.PI / 2; k.position.set(0, 0.72, 0.94); group.add(k);
+          if (wire) {
+            const edges = new THREE.LineSegments(new THREE.EdgesGeometry(bodyLow, 20), new THREE.LineBasicMaterial({ color: 0x121314 }));
+            group.add(edges);
+            const grid = new THREE.GridHelper(8, 32, 0x2342c8, 0x9aa6d8); grid.position.y = -1.2; scene.add(grid);
+          } else {
+            scene.add(new THREE.HemisphereLight(0xffffff, 0xbcb6ad, 1.1));
+            const key = new THREE.DirectionalLight(0xfff4e6, 4.2); key.position.set(-5, 4, 3); key.castShadow = true;
+            key.shadow.mapSize.set(1024, 1024); key.shadow.radius = 6; Object.assign(key.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6 });
+            scene.add(key);
+            const rim = new THREE.DirectionalLight(0xdfe8ff, 2.2); rim.position.set(4, 2, -4); scene.add(rim);
+            const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.ShadowMaterial({ opacity: 0.22 }));
+            floor.rotation.x = -Math.PI / 2; floor.position.y = -1.2; floor.receiveShadow = true; scene.add(floor);
+          }
+          scene.add(group);
+          return { renderer, scene, camera, group };
+        }
+
+        const views = [makeView(document.getElementById("solid"), false), makeView(document.getElementById("wire"), true)];
+
+        function resize() {
+          const w = stage.clientWidth, h = stage.clientHeight;
+          views.forEach((v) => { v.renderer.setSize(w, h, false); v.camera.aspect = w / h; v.camera.position.z = w / h < 1 ? 11 : 8.6; v.camera.updateProjectionMatrix(); });
+          stage.style.setProperty("--r", Math.round(Math.min(w, h) * 0.24) + "px");
+        }
+        addEventListener("resize", resize);
+        resize();
+
+        // Lens: follows the pointer; drifts on its own when idle so the idea is visible at rest.
+        let tx = 0.68, ty = 0.5, x = tx, y = ty, lastMove = -1e9;
+        function setTarget(e) {
+          const r = stage.getBoundingClientRect();
+          tx = (e.clientX - r.left) / r.width; ty = (e.clientY - r.top) / r.height; lastMove = performance.now();
+          stage.classList.add("used");
+        }
+        stage.addEventListener("pointermove", setTarget);
+        stage.addEventListener("pointerdown", setTarget);
+
+        let visible = true;
+        new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(stage);
+        let t0 = performance.now(), turn = -0.35;
+        function frame(now) {
+          requestAnimationFrame(frame);
+          if (!visible || document.hidden) return;
+          const dt = Math.min((now - t0) / 1000, 1 / 20); t0 = now;
+          if (now - lastMove > 2500 && !reduce) { const s = now / 1000; tx = 0.5 + Math.cos(s * 0.35) * 0.18; ty = 0.5 + Math.sin(s * 0.5) * 0.12; }
+          const k = reduce ? 1 : 1 - Math.pow(0.0005, dt);
+          x += (tx - x) * k; y += (ty - y) * k;
+          stage.style.setProperty("--x", (x * 100).toFixed(2) + "%");
+          stage.style.setProperty("--y", (y * 100).toFixed(2) + "%");
+          if (!reduce) turn += dt * 0.12;
+          views.forEach((v) => { v.group.rotation.y = turn + (x - 0.5) * 0.25; v.renderer.render(v.scene, v.camera); });
+        }
+        requestAnimationFrame(frame);
+      })();
+    </script>
+  </body>
+</html>
