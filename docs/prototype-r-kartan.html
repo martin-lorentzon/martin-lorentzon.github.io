@@ -286,24 +286,164 @@
           anim.push((t) => { flag.rotation.x = Math.sin(t * 1.4) * 0.15; });
         })();
 
-        // MARK: The visitor's car. Local +z is the front, local +x the left side.
+        // MARK: The visitor's vehicle (classic American muscle car + speedboat). Local +z is front, +x is left.
         const me = new THREE.Group(); scene.add(me);
         const car = new THREE.Group(); me.add(car);          // turns with the heading
-        const carBody = new THREE.Group(); car.add(carBody); // leans in turns, dips when braking
-        const blueMat = mat(0x2b4cc4), creamMat = mat(0xf2eee7), glassMat = mat(0x9fbcc2);
-        slab(carBody, 0, 0, 1.6, 2.9, 0.55, 0.64, blueMat);
-        slab(carBody, 0, -0.15, 1.3, 1.5, 0.5, 1.14, creamMat);
-        slab(carBody, 0, 0.61, 1.16, 0.06, 0.36, 1.12, glassMat); slab(carBody, 0, -0.91, 1.16, 0.06, 0.34, 1.12, glassMat);
-        slab(carBody, 0.52, 1.46, 0.32, 0.04, 0.16, 0.72, mat(0xfff3c4)); slab(carBody, -0.52, 1.46, 0.32, 0.04, 0.16, 0.72, mat(0xfff3c4));
-        slab(carBody, 0, -1.46, 1.3, 0.04, 0.12, 0.74, mat(0x8a2b2b));
-        const wheelGeo = new THREE.CylinderGeometry(0.36, 0.36, 0.3, 14); wheelGeo.rotateZ(Math.PI / 2);
-        const tyreMat = mat(0x222222);
-        const wheels = [[0.8, 0.95, true], [-0.8, 0.95, true], [0.8, -0.95, false], [-0.8, -0.95, false]].map(([x, z, front]) => {
-          const pivot = new THREE.Group(); pivot.position.set(x, 0.36, z); car.add(pivot);
-          const w = new THREE.Mesh(wheelGeo, tyreMat); pivot.add(w);
-          slab(w, 0, 0, 0.32, 0.12, 0.5, 0, creamMat); // a spoke, so the spin shows
-          return { pivot, w, front, x, z };
+        const carBody = new THREE.Group(); car.add(carBody); // leans in turns, dips when braking, leaps on transform
+        const carMeshGroup = new THREE.Group(); carBody.add(carMeshGroup);
+        const blueMat = new THREE.MeshPhongMaterial({ color: 0x2648bf, shininess: 85, specular: 0x6b88e8 });
+        const creamMat = new THREE.MeshPhongMaterial({ color: 0xf4f0e8, shininess: 65, specular: 0x555555 });
+        const darkTrimMat = new THREE.MeshPhongMaterial({ color: 0x1e2024, shininess: 30, specular: 0x333333 });
+        const chromeMat = new THREE.MeshPhongMaterial({ color: 0xe6eaef, shininess: 140, specular: 0xffffff });
+        const glassMat = new THREE.MeshPhongMaterial({ color: 0x21313d, shininess: 120, specular: 0x9ec0cc });
+        const headLightMat = new THREE.MeshBasicMaterial({ color: 0xfff5cf });
+        const tailLightMat = new THREE.MeshBasicMaterial({ color: 0xd93426 });
+        const tyreMat = mat(0x1c1d20);
+        const whiteRingMat = new THREE.MeshBasicMaterial({ color: 0xf0ece3 });
+
+        function extrudeProfile(pts, width, bevel = 0.04) {
+          const sh = new THREE.Shape();
+          pts.forEach(([z, y], i) => (i ? sh.lineTo(z, y) : sh.moveTo(z, y)));
+          sh.closePath();
+          const geo = new THREE.ExtrudeGeometry(sh, { depth: width, bevelEnabled: bevel > 0, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 2 });
+          geo.translate(0, 0, -width / 2);
+          geo.rotateY(-Math.PI / 2);
+          geo.computeVertexNormals();
+          return geo;
+        }
+        function addPart(parent, geo, m, x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0) {
+          const o = new THREE.Mesh(geo, m);
+          o.position.set(x, y, z);
+          if (rx || ry || rz) o.rotation.set(rx, ry, rz);
+          parent.add(o);
+          return o;
+        }
+
+        // Classic late-60s American muscle car: long hood, coke-bottle haunches, set-back fastback roofline & louvers.
+        (function buildMuscleCar() {
+          // Sculpted lower body (side profile extruded across width)
+          const bodyGeo = extrudeProfile([
+            [-1.72, 0.34], [-1.58, 0.28], [1.56, 0.28], [1.74, 0.36],
+            [1.78, 0.68], [1.70, 0.80], [0.42, 0.84], [-0.46, 0.84],
+            [-1.02, 0.90], [-1.66, 0.86], [-1.76, 0.81]
+          ], 1.66, 0.05);
+          addPart(carMeshGroup, bodyGeo, blueMat);
+
+          // Wide sculpted front & rear fender haunches for a planted muscle stance
+          const rearHaunchGeo = extrudeProfile([
+            [-1.66, 0.44], [-0.46, 0.44], [-0.56, 0.84], [-1.04, 0.91], [-1.64, 0.86]
+          ], 0.14, 0.03);
+          const frontHaunchGeo = extrudeProfile([
+            [0.52, 0.42], [1.66, 0.42], [1.66, 0.78], [0.58, 0.82]
+          ], 0.10, 0.025);
+          for (const side of [-1, 1]) {
+            addPart(carMeshGroup, rearHaunchGeo, blueMat, side * 0.84, 0, 0);
+            addPart(carMeshGroup, frontHaunchGeo, blueMat, side * 0.83, 0, 0);
+            // Dark wheel-well cutouts so the wide tyres sit deep inside the arches
+            slab(carMeshGroup, side * 0.82, 1.06, 0.18, 0.82, 0.46, 0.46, darkTrimMat);
+            slab(carMeshGroup, side * 0.84, -1.02, 0.22, 0.90, 0.52, 0.50, darkTrimMat);
+            // Chrome rocker sill trim + aerodynamic bullet door mirror
+            slab(carMeshGroup, side * 0.89, 0.02, 0.04, 1.24, 0.06, 0.30, chromeMat);
+            const mir = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 8), chromeMat);
+            mir.scale.set(0.9, 0.75, 1.4); mir.position.set(side * 0.89, 0.91, 0.28); carMeshGroup.add(mir);
+          }
+
+          // Set-back fastback greenhouse (classic 60:40 long-hood / short-deck proportions)
+          const cabinGeo = extrudeProfile([
+            [0.44, 0.82], [-0.04, 1.25], [-0.64, 1.25], [-1.52, 0.87], [-1.52, 0.82]
+          ], 1.32, 0.04);
+          addPart(carMeshGroup, cabinGeo, blueMat);
+
+          // Tinted wraparound glass: raked windshield, side windows, sloping fastback rear window
+          const ws = slab(carMeshGroup, 0, 0.21, 1.22, 0.04, 0.56, 1.05, glassMat);
+          ws.rotation.x = -0.84;
+          const rw = slab(carMeshGroup, 0, -1.07, 1.18, 0.04, 0.86, 1.07, glassMat);
+          rw.rotation.x = 1.16;
+          for (const side of [-1, 1]) {
+            const sideWinGeo = extrudeProfile([
+              [0.34, 0.88], [-0.04, 1.20], [-0.60, 1.20], [-1.18, 0.94], [-1.18, 0.88]
+            ], 0.03, 0);
+            addPart(carMeshGroup, sideWinGeo, glassMat, side * 0.70, 0, 0);
+            // B-pillar divider
+            const bp = slab(carMeshGroup, side * 0.71, -0.44, 0.04, 0.08, 0.34, 1.04, blueMat);
+            bp.rotation.x = 0.22;
+          }
+          // Classic fastback rear window louvers (4 angled dark slats)
+          for (let i = 0; i < 4; i++) {
+            const u = i / 3;
+            const lv = slab(carMeshGroup, 0, lerp(-0.78, -1.32, u), 1.12, 0.14, 0.03, lerp(1.20, 0.98, u), darkTrimMat);
+            lv.rotation.x = 0.22;
+          }
+
+          // Twin cream Le Mans racing stripes (hood, roof, rear deck)
+          for (const sx of [-0.20, 0.20]) {
+            const hs = slab(carMeshGroup, sx, 1.09, 0.20, 1.26, 0.025, 0.875, creamMat); hs.rotation.x = 0.032;
+            slab(carMeshGroup, sx, -0.34, 0.19, 0.58, 0.025, 1.295, creamMat);
+            const ts = slab(carMeshGroup, sx, -1.60, 0.20, 0.24, 0.025, 0.895, creamMat); ts.rotation.x = -0.05;
+          }
+
+          // Sculpted shaker hood scoop / power bulge
+          const scoopGeo = extrudeProfile([
+            [0.58, 0.86], [1.34, 0.84], [1.30, 0.96], [0.64, 0.99]
+          ], 0.50, 0.02);
+          addPart(carMeshGroup, scoopGeo, darkTrimMat);
+          slab(carMeshGroup, 0, 1.33, 0.44, 0.04, 0.08, 0.90, chromeMat); // intake lip
+
+          // Rear ducktail pedestal spoiler
+          const sp = slab(carMeshGroup, 0, -1.67, 1.56, 0.22, 0.06, 0.97, darkTrimMat); sp.rotation.x = -0.18;
+          for (const sx of [-0.52, 0.52]) slab(carMeshGroup, sx, -1.64, 0.08, 0.14, 0.12, 0.91, darkTrimMat);
+
+          // Recessed aggressive front grille, chrome surround, quad round headlights, bumper & chin splitter
+          slab(carMeshGroup, 0, 1.79, 1.52, 0.08, 0.28, 0.61, darkTrimMat);
+          slab(carMeshGroup, 0, 1.81, 1.58, 0.04, 0.04, 0.74, chromeMat);
+          slab(carMeshGroup, 0, 1.81, 1.58, 0.04, 0.04, 0.48, chromeMat);
+          const hlRimGeo = new THREE.CylinderGeometry(0.11, 0.11, 0.06, 14); hlRimGeo.rotateX(Math.PI / 2);
+          const hlLensGeo = new THREE.CylinderGeometry(0.085, 0.085, 0.07, 14); hlLensGeo.rotateX(Math.PI / 2);
+          for (const hx of [-0.62, -0.40, 0.40, 0.62]) {
+            addPart(carMeshGroup, hlRimGeo, chromeMat, hx, 0.61, 1.82);
+            addPart(carMeshGroup, hlLensGeo, headLightMat, hx, 0.61, 1.83);
+          }
+          slab(carMeshGroup, 0, 1.86, 1.78, 0.12, 0.13, 0.39, chromeMat);
+          slab(carMeshGroup, 0, 1.78, 1.58, 0.24, 0.07, 0.26, darkTrimMat); // chin splitter
+
+          // Recessed dark rear panel, iconic tri-bar crimson taillights, chrome rear bumper & dual exhausts
+          slab(carMeshGroup, 0, -1.78, 1.56, 0.06, 0.24, 0.66, darkTrimMat);
+          for (const tx of [-0.66, -0.50, -0.34, 0.34, 0.50, 0.66]) {
+            slab(carMeshGroup, tx, -1.80, 0.10, 0.05, 0.15, 0.66, tailLightMat);
+          }
+          slab(carMeshGroup, 0, -1.84, 1.78, 0.12, 0.13, 0.41, chromeMat);
+          const exGeo = new THREE.CylinderGeometry(0.055, 0.055, 0.24, 10); exGeo.rotateX(Math.PI / 2);
+          for (const ex of [-0.58, -0.44, 0.44, 0.58]) addPart(carMeshGroup, exGeo, chromeMat, ex, 0.27, -1.80);
+        })();
+
+        // Staggered classic muscle wheels: wider, meatier rear tires with deep-dish chrome rims & 5-spoke Mag centers
+        const wheels = [
+          [0.84, 1.06, true, 0.35, 0.28],
+          [-0.84, 1.06, true, 0.35, 0.28],
+          [0.86, -1.02, false, 0.39, 0.36],
+          [-0.86, -1.02, false, 0.39, 0.36]
+        ].map(([x, z, front, r, width]) => {
+          const side = Math.sign(x);
+          const pivot = new THREE.Group(); pivot.position.set(x, r, z); car.add(pivot);
+          const w = new THREE.Group(); pivot.add(w);
+          const tireGeo = new THREE.CylinderGeometry(r, r, width, 18); tireGeo.rotateZ(Math.PI / 2);
+          w.add(new THREE.Mesh(tireGeo, tyreMat));
+          const rimGeo = new THREE.CylinderGeometry(r * 0.64, r * 0.64, width + 0.02, 16); rimGeo.rotateZ(Math.PI / 2);
+          w.add(new THREE.Mesh(rimGeo, chromeMat));
+          const hubGeo = new THREE.CylinderGeometry(r * 0.46, r * 0.46, width + 0.03, 12); hubGeo.rotateZ(Math.PI / 2);
+          w.add(new THREE.Mesh(hubGeo, darkTrimMat));
+          const wwGeo = new THREE.RingGeometry(r * 0.72, r * 0.80, 20);
+          const ww = new THREE.Mesh(wwGeo, whiteRingMat);
+          ww.rotation.y = side > 0 ? Math.PI / 2 : -Math.PI / 2;
+          ww.position.x = side * (width / 2 + 0.006);
+          w.add(ww);
+          for (let s = 0; s < 5; s++) {
+            const sp = slab(w, side * (width / 2 + 0.012), 0, 0.03, r * 0.14, r * 1.10, 0, chromeMat);
+            sp.rotation.x = (s / 5) * Math.PI;
+          }
+          return { pivot, w, front, x, z, r };
         });
+
         // Boat parts: a hull with a pointed bow and an outboard motor. They unfold when the car drives into the river.
         const hull = new THREE.Group(); hull.visible = false; hull.scale.setScalar(0.001); carBody.add(hull);
         slab(hull, 0, -0.15, 1.9, 2.6, 0.5, 0.3, mat(0xf7f4ee));
