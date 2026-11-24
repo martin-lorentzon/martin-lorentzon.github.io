@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Site Visual Directions</title>
+    <!-- Internal decision board for the founder. Not linked from the site. Fonts load from Google Fonts / Fontshare only to preview the type pairings. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=JetBrains+Mono:wght@400;600&family=Mona+Sans:wdth,wght@75..125,400..800&family=Martian+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://api.fontshare.com/v2/css?f[]=supreme@400,500,700,800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #f4f4f2;
+        --surface: #ffffff;
+        --ink: #17181a;
+        --muted: #5d6066;
+        --line: #dcdcd8;
+        --focus: #1d5fd1;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --bg: #121315;
+          --surface: #1b1c1f;
+          --ink: #ececea;
+          --muted: #a3a6ad;
+          --line: #2e3034;
+          --focus: #7aa7ff;
+        }
+      }
+      :root[data-theme="dark"] {
+        --bg: #121315;
+        --surface: #1b1c1f;
+        --ink: #ececea;
+        --muted: #a3a6ad;
+        --line: #2e3034;
+        --focus: #7aa7ff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 16px/1.55 "Archivo", system-ui, sans-serif;
+        font-variation-settings: "wdth" 100;
+      }
+      a { color: inherit; }
+      a:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+      .wrap { max-width: 1180px; margin: 0 auto; padding: 48px 16px 96px; }
+      @media (min-width: 720px) { .wrap { padding: 64px 32px 120px; } }
+      header.top h1 { font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.02; letter-spacing: -0.02em; margin: 0 0 12px; font-weight: 800; font-variation-settings: "wdth" 112; }
+      header.top p { max-width: 62ch; color: var(--muted); margin: 0; }
+      h2.part { font-size: 1.5rem; margin: 72px 0 16px; letter-spacing: -0.01em; }
+      .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+      .audit { display: grid; gap: 16px; }
+      @media (min-width: 860px) { .audit { grid-template-columns: 1fr 1fr; } }
+      .audit h3 { margin: 0 0 8px; font-size: 1.05rem; }
+      .audit ul { margin: 0; padding-left: 1.1em; }
+      .audit li { margin: 6px 0; }
+      .num { font-family: "JetBrains Mono", monospace; font-size: 0.92em; }
+      .dir { margin-top: 40px; }
+      .dir-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin-bottom: 14px; }
+      .dir-head h3 { margin: 0; font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -0.01em; }
+      .dir-head .tag { color: var(--muted); }
+      .rec { display: inline-block; font-size: 0.8rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--ink); color: var(--bg); }
+      .idea { font-size: 1.15rem; max-width: 70ch; margin: 0 0 20px; }
+      .mock { border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; position: relative; border: 1px solid var(--line); }
+      @media (max-width: 640px) { .mock { aspect-ratio: 4 / 5; } }
+      .spec { display: grid; gap: 16px; margin-top: 20px; }
+      @media (min-width: 860px) { .spec { grid-template-columns: repeat(2, 1fr); } }
+      .spec h4 { margin: 0 0 6px; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+      .spec p { margin: 0; }
+      .swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+      .sw { display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; width: 78px; }
+      .sw i { display: block; height: 44px; border-radius: 8px; border: 1px solid var(--line); }
+      .sw b { font-weight: 600; }
+      .sw span { font-family: "JetBrains Mono", monospace; color: var(--muted); }
+      .refs a { margin-right: 14px; }
+      .scores { font-family: "JetBrains Mono", monospace; font-size: 0.9rem; }
+      .verdict { margin-top: 72px; }
+      .verdict p { max-width: 72ch; }
+
+      /* ---------- Mock A: Viewport to render ---------- */
+      .mA { background: #1f1f1f; color: #e8e6e3; font-family: "Archivo", sans-serif; }
+      .mA .grid { position: absolute; inset: 0; background-image: linear-gradient(#3a3a3a 1px, transparent 1px), linear-gradient(90deg, #3a3a3a 1px, transparent 1px); background-size: 48px 48px; opacity: 0.45; }
+      .mA .strip { position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(4, 1fr); height: 58%; }
+      .mA .strip div { position: relative; border-left: 1px solid #3a3a3a; display: grid; place-items: center; }
+      .mA .strip div:first-child { border-left: 0; }
+      .mA .strip small { position: absolute; top: 8px; left: 10px; font: 600 10px/1 "JetBrains Mono", monospace; color: #8e8c88; letter-spacing: 0.04em; }
+      .mA .obj { width: 46%; aspect-ratio: 1; border-radius: 50% 46% 52% 44%; }
+      .mA .s1 .obj { border: 1.5px solid #e8e6e3; background: repeating-linear-gradient(0deg, transparent 0 9px, #e8e6e366 9px 10px), repeating-linear-gradient(90deg, transparent 0 9px, #e8e6e366 9px 10px); }
+      .mA .s2 .obj { background: radial-gradient(circle at 35% 30%, #d9d9d9, #8a8a8a 60%, #4c4c4c); }
+      .mA .s3 .obj { background: radial-gradient(circle at 35% 30%, #fff6e6, #e7c27a 45%, #a7651f 80%); }
+      .mA .s4 .obj { background: radial-gradient(circle at 35% 30%, #fffaf0, #f0cf8c 40%, #b86a1d 78%, #5a2c07); box-shadow: 0 18px 30px -12px #000; outline: 2px solid #ffa24a; outline-offset: 6px; }
+      .mA .copy { position: absolute; top: 9%; left: 5%; right: 5%; }
+      .mA h5 { margin: 0; font-weight: 800; font-variation-settings: "wdth" 125; font-size: clamp(1.3rem, 4.2vw, 3rem); line-height: 0.95; letter-spacing: -0.02em; }
+      .mA h5 em { font-style: normal; color: #ffa24a; }
+      .mA .read { position: absolute; top: 9%; right: 5%; font: 400 11px/1.6 "JetBrains Mono", monospace; color: #8e8c88; text-align: right; }
+
+      /* ---------- Mock B: Clay & tape ---------- */
+      .mB { background: #ecebe8; color: #161616; font-family: "Mona Sans", sans-serif; }
+      .mB .clay { position: absolute; right: 4%; bottom: 10%; width: 54%; height: 52%; border-radius: 48% 52% 18% 22% / 70% 64% 22% 26%; background: radial-gradient(120% 90% at 30% 20%, #c6c2bb, #a9a59e 55%, #85817a); }
+      .mB svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+      .mB .copy { position: absolute; top: 9%; left: 5%; width: 56%; }
+      .mB h5 { margin: 0; font-weight: 800; font-variation-settings: "wdth" 125; font-size: clamp(1.3rem, 4.4vw, 3.1rem); line-height: 0.95; letter-spacing: -0.02em; }
+      .mB p { margin: 10px 0 0; font-size: clamp(0.7rem, 1.3vw, 0.95rem); color: #6d6a64; max-width: 34ch; }
+      .mB .dim { position: absolute; font: 400 10px/1 "Martian Mono", monospace; color: #161616; }
+
+      /* ---------- Mock C: Node graph ---------- */
+      .mC { background: #15181d; color: #e9ecef; font-family: "Supreme", sans-serif; }
+      .mC .dots { position: absolute; inset: 0; background-image: radial-gradient(#2a303a 1px, transparent 1.4px); background-size: 22px 22px; }
+      .mC svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+      .mC .copy { position: absolute; top: 7%; left: 5%; }
+      .mC h5 { margin: 0; font-weight: 800; font-size: clamp(1.2rem, 3.8vw, 2.7rem); line-height: 0.98; letter-spacing: -0.02em; }
+      .mC .node { position: absolute; background: #232831; border: 1px solid #333b47; border-radius: 8px; width: 23%; min-width: 92px; font-size: clamp(0.56rem, 1.05vw, 0.82rem); }
+      .mC .node b { display: block; padding: 5px 9px; border-bottom: 1px solid #333b47; border-radius: 8px 8px 0 0; font-weight: 700; }
+      .mC .node span { display: block; padding: 4px 9px; color: #8a93a0; font-family: "Martian Mono", monospace; font-size: 0.86em; }
+      .mC .n0 { left: 5%; top: 46%; } .mC .n0 b { background: #3a2f22; }
+      .mC .n1 { left: 39%; top: 30%; } .mC .n1 b { background: #10453a; }
+      .mC .n2 { left: 39%; top: 56%; } .mC .n2 b { background: #24462a; }
+      .mC .n3 { left: 39%; top: 80%; width: 25%; } .mC .n3 b { background: #3b3d47; }
+      .mC .n4 { right: 5%; top: 55%; } .mC .n4 b { background: #2e3440; }
+      @media (max-width: 640px) {
+        .mA .strip { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
+        .mB .copy { width: 88%; }
+        .mC .node { width: 40%; }
+        .mC svg { display: none; }
+        .mC .nodes { position: absolute; left: 5%; right: 5%; top: 20%; display: flex; flex-direction: column; gap: 9px; }
+        .mC .node { position: static; width: auto; font-size: 0.8rem; }
+        .mC .n1, .mC .n2, .mC .n3 { margin-left: 22px; border-left: 3px solid #00d6a3; } .mC .n2 { border-left-color: #63c763; } .mC .n3 { border-left-color: #a1a1a1; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <h1>Company site: three visual directions</h1>
+        <p>Phase 1 of the refresh of <a href="https://martin-lorentzon.github.io/">martin-lorentzon.github.io</a> for Lorentzon Visualisation AB. An audit of today's site, then three directions to choose from. Nothing is built yet. Mock copy is in Swedish, like the site.</p>
+      </header>
+
+      <h2 class="part">1. Audit of the live site (24 Nov 2026)</h2>
+      <div class="audit">
+        <div class="card">
+          <h3>What works</h3>
+          <ul>
+            <li>The popcorn hero is real Three.js with physics, built from the founder's own model. It is the one memorable thing on the site.</li>
+            <li>Light page: about <span class="num">191 KB</span> in total, no console errors, no layout shift (<span class="num">CLS 0</span>).</li>
+            <li>The pinned full-screen views pattern in Infografik is solid and documented.</li>
+            <li>Reduced-motion and phone-specific settings already exist in the hero code.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>What holds it back</h3>
+          <ul>
+            <li><b>No work on the site.</b> No projects, films or add-ons; "Tidigare arbeten" links out to an old Notion page. The Blender add-ons the company sells aren't mentioned.</li>
+            <li><b>Placeholder images</b> (placehold.co "1920 × 1080") in Infografik and Om mig.</li>
+            <li><b>Phone load:</b> on a throttled mid-range phone the headline appeared after <span class="num">21.7 s</span> (desktop <span class="num">2.9 s</span>), and the popcorn hadn't shown up in the phone screenshot.</li>
+            <li><b>Looks like a default template:</b> stock daisyUI look, centred headline with one gradient word, a lilac default button. Nothing in the type, colour or layout says "3D studio".</li>
+            <li><b>Accessibility:</b> 5 form inputs without labels (menu toggle, FAQ), no skip link, focus lands on hidden inputs, 7 footer/contact links under the 24 px tap-target size, "Lanseringserbjudande" is a link with nowhere to go.</li>
+            <li><b>Sharing &amp; search:</b> no social preview image or Open Graph tags, no favicon, canonical link, robots.txt or sitemap. Company name and org nr aren't on the page.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 class="part">2. Three directions</h2>
+      <p style="max-width:70ch;color:var(--muted);margin:0">Each takes its idea from a different place: the craft (A), the city and the car industry (B), how the work actually gets done (C). Scores are 1&ndash;5 for originality, fit, how buildable it is, and how easily it could be moved to someone else (lower is better).</p>
+
+      <!-- ===== A ===== -->
+      <section class="dir" aria-labelledby="a-title">
+        <div class="dir-head"><h3 id="a-title">A. Viewport → Render</h3><span class="tag">The craft</span></div>
+        <p class="idea">The site resolves like a 3D viewport: each section steps from wireframe to solid to material to final render, so visitors watch an idea become a finished image.</p>
+        <div class="mock mA" role="img" aria-label="Mock of direction A: dark viewport grid, headline 'Från skiss till färdig render', and the same object shown in four shading stages from wireframe to rendered.">
+          <div class="grid"></div>
+          <div class="copy"><h5>Från skiss<br />till färdig <em>render</em>.</h5></div>
+          <div class="read">Lorentzon Visualisation<br />Göteborg<br />Sample 128 / 128</div>
+          <div class="strip">
+            <div class="s1"><small>WIREFRAME</small><div class="obj"></div></div>
+            <div class="s2"><small>SOLID</small><div class="obj"></div></div>
+            <div class="s3"><small>MATERIAL</small><div class="obj"></div></div>
+            <div class="s4"><small>RENDERED</small><div class="obj"></div></div>
+          </div>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#1f1f1f"></i><b>Ground</b><span>#1F1F1F</span></div>
+            <div class="sw"><i style="background:#2c2c2c"></i><b>Panel</b><span>#2C2C2C</span></div>
+            <div class="sw"><i style="background:#3a3a3a"></i><b>Line</b><span>#3A3A3A</span></div>
+            <div class="sw"><i style="background:#e8e6e3"></i><b>Ink</b><span>#E8E6E3</span></div>
+            <div class="sw"><i style="background:#8e8c88"></i><b>Muted</b><span>#8E8C88</span></div>
+            <div class="sw"><i style="background:#ffa24a"></i><b>Selected</b><span>#FFA24A</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:Archivo;font-weight:800;font-variation-settings:'wdth' 125">Archivo Expanded 800</b> for headlines, Archivo normal width for text, <span style="font-family:'JetBrains Mono'">JetBrains Mono</span> for render readouts (samples, frame, resolution). Google Fonts.</p></div>
+          <div><h4>Motion &amp; 3D</h4><p>Signature: one pinned 3D object (a client product or the popcorn kernel) whose shading mode changes as you scroll, with render noise that clears like a path tracer collecting samples. Motion verb: <i>resolve</i>, steps and noise rather than fades. Three.js, which the site already uses.</p></div>
+          <div><h4>References</h4><p class="refs"><a href="https://lusion.co">lusion.co</a><a href="https://igloo.inc">igloo.inc</a><a href="https://bruno-simon.com">bruno-simon.com</a></p></div>
+          <div><h4>Risk</h4><p>Dark grey plus one orange is a common look. It's justified here because it is the 3D viewport, but other 3D artists could use the same idea.</p></div>
+          <div><h4>Scores</h4><p class="scores">Originality 3 · Fit 5 · Buildable 4 · Portable 3</p></div>
+        </div>
+      </section>
+
+      <!-- ===== B ===== -->
+      <section class="dir" aria-labelledby="b-title">
+        <div class="dir-head"><h3 id="b-title">B. Clay &amp; tape</h3><span class="tag">Gothenburg and the car industry</span></div>
+        <p class="idea">The site is a car-design studio's clay model: content arrives as matte grey clay, and the tape lines designers lay on clay draw the layout. The finished render shows only inside shapes the tape has closed.</p>
+        <div class="mock mB" role="img" aria-label="Mock of direction B: light studio grey, headline 'Formen först. Lacken sen.', a grey clay form outlined by a red tape line with small dimension labels.">
+          <div class="clay"></div>
+          <svg viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M700 760 C 820 520, 1060 440, 1300 470 S 1560 600, 1540 800" fill="none" stroke="#d3261f" stroke-width="7" stroke-linecap="round" />
+            <path d="M80 650 H 760" fill="none" stroke="#161616" stroke-width="3" />
+          </svg>
+          <div class="copy"><h5>Formen först.<br />Lacken sen.</h5><p>Produktfilm, interaktiv 3D och verktyg från en 3D-generalist med bakgrund i bilindustrin. Göteborg.</p></div>
+          <span class="dim" style="left:73%;top:44%">R 1200</span>
+          <span class="dim" style="left:90%;top:68%">Ø 24</span>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#ecebe8"></i><b>Studio</b><span>#ECEBE8</span></div>
+            <div class="sw"><i style="background:#a9a59e"></i><b>Clay</b><span>#A9A59E</span></div>
+            <div class="sw"><i style="background:#d2d0cb"></i><b>Line</b><span>#D2D0CB</span></div>
+            <div class="sw"><i style="background:#161616"></i><b>Ink / tape</b><span>#161616</span></div>
+            <div class="sw"><i style="background:#6d6a64"></i><b>Muted</b><span>#6D6A64</span></div>
+            <div class="sw"><i style="background:#d3261f"></i><b>Red tape</b><span>#D3261F</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:'Mona Sans';font-weight:800;font-variation-settings:'wdth' 125">Mona Sans</b>, one variable family: wide and heavy for headlines, normal width for text. <span style="font-family:'Martian Mono'">Martian Mono</span> for dimension call-outs. Google Fonts.</p></div>
+          <div><h4>Motion &amp; 3D</h4><p>Signature: a tape line pulls across the page as you scroll and outlines each section. In the hero it closes around a clay model, and the painted render wipes in inside it. Motion verb: <i>pull taut</i>, a fast draw with a small settle. Mostly SVG and clip masks, with Three.js only for the hero model.</p></div>
+          <div><h4>References</h4><p class="refs"><a href="https://www.polestar.com">polestar.com</a><a href="https://teenage.engineering">teenage.engineering</a><a href="https://nothing.tech">nothing.tech</a></p></div>
+          <div><h4>Risk</h4><p>It leans on product and automotive work. Blender add-ons and in-house tools fit the clay metaphor less naturally.</p></div>
+          <div><h4>Scores</h4><p class="scores">Originality 4 · Fit 4 · Buildable 4 · Portable 2</p></div>
+        </div>
+      </section>
+
+      <!-- ===== C ===== -->
+      <section class="dir" aria-labelledby="c-title">
+        <div class="dir-head"><h3 id="c-title">C. Node graph</h3><span class="tag">How the work gets done</span> <span class="rec">Recommended</span></div>
+        <p class="idea">The site is a node graph. The visitor's idea is the input node, each service is a node with real outputs (film, web 3D, a tool), and wires connect them as you scroll down to the contact node. The page is the pipeline.</p>
+        <div class="mock mC" role="img" aria-label="Mock of direction C: dark dotted canvas, headline 'Din idé in. Färdig 3D ut.', an input node 'Din idé' wired to three service nodes and on to a contact node.">
+          <div class="dots"></div>
+          <svg viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true">
+            <g fill="none" stroke-width="4" stroke-linecap="round">
+              <path d="M450 470 C 540 470, 540 320, 625 320" stroke="#00d6a3" />
+              <path d="M450 470 C 540 470, 540 550, 625 550" stroke="#63c763" />
+              <path d="M450 470 C 540 470, 540 770, 625 770" stroke="#a1a1a1" />
+              <path d="M995 320 C 1120 320, 1100 540, 1215 540" stroke="#00d6a3" />
+              <path d="M995 550 C 1100 550, 1110 545, 1215 545" stroke="#63c763" />
+              <path d="M1035 770 C 1140 770, 1100 552, 1215 552" stroke="#a1a1a1" />
+            </g>
+          </svg>
+          <div class="copy"><h5>Din idé in.<br />Färdig 3D ut.</h5></div>
+          <div class="nodes">
+          <div class="node n0"><b>Din idé</b><span>CAD · skiss · problem</span></div>
+          <div class="node n1"><b>Interaktiv 3D</b><span>→ webb, AR</span></div>
+          <div class="node n2"><b>Produktfilm</b><span>→ film, stillbild</span></div>
+          <div class="node n3"><b>Verktyg &amp; tillägg</b><span>→ Blender-add-on</span></div>
+          <div class="node n4"><b>Kontakt</b><span>contact@…</span></div>
+          </div>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#15181d"></i><b>Canvas</b><span>#15181D</span></div>
+            <div class="sw"><i style="background:#232831"></i><b>Node</b><span>#232831</span></div>
+            <div class="sw"><i style="background:#e9ecef"></i><b>Ink</b><span>#E9ECEF</span></div>
+            <div class="sw"><i style="background:#8a93a0"></i><b>Muted</b><span>#8A93A0</span></div>
+            <div class="sw"><i style="background:#00d6a3"></i><b>Geometry</b><span>#00D6A3</span></div>
+            <div class="sw"><i style="background:#63c763"></i><b>Shader</b><span>#63C763</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:Supreme;font-weight:800">Supreme</b> for headlines and text (Fontshare), <span style="font-family:'Martian Mono'">Martian Mono</span> for node labels and socket names (Google Fonts).</p></div>
+          <div><h4>Motion &amp; 3D</h4><p>Signature: wires draw from socket to socket as you scroll and a pulse runs along them. Hover a socket to light up its whole path. Wire colours follow Blender's socket colours, so each service has a colour that means something. The popcorn stays: the kernel in "Din idé" pops when its first wire connects. Motion verb: <i>connect</i>, snap to the socket and flow. SVG wires plus the existing Three.js hero.</p></div>
+          <div><h4>References</h4><p class="refs"><a href="https://spline.design">spline.design</a><a href="https://rive.app">rive.app</a><a href="https://cables.gl">cables.gl</a></p></div>
+          <div><h4>Risk</h4><p>Can feel technical to product-film buyers. Fix: plain Swedish copy on every node, and the graph is a reading aid, never required to navigate.</p></div>
+          <div><h4>Scores</h4><p class="scores">Originality 4 · Fit 5 · Buildable 4 · Portable 2</p></div>
+        </div>
+      </section>
+
+      <section class="verdict" aria-labelledby="v-title">
+        <h2 class="part" id="v-title">3. Recommendation</h2>
+        <div class="card">
+          <p><b>Go with C, Node graph.</b> It is the only direction that ties all three services and the Blender add-ons together in one system, and it reads as a sales path: your idea in, a finished result out, then contact. It keeps the popcorn and the "poppa" line, and it gives a natural place for case studies (each project is a small graph from input to output).</p>
+          <p>From B, take the dimension call-outs for project captions. From A, take render noise that clears for the loader.</p>
+          <p>Whichever you pick, the rebuild should also fix the audit items: real work on the site, the phone load time, labels and tap targets, and sharing tags.</p>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
