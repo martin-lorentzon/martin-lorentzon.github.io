@@ -14,23 +14,55 @@
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Host+Grotesk:wght@400..700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
     <link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,700,800&f[]=zodiak@400,700&f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet" />
     <style>
-      :root { --bg: #f4f4f2; --surface: #ffffff; --ink: #17181a; --muted: #5d6066; --line: #dcdcd8; --focus: #1d5fd1; }
-      @media (prefers-color-scheme: dark) {
-        :root:not([data-theme="light"]) { --bg: #121315; --surface: #1b1c1f; --ink: #ececea; --muted: #a3a6ad; --line: #2e3034; --focus: #7aa7ff; }
+      :root {
+        --bg: #f4f4f2;
+        --surface: #ffffff;
+        --ink: #17181a;
+        --muted: #5d6066;
+        --line: #dcdcd8;
+        --focus: #1d5fd1;
       }
-      :root[data-theme="dark"] { --bg: #121315; --surface: #1b1c1f; --ink: #ececea; --muted: #a3a6ad; --line: #2e3034; --focus: #7aa7ff; }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --bg: #121315;
+          --surface: #1b1c1f;
+          --ink: #ececea;
+          --muted: #a3a6ad;
+          --line: #2e3034;
+          --focus: #7aa7ff;
+        }
+      }
+      :root[data-theme="dark"] {
+        --bg: #121315;
+        --surface: #1b1c1f;
+        --ink: #ececea;
+        --muted: #a3a6ad;
+        --line: #2e3034;
+        --focus: #7aa7ff;
+      }
       * { box-sizing: border-box; }
-      body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 "Archivo", system-ui, sans-serif; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 16px/1.55 "Archivo", system-ui, sans-serif;
+        font-variation-settings: "wdth" 100;
+      }
       a { color: inherit; }
       a:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
       .wrap { max-width: 1180px; margin: 0 auto; padding: 48px 16px 96px; }
       @media (min-width: 720px) { .wrap { padding: 64px 32px 120px; } }
       header.top h1 { font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.02; letter-spacing: -0.02em; margin: 0 0 12px; font-weight: 800; font-variation-settings: "wdth" 112; }
-      header.top p { max-width: 64ch; color: var(--muted); margin: 0 0 8px; }
-      h2.part { font-size: 1.5rem; margin: 64px 0 16px; letter-spacing: -0.01em; }
+      header.top p { max-width: 62ch; color: var(--muted); margin: 0; }
+      h2.part { font-size: 1.5rem; margin: 72px 0 16px; letter-spacing: -0.01em; }
       .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
-      .card ul { margin: 0; padding-left: 1.1em; } .card li { margin: 6px 0; }
-      .dir { margin-top: 48px; }
+      .audit { display: grid; gap: 16px; }
+      @media (min-width: 860px) { .audit { grid-template-columns: 1fr 1fr; } }
+      .audit h3 { margin: 0 0 8px; font-size: 1.05rem; }
+      .audit ul { margin: 0; padding-left: 1.1em; }
+      .audit li { margin: 6px 0; }
+      .num { font-family: "JetBrains Mono", monospace; font-size: 0.92em; }
+      .dir { margin-top: 40px; }
       .dir-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin-bottom: 14px; }
       .dir-head h3 { margin: 0; font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -0.01em; }
       .dir-head .tag { color: var(--muted); }
@@ -49,6 +81,8 @@
       .sw span { font-family: "JetBrains Mono", monospace; color: var(--muted); }
       .refs a { margin-right: 14px; }
       .scores { font-family: "JetBrains Mono", monospace; font-size: 0.9rem; }
+      .verdict { margin-top: 72px; }
+      .verdict p { max-width: 72ch; }
 
       
       /* ---------- Review layout and tags ---------- */
@@ -140,7 +174,7 @@
         .mC .n1, .mC .n2, .mC .n3 { margin-left: 22px; border-left: 3px solid #00d6a3; } .mC .n2 { border-left-color: #63c763; } .mC .n3 { border-left-color: #a1a1a1; }
       }
     
-      /* ---------- Mock 1: Sketch to finished ---------- */
+/* ---------- Mock 1: Sketch to finished ---------- */
       .m1 { background: #f3f3f0; color: #262626; font-family: "Switzer", sans-serif; }
       .m1 .copy { position: absolute; top: 8%; left: 5%; right: 5%; }
       .m1 h5 { margin: 0; font-weight: 800; font-size: clamp(1.3rem, 4.4vw, 3.2rem); line-height: 0.95; letter-spacing: -0.03em; }
@@ -196,7 +230,7 @@
     <div class="wrap">
       <header class="top">
         <h1>Tag the directions</h1>
-        <p>All six directions on one page, each with its tags beside it (below it on a phone). Click a tag once to mark it true (green, +), again to mark it wrong for us (red, −), a third time to clear it. Add a score and a note if you like, then press <b>Copy feedback</b> and paste the result back to me. Your picks stay in this browser, so you can stop and come back.</p>
+        <p>All directions on one page, each with its tags beside it (below it on a phone). Click a tag once to mark it true (green, +), again to mark it wrong for us (red, −), a third time to clear it. Add a score and a note if you like, then press <b>Copy feedback</b> and paste the result back to me. Your picks stay in this browser, so you can stop and come back.</p>
         <nav class="jump" aria-label="Jump to a direction" id="jump"></nav>
       </header>
 
@@ -437,14 +471,8 @@
       <button type="button" id="copy">Copy feedback</button>
     </div>
     <script>
-      const DIRECTIONS = [
-        { id: "A", round: 1, name: "Viewport → Render" },
-        { id: "B", round: 1, name: "Clay & tape" },
-        { id: "C", round: 1, name: "Node graph" },
-        { id: "1", round: 2, name: "Skiss → Klart" },
-        { id: "2", round: 2, name: "Gör det synligt" },
-        { id: "3", round: 2, name: "Låt den poppa" },
-      ];
+      const DIRECTIONS = [{"id":"A","round":1,"name":"Viewport → Render"},{"id":"B","round":1,"name":"Clay & tape"},{"id":"C","round":1,"name":"Node graph"},{"id":"1","round":2,"name":"Skiss → Klart"},{"id":"2","round":2,"name":"Gör det synligt"},{"id":"3","round":2,"name":"Låt den poppa"}];
+      const KEY = "direction-feedback-v1";
       const GROUPS = [
         { label: "Feel: how it comes across", tags: ["Premium", "Playful", "Serious", "Calm", "Bold", "Warm", "Cold", "Friendly", "Technical", "Artistic", "Corporate", "Personal", "Modern", "Timeless", "Trendy", "Nordic"] },
         { label: "Idea", tags: ["Clear in 3 seconds", "Needs explaining", "Memorable", "Forgettable", "Original", "Seen it before", "Shows the process", "Shows the results", "Shows the person behind it", "Works for any field", "Too narrow", "Too abstract", "Too literal", "Gimmicky"] },
@@ -453,7 +481,6 @@
         { label: "Motion & 3D", tags: ["Right amount of motion", "Too much motion", "Too little motion", "Signature moment works", "Signature moment is weak", "Good use of 3D", "3D feels forced", "Popcorn should stay", "Popcorn should go"] },
         { label: "Carry forward", tags: ["Keep the idea", "Keep the palette", "Keep the type", "Keep the motion", "Keep the headline", "Combine with another direction", "Drop it"] },
       ];
-      const KEY = "direction-feedback-v1"; // same key as the earlier tab version, so picks carry over
       let state = load();
       function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.dirs) return s; } catch (e) {} return { dirs: {}, overall: "" }; }
       function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} renderJump(); }

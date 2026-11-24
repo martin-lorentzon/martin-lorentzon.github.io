@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Visual Directions, Round 3</title>
+    <!-- Internal decision board for the founder, round 3. Not linked from the site. Fonts load from Google Fonts only to preview the type. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=JetBrains+Mono:wght@400;600&family=Caveat:wght@500;700&display=swap" rel="stylesheet" />
+    <style>
+      :root { --bg: #f4f4f2; --surface: #ffffff; --ink: #17181a; --muted: #5d6066; --line: #dcdcd8; --focus: #1d5fd1; }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) { --bg: #121315; --surface: #1b1c1f; --ink: #ececea; --muted: #a3a6ad; --line: #2e3034; --focus: #7aa7ff; }
+      }
+      :root[data-theme="dark"] { --bg: #121315; --surface: #1b1c1f; --ink: #ececea; --muted: #a3a6ad; --line: #2e3034; --focus: #7aa7ff; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 "Archivo", system-ui, sans-serif; }
+      a { color: inherit; }
+      a:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+      .wrap { max-width: 1180px; margin: 0 auto; padding: 48px 16px 96px; }
+      @media (min-width: 720px) { .wrap { padding: 64px 32px 120px; } }
+      header.top h1 { font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.02; letter-spacing: -0.02em; margin: 0 0 12px; font-weight: 800; font-variation-settings: "wdth" 112; }
+      header.top p { max-width: 64ch; color: var(--muted); margin: 0 0 8px; }
+      h2.part { font-size: 1.5rem; margin: 64px 0 16px; letter-spacing: -0.01em; }
+      .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+      .card ul { margin: 0; padding-left: 1.1em; } .card li { margin: 6px 0; }
+      .dir { margin-top: 48px; }
+      .dir-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin-bottom: 14px; }
+      .dir-head h3 { margin: 0; font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -0.01em; }
+      .dir-head .tag { color: var(--muted); }
+      .rec { display: inline-block; font-size: 0.8rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--ink); color: var(--bg); }
+      .idea { font-size: 1.15rem; max-width: 70ch; margin: 0 0 20px; }
+      .mock { border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; position: relative; border: 1px solid var(--line); }
+      @media (max-width: 640px) { .mock { aspect-ratio: 4 / 5; } }
+      .spec { display: grid; gap: 16px; margin-top: 20px; }
+      @media (min-width: 860px) { .spec { grid-template-columns: repeat(2, 1fr); } }
+      .spec h4 { margin: 0 0 6px; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+      .spec p { margin: 0; }
+      .swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+      .sw { display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; width: 78px; }
+      .sw i { display: block; height: 44px; border-radius: 8px; border: 1px solid var(--line); }
+      .sw b { font-weight: 600; }
+      .sw span { font-family: "JetBrains Mono", monospace; color: var(--muted); }
+      .refs a { margin-right: 14px; }
+      .scores { font-family: "JetBrains Mono", monospace; font-size: 0.9rem; }
+
+      /* ---------- Mock X: Annotated work ---------- */
+      .mX { background: #e8e6e3; color: #121314; font-family: "Archivo", sans-serif; }
+      .mX .work { position: absolute; left: 5%; top: 10%; width: 58%; height: 80%; border-radius: 6px; overflow: hidden; background: radial-gradient(70% 80% at 40% 35%, #fbfbfb, #c9ccd1 45%, #5e646d 85%, #2a2e34); }
+      .mX .work::before { content: ""; position: absolute; left: 22%; top: 24%; width: 46%; height: 52%; border-radius: 44% 44% 18% 18% / 52% 52% 16% 16%; background: radial-gradient(80% 70% at 32% 25%, #ffffff, #aeb6c2 40%, #3f4754 85%); box-shadow: 0 30px 40px -24px #000a; }
+      .mX .work::after { content: ""; position: absolute; right: 0; top: 0; bottom: 0; width: 38%; background: repeating-linear-gradient(0deg, transparent 0 13px, #2342c855 13px 14px), repeating-linear-gradient(90deg, transparent 0 13px, #2342c855 13px 14px), #e8e6e3ee; border-left: 2px solid #2342c8; }
+      .mX .copy { position: absolute; right: 5%; top: 10%; width: 30%; }
+      .mX h5 { margin: 0; font-weight: 900; font-variation-settings: "wdth" 125; font-size: clamp(1.1rem, 3vw, 2.3rem); line-height: 0.95; letter-spacing: -0.02em; }
+      .mX p { margin: 12px 0 0; font-size: clamp(0.66rem, 1.15vw, 0.92rem); color: #4a4d52; }
+      .mX .note { position: absolute; font: 700 clamp(0.8rem, 1.6vw, 1.25rem)/1.05 "Caveat", cursive; color: #2342c8; }
+      .mX .meta { position: absolute; right: 5%; bottom: 10%; width: 30%; font: 400 clamp(0.56rem, 0.95vw, 0.76rem)/1.5 "JetBrains Mono", monospace; color: #4a4d52; border-top: 1px solid #c9cbce; padding-top: 8px; }
+
+      /* ---------- Mock Y: The name as the stage ---------- */
+      .mY { container-type: inline-size; background: #0c0d0f; color: #f2f2f0; font-family: "Archivo", sans-serif; }
+      .mY .word { position: absolute; left: 0; right: 0; top: 30%; text-align: center; font-weight: 900; font-variation-settings: "wdth" 125; font-size: 10.6cqi; line-height: 0.85; letter-spacing: -0.04em; color: transparent; background: linear-gradient(100deg, transparent 0 34%, #f2f2f0 34% 100%), repeating-linear-gradient(0deg, #3a3e44 0 1px, transparent 1px 7px); -webkit-background-clip: text; background-clip: text; -webkit-text-stroke: 1px #6e737a; }
+      .mY .cut { position: absolute; top: 24%; bottom: 30%; left: 34%; width: 1px; background: #c9d3dd; }
+      .mY .cut span { position: absolute; top: -18px; left: 6px; white-space: nowrap; font: 400 10px/1 "JetBrains Mono", monospace; color: #8b8f95; }
+      .mY .top { position: absolute; top: 7%; left: 5%; right: 5%; display: flex; justify-content: space-between; font-size: clamp(0.62rem, 1.1vw, 0.88rem); color: #8b8f95; }
+      .mY .bottom { position: absolute; left: 5%; right: 5%; bottom: 8%; display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 3%; }
+      .mY .bottom p { margin: 0; font-size: clamp(0.62rem, 1.1vw, 0.9rem); color: #c9d3dd; }
+      .mY .bottom p b { display: block; color: #f2f2f0; font-weight: 700; margin-bottom: 2px; }
+
+      /* ---------- Mock Z: Gothenburg light ---------- */
+      .mZ { background: linear-gradient(180deg, #2b3e63 0%, #8094b4 52%, #e9c9a1 100%); color: #14181c; font-family: "Archivo", sans-serif; }
+      .mZ .floor { position: absolute; left: 0; right: 0; bottom: 0; height: 38%; background: #eef1f3; }
+      .mZ .obj { position: absolute; left: 50%; bottom: 30%; width: 22%; aspect-ratio: 1; border-radius: 50% 50% 18% 18% / 56% 56% 14% 14%; background: radial-gradient(70% 70% at 78% 40%, #fff3e2, #c5cbd3 38%, #4a5563 80%); }
+      .mZ .shadow { position: absolute; left: 22%; bottom: 31%; width: 34%; height: 5%; border-radius: 50%; background: linear-gradient(90deg, transparent, #14181c66); filter: blur(4px); }
+      .mZ .copy { position: absolute; left: 5%; top: 9%; color: #eef1f3; }
+      .mZ h5 { margin: 0; font-weight: 900; font-variation-settings: "wdth" 125; font-size: clamp(1.2rem, 3.6vw, 2.8rem); line-height: 0.95; letter-spacing: -0.02em; }
+      .mZ .clock { position: absolute; right: 5%; top: 9%; text-align: right; font: 400 clamp(0.6rem, 1vw, 0.82rem)/1.55 "JetBrains Mono", monospace; color: #dfe6ee; }
+      .mZ .cap { position: absolute; left: 5%; bottom: 8%; right: 5%; display: flex; justify-content: space-between; gap: 12px; font-size: clamp(0.62rem, 1.1vw, 0.9rem); color: #5e6b75; }
+      .mZ .cap b { color: #14181c; }
+      @media (max-width: 640px) {
+        .mX .work { width: 90%; height: 46%; top: 30%; } .mX .copy { left: 5%; right: 5%; width: auto; top: 6%; } .mX .meta { display: none; } .mX .n2 { display: none; }
+        .mY .word { top: 38%; } .mY .bottom { grid-template-columns: 1fr; gap: 8px; }
+        .mZ .obj { width: 36%; left: 46%; } .mZ .shadow { left: 6%; width: 46%; } .mZ .cap { flex-direction: column; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <h1>Company site: visual directions, round 3</h1>
+        <p>Three new directions built from your tags. Rounds 1 and 2 are still in the branch for comparison.</p>
+      </header>
+
+      <h2 class="part">What I took from your tags</h2>
+      <div class="card">
+        <ul>
+          <li><b>Aim for:</b> premium, serious, bold, modern, personal. It should look expensive, be clear in 3 seconds, build trust, and work for industry clients and Blender add-on buyers alike.</li>
+          <li><b>Keep from A:</b> the type (Archivo, wide and heavy) and the render idea, combined with something else. From B: the premium, trustworthy studio feel, without the cars.</li>
+          <li><b>Avoid:</b> forgettable, too safe, seen before, gimmicky, empty, template-like. No popcorn and no popcorn orange.</li>
+          <li><b>Bonus points:</b> a Nordic feel and some warmth, as smaller extras.</li>
+          <li><b>My assumptions</b> (tell me if any is wrong): lead with finished work and keep the process inside the case studies; directions 1 and 3 are dropped.</li>
+        </ul>
+      </div>
+
+      <!-- ===== X ===== -->
+      <section class="dir" aria-labelledby="x-title">
+        <div class="dir-head"><h3 id="x-title">X. Signerat</h3><span class="tag">Signed. Finished work, with Martin's own notes on it</span> <span class="rec">Recommended</span></div>
+        <p class="idea">Every piece of work is shown big and finished, like a gallery print. Then the work is "signed": Martin's own hand-written notes sit on top of it and explain one decision each. Move the pointer over the image and part of it turns back into the wire model underneath. The work sells; the notes make it personal.</p>
+        <div class="mock mX" role="img" aria-label="Mock of direction X: a large finished product render, the right third shown as a blue wire grid, two handwritten blue notes, and a bold headline 'Martin Lorentzon, 3D för det som ska säljas' beside it.">
+          <div class="work"></div>
+          <span class="note n1" style="left:9%;top:14%">ljuset från vänster,<br />som i butik →</span>
+          <span class="note n2" style="left:44%;top:80%">↑ samma modell, 3 färger</span>
+          <div class="copy"><h5>3D för det<br />som ska<br />säljas.</h5><p>Jag gör produktfilm, interaktiv 3D och verktyg. Varje bild här är min, med en anteckning om varför den ser ut som den gör.</p></div>
+          <div class="meta">Martin Lorentzon<br />Lorentzon Visualisation AB<br />Göteborg</div>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#e8e6e3"></i><b>Warm grey</b><span>#E8E6E3</span></div>
+            <div class="sw"><i style="background:#121314"></i><b>Ink</b><span>#121314</span></div>
+            <div class="sw"><i style="background:#4a4d52"></i><b>Graphite</b><span>#4A4D52</span></div>
+            <div class="sw"><i style="background:#c9cbce"></i><b>Line</b><span>#C9CBCE</span></div>
+            <div class="sw"><i style="background:#2342c8"></i><b>Blue pencil</b><span>#2342C8</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:Archivo;font-weight:900;font-variation-settings:'wdth' 125">Archivo Expanded 900</b> for headlines (kept from A), Archivo for text, <span style="font-family:Caveat;font-size:1.25em;font-weight:700;color:#2342c8">Caveat</span> only for Martin's notes, which always carry real information. Google Fonts.</p></div>
+          <div><h4>Motion &amp; 3D</h4><p>Signature: a pointer-led "x-ray" that turns part of a finished render back into its wire model (A's idea, used in reverse), while the notes write themselves on. Motion verb: <i>annotate</i>, lines drawn like a pen. Two stacked renders per piece and a mask; real 3D only where a project needs a viewer.</p></div>
+          <div><h4>References</h4><p class="refs"><a href="https://aristidebenoist.com">aristidebenoist.com</a><a href="https://rauno.me">rauno.me</a><a href="https://lusion.co">lusion.co</a></p></div>
+          <div><h4>Risk</h4><p>Handwriting can look cute if overused. Rule: one or two notes per piece, each a real decision (light, material, camera). Needs a render and a wire pass for each showcase.</p></div>
+          <div><h4>Scores</h4><p class="scores">Originality 4 · Fit 5 · Buildable 4 · Portable 2</p></div>
+        </div>
+      </section>
+
+      <!-- ===== Y ===== -->
+      <section class="dir" aria-labelledby="y-title">
+        <div class="dir-head"><h3 id="y-title">Y. Namnet</h3><span class="tag">The name. A bold wordmark the work lives inside</span></div>
+        <p class="idea">"LORENTZON" fills the screen in heavy wide type, built in 3D. As the page scrolls, a cut line sweeps across the letters: behind it they're wire, in front they're finished, polished renders. Then the letters open and become frames for the work. Bold and expensive, and nobody else can have it, because it's the name.</p>
+        <div class="mock mY" role="img" aria-label="Mock of direction Y: black page, the word LORENTZON huge across the screen, left part drawn as a wire outline and right part solid, with a thin cut line between them and three short service blocks below.">
+          <div class="top"><span>Lorentzon Visualisation · Göteborg</span><span>Arbeten  Om  Kontakt</span></div>
+          <div class="word">LORENTZON</div>
+          <div class="cut"><span>wire | render</span></div>
+          <div class="bottom">
+            <p><b>3D som säljer, förklarar och sparar tid.</b>Produktfilm, interaktiv 3D, verktyg.</p>
+            <p><b>Produktfilm</b>Från CAD till färdig lansering.</p>
+            <p><b>Verktyg</b>Blender-tillägg och egna pipelines.</p>
+          </div>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#0c0d0f"></i><b>Ground</b><span>#0C0D0F</span></div>
+            <div class="sw"><i style="background:#f2f2f0"></i><b>Ink</b><span>#F2F2F0</span></div>
+            <div class="sw"><i style="background:#8b8f95"></i><b>Muted</b><span>#8B8F95</span></div>
+            <div class="sw"><i style="background:#24272b"></i><b>Line</b><span>#24272B</span></div>
+            <div class="sw"><i style="background:#c9d3dd"></i><b>Steel</b><span>#C9D3DD</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:Archivo;font-weight:900;font-variation-settings:'wdth' 125">Archivo Expanded 900</b> for the wordmark and headlines, Archivo for text. One family only. Google Fonts.</p></div>
+          <div><h4>Motion &amp; 3D</h4><p>Signature: the 3D wordmark with a scroll-driven cut from wire to render (A's idea), then the letters part to frame the work. Motion verb: <i>cut</i>, a clean sweep, no wobble. Three.js for the wordmark only; everything after it is calm. Colour comes from the work, never the interface.</p></div>
+          <div><h4>References</h4><p class="refs"><a href="https://www.pentagram.com">pentagram.com</a><a href="https://locomotive.ca">locomotive.ca</a><a href="https://igloo.inc">igloo.inc</a></p></div>
+          <div><h4>Risk</h4><p>Black and steel can tip into cold. The personal part has to come from the copy ("jag"), a real portrait and real work. Big type can push work below the fold, so the first frame must already show a project.</p></div>
+          <div><h4>Scores</h4><p class="scores">Originality 4 · Fit 4 · Buildable 4 · Portable 1</p></div>
+        </div>
+      </section>
+
+      <!-- ===== Z ===== -->
+      <section class="dir" aria-labelledby="z-title">
+        <div class="dir-head"><h3 id="z-title">Z. Göteborgsljus</h3><span class="tag">Gothenburg light. The work lit by the real sky outside</span></div>
+        <p class="idea">Lighting is the core skill behind every render, and Martin works in Gothenburg, under a low Nordic sun. The hero shows a finished render lit by the sun's real position over Gothenburg right now: long shadows in winter, blue dusk in the afternoon, a night set after dark. Visitors see the work, and where and when it's made.</p>
+        <div class="mock mZ" role="img" aria-label="Mock of direction Z: dusk sky from deep blue to pale gold, a finished object on a pale floor casting a long shadow to the left, headline 'Gjort i Göteborg, i det här ljuset', and a small readout of the local time and sun height.">
+          <div class="floor"></div>
+          <div class="shadow"></div>
+          <div class="obj"></div>
+          <div class="copy"><h5>Gjort i Göteborg,<br />i det här ljuset.</h5></div>
+          <div class="clock">Göteborg 15:42<br />Solhöjd 4°<br />Skymning om 18 min</div>
+          <div class="cap"><span><b>Martin Lorentzon</b>, 3D-generalist</span><span>Produktfilm · Interaktiv 3D · Verktyg</span></div>
+        </div>
+        <div class="spec">
+          <div><h4>Palette</h4><div class="swatches">
+            <div class="sw"><i style="background:#eef1f3"></i><b>Overcast</b><span>#EEF1F3</span></div>
+            <div class="sw"><i style="background:#14181c"></i><b>Ink</b><span>#14181C</span></div>
+            <div class="sw"><i style="background:#5e6b75"></i><b>Muted</b><span>#5E6B75</span></div>
+            <div class="sw"><i style="background:#2b3e63"></i><b>Dusk</b><span>#2B3E63</span></div>
+            <div class="sw"><i style="background:#e9c9a1"></i><b>Low sun</b><span>#E9C9A1</span></div>
+          </div></div>
+          <div><h4>Type</h4><p><b style="font-family:Archivo;font-weight:900;font-variation-settings:'wdth' 125">Archivo Expanded 900</b> for headlines, Archivo for text, <span style="font-family:'JetBrains Mono'">JetBrains Mono</span> only for the time and sun readout. Google Fonts.</p></div>
+          <div><h4>Motion &amp; 3D</h4><p>Signature: a real-time Three.js scene where the sun angle comes from Gothenburg's clock (calculated in the browser, no location needed). Scrolling moves the camera, not the sun. Motion verb: <i>settle</i>, slow like daylight. With reduced motion, a still render for the current time of day.</p></div>
+          <div><h4>References</h4><p class="refs"><a href="https://igloo.inc">igloo.inc</a><a href="https://lusion.co">lusion.co</a><a href="https://teenage.engineering">teenage.engineering</a></p></div>
+          <div><h4>Risk</h4><p>The most expensive to build and the heaviest on phones. It needs a night version that still looks good. The idea only lands if the visitor notices the light is live, so the readout has to stay visible.</p></div>
+          <div><h4>Scores</h4><p class="scores">Originality 5 · Fit 4 · Buildable 3 · Portable 1</p></div>
+        </div>
+      </section>
+
+      <h2 class="part">Recommendation</h2>
+      <div class="card">
+        <p style="margin-top:0"><b>Go with X, Signerat.</b> It leads with finished work, which looks expensive and builds trust with any kind of client, and the handwritten notes make it personal without being cute. A's wire-to-render idea survives as the pointer x-ray, and A's type stays.</p>
+        <p style="margin-bottom:0">Borrow from Y for the header and footer (the wide wordmark), and from Z for the About page (a portrait lit by the current Gothenburg light).</p>
+      </div>
+    </div>
+  </body>
+</html>
