@@ -154,7 +154,7 @@
         const city = new THREE.Group(); // everything that rises when you zoom in
         scene.add(city);
         const colliders = [];
-        const addBox = (x, z, w, d) => colliders.push({ x0: x - w / 2, x1: x + w / 2, z0: z - d / 2, z1: z + d / 2 });
+        const addBox = (x, z, w, d, h = 7) => colliders.push({ x0: x - w / 2, x1: x + w / 2, z0: z - d / 2, z1: z + d / 2, h });
         const unit = new THREE.BoxGeometry(1, 1, 1);
         const mat = (c) => new THREE.MeshLambertMaterial({ color: c });
         function slab(parent, x, z, w, d, h, y, m) { const o = new THREE.Mesh(unit, m); o.scale.set(w, h, d); o.position.set(x, y, z); parent.add(o); return o; }
@@ -183,7 +183,7 @@
             const tx = x - w / 2 + 2 + rnd() * (w - 4), tz = z - d / 2 + 2 + rnd() * (d - 4);
             const tr = new THREE.Mesh(trunkGeo, trunkMat); tr.position.set(tx, 0.7, tz); city.add(tr);
             const cr = new THREE.Mesh(crownGeo, crownMat); cr.position.set(tx, 2.4, tz); cr.scale.setScalar(0.8 + rnd() * 0.5); city.add(cr);
-            addBox(tx, tz, 0.8, 0.8);
+            addBox(tx, tz, 0.8, 0.8, 3.4);
           }
         });
 
@@ -203,7 +203,7 @@
         const blocks = new THREE.InstancedMesh(bGeo, mat(0xffffff), lots.length);
         const m4 = new THREE.Matrix4(), col = new THREE.Color();
         const PAL = [0xece6db, 0xe5ded0, 0xf1ebe1, 0xdcd3c3, 0xe8e1d4];
-        lots.forEach((l, i) => { m4.makeScale(l.w, l.h, l.d); m4.setPosition(l.x, 0, l.z); blocks.setMatrixAt(i, m4); blocks.setColorAt(i, col.setHex(PAL[(rnd() * PAL.length) | 0])); addBox(l.x, l.z, l.w, l.d); });
+        lots.forEach((l, i) => { m4.makeScale(l.w, l.h, l.d); m4.setPosition(l.x, 0, l.z); blocks.setMatrixAt(i, m4); blocks.setColorAt(i, col.setHex(PAL[(rnd() * PAL.length) | 0])); addBox(l.x, l.z, l.w, l.d, l.h); });
         city.add(blocks);
 
         // MARK: Landmarks, one per place
@@ -217,7 +217,7 @@
           const fx = fc.getContext("2d"); const tex = new THREE.CanvasTexture(fc);
           const scr = new THREE.Mesh(new THREE.PlaneGeometry(12.8, 7.2), new THREE.MeshBasicMaterial({ map: tex }));
           scr.position.set(x, 5.4, z + 5.05); city.add(scr);
-          addBox(x, z, 16, 10);
+          addBox(x, z, 16, 10, 11);
           anim.push((t) => {
             const g = fx.createLinearGradient(0, 0, 320, 180); g.addColorStop(0, "#1c1b1a"); g.addColorStop(1, "#3a342d");
             fx.fillStyle = g; fx.fillRect(0, 0, 320, 180);
@@ -240,7 +240,7 @@
           const prof = [[0, 0], [1.6, 0], [1.9, 0.3], [2.0, 1.5], [1.8, 4.6], [1.3, 6.2], [0.7, 6.9], [0, 7.1]].map(([a, b]) => new THREE.Vector2(a, b));
           objMat = new THREE.MeshPhongMaterial({ color: 0xac8253, shininess: 50, specular: 0x333333 });
           const obj = new THREE.Mesh(new THREE.LatheGeometry(prof, 48), objMat); obj.position.set(x, 1.2, z); obj.scale.set(1, 1, 0.82); city.add(obj);
-          addBox(x, z, 8.6, 8.6);
+          addBox(x, z, 8.6, 8.6, 8.3);
           [[0xac8253, -6], [0x59655d, 0], [0xb9bdc1, 6]].forEach(([c, dx]) => {
             const p = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 0.25, 32), mat(c)); p.position.set(x + dx, 0.13, z + 8); scene.add(p);
             pads.push({ x: x + dx, z: z + 8, c: new THREE.Color(c) });
@@ -260,7 +260,7 @@
           city.add(gear);
           slab(city, x - 4, z + 6.2, 0.6, 0.6, 1.4, 0.7, gm);
           slab(city, x + 3, z + 6.5, 10, 1.8, 0.8, 0.4, mat(0x3a3d42));
-          addBox(x - 1, z + 6.4, 14, 2.4);
+          addBox(x - 1, z + 6.4, 14, 2.4, 1.6);
           const crates = [0, 1, 2].map(() => slab(city, 0, z + 6.5, 1.2, 1.2, 1.2, 1.4, mat(0xac8253)));
           anim.push((t, dt) => { gear.rotation.z -= dt * 0.8; crates.forEach((c, i) => { c.position.x = x - 1.5 + (((t * 1.5 + i * 3) % 9)); }); });
         })();
@@ -311,8 +311,12 @@
         const tgt = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.85, 32), new THREE.MeshBasicMaterial({ color: 0x1a1a1a })); tgt.rotation.x = -Math.PI / 2; tgt.position.y = 0.2; tgt.visible = false; scene.add(tgt);
         const pos = new THREE.Vector2(START[0], START[1]);
         const follow = new THREE.Vector3(START[0], 0, START[1]);
-        let heading = Math.PI, camYaw = Math.PI, speed = 0, steer = 0;
-        let path = null, pathI = 0, pathGoal = null, stuckT = 0, reverseT = 0, revSteer = 1;
+        const vel = new THREE.Vector2();
+        let heading = Math.PI, camYaw = Math.PI, speed = 0, slip = 0, steer = 0, lift = 0;
+        let path = null, pathI = 0, pathGoal = null, stuckT = 0, gear = 1, gearT = 0, flips = 0;
+        const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
+        const camFace = () => (portrait ? Math.PI / 2 : Math.PI); // the close-up looks the same way as map-up, and never turns
+        const spawnAt = (d) => (portrait ? findFree(d.pos[0] - 13, d.pos[1]) : d.spawn); // park in front of the place, as seen from the camera
         const CAR_R = 1.15;
         const bridgeOk = (x, r) => BRIDGES.some((b) => Math.abs(x - b) < 3.5 - r);
         function blocked(x, z, r = CAR_R) {
@@ -435,12 +439,13 @@
           tween = { from: zoom, to, t0: performance.now(), ms, done };
         }
         const busy = () => tween !== null;
-        function clearRoute() { path = null; reverseT = 0; stuckT = 0; tgt.visible = false; showRoute(null); }
-        function placeAt(x, z, face) { pos.set(x, z); follow.set(x, 0, z); clearRoute(); speed = 0; steer = 0; if (face !== undefined) heading = face; camYaw = heading; }
+        function clearRoute() { path = null; gear = 1; gearT = 0; stuckT = 0; flips = 0; tgt.visible = false; showRoute(null); }
+        function setRoute(r) { path = r; pathI = 1; pathGoal = r[r.length - 1]; stuckT = 0; gear = 1; gearT = 0; flips = 0; tgt.position.set(pathGoal[0], 0.2, pathGoal[1]); tgt.visible = true; }
+        function placeAt(x, z, face) { pos.set(x, z); follow.set(x, 0, z); clearRoute(); speed = 0; slip = 0; vel.set(0, 0); steer = 0; if (face !== undefined) heading = face; camYaw = camFace(); }
         function travel(d) {
           if (busy()) return;
           dismissed = null;
-          const go = () => { placeAt(d.spawn[0], d.spawn[1], Math.PI); zoomTo(1, 1500); };
+          const go = () => { const s = spawnAt(d); placeAt(s[0], s[1], camFace()); zoomTo(1, 1500); };
           if (zoom > 0.5) zoomTo(0, 900, go); else go();
         }
         function toMap() { if (!busy() && zoom > 0.5) zoomTo(0, 1100); }
@@ -503,10 +508,11 @@
           ndc.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
           ray.setFromCamera(ndc, camera);
           if (!ray.ray.intersectPlane(plane, hit)) return;
-          if (zoom < 0.5) { const [x, z] = findFree(hit.x, hit.z); placeAt(x, z, portrait ? Math.PI / 2 : Math.PI); dismissed = null; zoomTo(1, 1300); }
+          if (zoom < 0.5) { const [x, z] = findFree(hit.x, hit.z); placeAt(x, z, camFace()); dismissed = null; zoomTo(1, 1300); }
           else if (zoom > 0.98) {
+            // Forgiving: a click on a roof, the river or a wall drives to the nearest spot the car can reach.
             const r = findRoute(pos.x, pos.y, hit.x, hit.z);
-            if (r && r.length > 1) { path = r; pathI = 1; pathGoal = r[r.length - 1]; stuckT = 0; reverseT = 0; tgt.position.set(pathGoal[0], 0.2, pathGoal[1]); tgt.visible = true; }
+            if (r) setRoute(r.length > 1 ? r : [[pos.x, pos.y], r[0]]);
           }
         });
         let wheelAcc = 0;
@@ -534,6 +540,16 @@
         // MARK: Loop
         const MAPC = new THREE.Vector3(0, 0, (W.minZ + W.maxZ) / 2);
         const v = new THREE.Vector3(), look = new THREE.Vector3();
+        // Close-up camera: 30 units from the car (44 on phones), about 55 degrees down; up to about 80 degrees when a building is in the way.
+        const CAM_P0 = 0.96, CAM_P1 = 1.4, camD = () => (portrait ? 44 : 30); // phones stand further back to see the street ahead
+        function sees(p) {
+          const cx = Math.sin(camYaw), cz = Math.cos(camYaw), hd = camD() * Math.cos(p), hy = camD() * Math.sin(p);
+          for (let s = 1; s <= 14; s++) {
+            const u = s / 14, x = pos.x - cx * hd * u, y = 1.2 + (hy - 1.2) * u, z = pos.y - cz * hd * u;
+            if (colliders.some((c) => y < c.h && x > c.x0 && x < c.x1 && z > c.z0 && z < c.z1)) return false;
+          }
+          return true;
+        }
         function screen(x, y, z) { v.set(x, y, z).project(camera); return { x: (v.x * 0.5 + 0.5) * innerWidth, y: (-v.y * 0.5 + 0.5) * innerHeight, front: v.z < 1 }; }
         function place(el, p, s, o) {
           el.style.transform = "translate(" + p.x.toFixed(1) + "px," + p.y.toFixed(1) + "px) translate(-50%,-50%) scale(" + s.toFixed(3) + ")";
@@ -558,79 +574,114 @@
             hand = !!keys[" "];
             if (kT || kS || hand) { if (path) clearRoute(); throttle = kT; steerIn = kS; }
             else if (path) {
-              let [tx, tz] = path[pathI];
-              let dist = Math.hypot(tx - pos.x, tz - pos.y);
-              if (pathI < path.length - 1 && dist < 3.4) { pathI++; [tx, tz] = path[pathI]; dist = Math.hypot(tx - pos.x, tz - pos.y); }
+              // Follow the route line itself (aim at a point a little further along it), so the car never cuts a corner into a wall.
+              let px, pz, tx, tz, u;
+              for (;;) {
+                [px, pz] = path[pathI - 1]; [tx, tz] = path[pathI];
+                const sx = tx - px, sz = tz - pz;
+                u = clamp(((pos.x - px) * sx + (pos.y - pz) * sz) / (sx * sx + sz * sz || 1), 0, 1.01);
+                if (pathI < path.length - 1 && (u > 1 || Math.hypot(tx - pos.x, tz - pos.y) < 3)) pathI++; else break;
+              }
+              const dist = Math.hypot(tx - pos.x, tz - pos.y);
+              let ax = lerp(px, tx, Math.min(u, 1)), az = lerp(pz, tz, Math.min(u, 1)), ahead = 3.5 + Math.abs(speed) * 0.3, seg = pathI;
+              for (;;) {
+                const [qx, qz] = path[seg], d = Math.hypot(qx - ax, qz - az);
+                if (ahead <= d || seg === path.length - 1) { const k = Math.min(1, ahead / (d || 1)); ax = lerp(ax, qx, k); az = lerp(az, qz, k); break; }
+                ahead -= d; ax = qx; az = qz; seg++;
+              }
               let remain = dist;
               for (let k = pathI; k < path.length - 1; k++) remain += Math.hypot(path[k + 1][0] - path[k][0], path[k + 1][1] - path[k][1]);
-              let err = Math.atan2(tx - pos.x, tz - pos.y) - heading; err = Math.atan2(Math.sin(err), Math.cos(err));
-              if (pathI === path.length - 1 && dist < 1.8) { clearRoute(); throttle = speed > 0.3 ? -1 : 0; }
-              else if (reverseT > 0) {
-                reverseT -= dt; throttle = -1; steerIn = revSteer;
-                if (reverseT <= 0) { const r = findRoute(pos.x, pos.y, pathGoal[0], pathGoal[1]); if (r && r.length > 1) { path = r; pathI = 1; } else clearRoute(); }
-              } else {
-                steerIn = clamp(err * 2.4, -1, 1);
-                const want = Math.min(18 * clamp(1 - Math.abs(err) / 1.4, 0.22, 1), 2.2 * remain + 2);
-                throttle = clamp((want - speed) * 0.35, -1, 1);
-                stuckT = Math.abs(speed) < 1.2 ? stuckT + dt : 0;
-                if (stuckT > 0.9) { stuckT = 0; reverseT = 0.8; revSteer = -Math.sign(err) || 1; }
+              const last = pathI === path.length - 1, err = wrap(Math.atan2(ax - pos.x, az - pos.y) - heading);
+              if (last && dist < 2.6) { clearRoute(); throttle = speed > 0.3 ? -1 : 0; }
+              else {
+                gearT += dt;
+                if (gear === 1) {
+                  // Forward to the next corner, slowing for turns. A corner behind the car starts a back-and-forth turn.
+                  steerIn = clamp(err * 2.6, -1, 1);
+                  let want = Math.min(22 * clamp(1 - Math.abs(err) / 1.3, 0.25, 1), 2.4 * remain + 2.5);
+                  if (!last) { // brake ahead of a sharp corner instead of sliding wide into a wall
+                    const [nx, nz] = path[pathI + 1], bend = Math.abs(wrap(Math.atan2(nx - tx, nz - tz) - Math.atan2(tx - px, tz - pz)));
+                    want = Math.min(want, lerp(22, 7, Math.min(1, bend / 1.6)) + 1.6 * dist);
+                  }
+                  throttle = clamp((want - speed) * 0.4, -1, 1);
+                  if (Math.abs(err) > 1.9 && Math.abs(speed) < 5 && gearT > 0.6) { gear = -1; gearT = 0; flips++; }
+                } else {
+                  // Reverse: straight back onto a goal just behind, or on opposite lock to swing the nose round (the N-point turn).
+                  const backTo = last && remain < 12, eb = wrap(err - Math.PI);
+                  steerIn = backTo ? clamp(-eb * 2.6, -1, 1) : -Math.sign(err) || 1;
+                  throttle = clamp((-(backTo ? Math.min(7, 1.8 * remain + 2) : 7) - speed) * 0.4, -1, 1);
+                  if (backTo ? Math.abs(eb) > 1.9 : (Math.abs(err) < 0.75 && gearT > 0.8) || gearT > 2.6) { gear = 1; gearT = 0; }
+                }
+                // Up against something: change direction. After many tries, plan the route again from here.
+                stuckT = Math.abs(speed) < 1 && gearT > 0.3 ? stuckT + dt : 0;
+                if (stuckT > 0.45) { stuckT = 0; gear = -gear; gearT = 0; flips++; }
+                if (flips > 7) { const r = findRoute(pos.x, pos.y, pathGoal[0], pathGoal[1]); if (r && r.length > 1) setRoute(r); else clearRoute(); }
               }
             }
           }
-          // A simple bicycle model with arcade grip.
-          const maxV = keys.shift ? 30 : 20;
-          if (throttle && Math.sign(throttle) !== Math.sign(speed) && Math.abs(speed) > 0.5) speed += throttle * 42 * dt;
-          else speed += throttle * (throttle > 0 ? 24 : 14) * dt;
-          if (!throttle) speed -= speed * Math.min(1, (path ? 1.6 : 2.4) * dt);
-          if (hand) speed -= speed * Math.min(1, 2.5 * dt);
-          speed = clamp(speed, -9, maxV);
+          // Arcade handling: speed along the nose plus a sideways slip that the tyres soak up. The handbrake lets the tail slide.
+          const maxV = keys.shift ? 32 : 24;
+          let fx = Math.sin(heading), fz = Math.cos(heading), lx = Math.cos(heading), lz = -Math.sin(heading);
+          speed = vel.x * fx + vel.y * fz; slip = vel.x * lx + vel.y * lz;
+          if (throttle && Math.sign(throttle) !== Math.sign(speed) && Math.abs(speed) > 0.5) speed += throttle * 55 * dt;
+          else speed += throttle * (throttle > 0 ? 34 : 22) * dt;
+          if (!throttle) speed -= speed * Math.min(1, (path ? 1.6 : 2.8) * dt);
+          if (hand) speed -= speed * Math.min(1, 1.1 * dt);
+          speed = clamp(speed, -11, maxV);
           if (!throttle && Math.abs(speed) < 0.08) speed = 0;
-          steer += (steerIn - steer) * Math.min(1, dt * 8);
-          const maxSteer = 0.62 * (1 - 0.45 * Math.min(1, Math.abs(speed) / 28)) * (hand ? 1.5 : 1);
-          heading += (speed / 2.0) * Math.tan(steer * maxSteer) * dt;
-          const fx = Math.sin(heading), fz = Math.cos(heading);
-          const dx = fx * speed * dt, dz = fz * speed * dt;
+          slip *= Math.exp(-(hand ? 1.3 : path ? 14 : 9) * dt);
+          steer += (steerIn - steer) * Math.min(1, dt * (steerIn ? 10 : 14));
+          // Turn rate builds over the first few units of speed (no spinning on the spot) and eases a little at top speed.
+          const turn = Math.min(1, Math.abs(speed) / 5) * (1 - 0.3 * Math.min(1, Math.abs(speed) / 32));
+          heading += steer * 2.7 * turn * Math.sign(speed) * (hand ? 1.6 : 1) * dt;
+          vel.set(fx * speed + lx * slip, fz * speed + lz * slip);
+          fx = Math.sin(heading); fz = Math.cos(heading); lx = Math.cos(heading); lz = -Math.sin(heading);
+          const dx = vel.x * dt, dz = vel.y * dt;
           if (dx || dz) {
             if (!blocked(pos.x + dx, pos.y + dz)) { pos.x += dx; pos.y += dz; }
-            else if (!blocked(pos.x + dx, pos.y)) { pos.x += dx; speed *= 0.92; }
-            else if (!blocked(pos.x, pos.y + dz)) { pos.y += dz; speed *= 0.92; }
-            else speed *= -0.25;
+            else if (!blocked(pos.x + dx, pos.y)) { pos.x += dx; vel.x *= 0.97; vel.y *= -0.1; }
+            else if (!blocked(pos.x, pos.y + dz)) { pos.y += dz; vel.y *= 0.97; vel.x *= -0.1; }
+            else vel.multiplyScalar(-0.25);
           }
           if (path) showRoute([[pos.x, pos.y]].concat(path.slice(pathI)));
           me.position.set(pos.x, 0, pos.y);
           car.rotation.y = heading;
-          wheels.forEach((w) => { w.w.rotation.x += (speed * dt) / 0.36; if (w.front) w.pivot.rotation.y = steer * maxSteer; });
-          carBody.rotation.z = lerp(carBody.rotation.z, steer * clamp(speed / 20, -1, 1) * 0.1, Math.min(1, dt * 6));
+          wheels.forEach((w) => { w.w.rotation.x += (speed * dt) / 0.36; if (w.front) w.pivot.rotation.y = steer * 0.55; });
+          carBody.rotation.z = lerp(carBody.rotation.z, clamp(steer * clamp(speed / 20, -1, 1) * 0.1 - slip * 0.012, -0.16, 0.16), Math.min(1, dt * 6));
           carBody.rotation.x = lerp(carBody.rotation.x, -throttle * 0.035 * Math.sign(speed || 1), Math.min(1, dt * 6));
           carBody.position.y = Math.abs(speed) > 1 ? Math.sin(t * 22) * 0.02 : 0;
           // Smoke: more when going fast, accelerating, turning hard or on the handbrake.
           if (zoom > 0.5 && Math.abs(speed) > 0.6) {
-            puffAcc += dt * (Math.abs(speed) * 0.9 + Math.max(0, throttle * Math.sign(speed)) * 10 + Math.abs(steer) * Math.abs(speed) * 0.9 + (hand ? 30 : 0));
-            const lx = Math.cos(heading), lz = -Math.sin(heading), size = 0.32 + Math.min(0.45, Math.abs(speed) / 45) + (hand ? 0.2 : 0);
+            puffAcc += dt * (Math.abs(speed) * 0.9 + Math.max(0, throttle * Math.sign(speed)) * 10 + Math.abs(steer) * Math.abs(speed) * 0.9 + Math.abs(slip) * 6 + (hand ? 30 : 0));
+            const size = 0.32 + Math.min(0.45, Math.abs(speed) / 45) + Math.min(0.25, Math.abs(slip) / 30) + (hand ? 0.2 : 0);
             while (puffAcc >= 1) {
               puffAcc -= 1; puffSide = -puffSide;
               puff(pos.x + lx * 0.8 * puffSide - fx * 1.15, pos.y + lz * 0.8 * puffSide - fz * 1.15, size, -fx * 1.6 * Math.sign(speed) + lx * steer * 1.4, -fz * 1.6 * Math.sign(speed) + lz * steer * 1.4);
             }
           }
           updatePuffs(dt);
-          follow.lerp(v.set(pos.x, 0, pos.y), 1 - Math.exp(-dt * 9));
-          if (zoom > 0.5 && speed > 0.5) { let dy = heading - camYaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); camYaw += dy * Math.min(1, dt * 2.4); }
+          // The camera never turns: it glides after the car (with a small lead in the direction of travel) from one fixed angle.
+          follow.lerp(v.set(pos.x + vel.x * 0.1, 0, pos.y + vel.y * 0.1), 1 - Math.exp(-dt * 5));
+          camYaw += wrap(camFace() - camYaw) * Math.min(1, dt * 3);
+          // A building between camera and car tips the camera up to look more from above.
+          if (zoom > 0.5) { const want = sees(CAM_P0) ? 0 : sees(CAM_P1) ? 0.6 : 1; lift += (want - lift) * Math.min(1, dt * (want > lift ? 3 : 1.5)); }
           // Pads change the product's material.
           pads.forEach((p) => { if (Math.hypot(pos.x - p.x, pos.y - p.z) < 2.1) objMat.color.lerp(p.c, 1 - Math.exp(-dt * 5)); });
           anim.forEach((f) => f(t, dt));
 
           // Camera: from straight above (map) to behind the visitor (close-up).
           const z = zoom, wxz = 1 - Math.pow(1 - z, 3);
-          const h = Math.exp(lerp(Math.log(mapH), Math.log(10.5), z));
-          const back = 17 * z * z, cfx = Math.sin(camYaw), cfz = Math.cos(camYaw);
-          camera.position.set(lerp(MAPC.x, follow.x, wxz) - cfx * back, h, lerp(MAPC.z, follow.z, wxz) - cfz * back + 0.001);
-          look.set(lerp(MAPC.x, follow.x, wxz) + cfx * 4 * z, lerp(0, 1.2, z), lerp(MAPC.z, follow.z, wxz) + cfz * 4 * z);
+          const pitch = lerp(CAM_P0, CAM_P1, lift);
+          const h = Math.exp(lerp(Math.log(mapH), Math.log(camD() * Math.sin(pitch)), z));
+          const back = camD() * Math.cos(pitch) * z * z, shift = portrait ? 9 * z : 0, cfx = Math.sin(camYaw), cfz = Math.cos(camYaw);
+          camera.position.set(lerp(MAPC.x, follow.x, wxz) - cfx * (back + shift), h, lerp(MAPC.z, follow.z, wxz) - cfz * (back + shift) + 0.001);
+          look.set(lerp(MAPC.x, follow.x, wxz) - cfx * shift, lerp(0, 1, z), lerp(MAPC.z, follow.z, wxz) - cfz * shift); // on phones the car sits higher, clear of the panel
           camera.up.copy(UP_MAP).lerp(UP_CLOSE, z).normalize();
           camera.lookAt(look);
-          camera.fov = lerp(24, 52, z); camera.updateProjectionMatrix();
+          camera.fov = lerp(24, 42, z); camera.updateProjectionMatrix();
           city.scale.y = lerp(0.04, 1, smooth(0.25, 0.95, z));
           scene.background.copy(SEA).lerp(SKY, smooth(0.3, 0.9, z));
-          scene.fog.color.copy(scene.background); scene.fog.near = lerp(4000, 70, smooth(0.4, 1, z)); scene.fog.far = lerp(9000, 190, smooth(0.4, 1, z));
+          scene.fog.color.copy(scene.background); scene.fog.near = lerp(4000, 80, smooth(0.4, 1, z)); scene.fog.far = lerp(9000, 230, smooth(0.4, 1, z));
           const ds = lerp(mapH / 95, 1.35, smooth(0, 0.8, z)); dot.scale.setScalar(ds); halo.scale.setScalar(ds);
           dot.material.opacity = 0.9 * (1 - smooth(0.5, 0.9, z));
           car.visible = z > 0.4; car.scale.setScalar(smooth(0.4, 0.8, z) || 0.001);
@@ -657,7 +708,7 @@
 
           // Arriving at a place opens its panel.
           let near = null;
-          if (z > 0.98) { let bd = 1e9; DEST.forEach((d) => { const dd = Math.hypot(pos.x - d.spawn[0], pos.y - (d.spawn[1] - 4)); if (dd < bd) { bd = dd; near = d; } }); if (bd > 16) near = null; }
+          if (z > 0.98) { let bd = 1e9; DEST.forEach((d) => { const dd = Math.hypot(pos.x - d.pos[0], pos.y - d.pos[1]); if (dd < bd) { bd = dd; near = d; } }); if (bd > 21) near = null; }
           if (near !== current) {
             current = near; if (near) { fillPanel(near); history.replaceState(null, "", "#" + near.id); }
             DEST.forEach((d) => d.chip.setAttribute("aria-current", d === near ? "true" : "false"));
@@ -670,7 +721,7 @@
 
         // Deep links: #film, #3d, #tools, #studio, #contact open straight at that place.
         const start = DEST.find((d) => "#" + d.id === location.hash);
-        if (start) { placeAt(start.spawn[0], start.spawn[1], Math.PI); zoom = 1; }
+        if (start) { const s = spawnAt(start); placeAt(s[0], s[1], camFace()); zoom = 1; }
       })();
     </script>
   </body>
