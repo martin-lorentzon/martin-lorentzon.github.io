@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Namnet Prototyp</title>
+    <!-- Internal draft: a working prototype of direction Y's hero (round 3). Not linked from the site.
+         The wordmark is type here; in the real build it would be a 3D render. Scroll drives the wire-to-render cut. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+    <style>
+      :root { --ground: #0c0d0f; --ink: #f2f2f0; --muted: #8b8f95; --line: #24272b; --steel: #c9d3dd; --focus: #c9d3dd; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: var(--ground); color: var(--ink); overflow-x: clip; }
+      body { font: 16px/1.5 "Archivo", system-ui, sans-serif; }
+      a { color: inherit; }
+      a:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+      .skip { position: absolute; left: 16px; top: -60px; background: var(--ink); color: var(--ground); padding: 8px 12px; border-radius: 6px; z-index: 10; }
+      .skip:focus { top: 12px; }
+      header { position: fixed; inset: 0 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 18px clamp(16px, 4vw, 48px); z-index: 5; mix-blend-mode: difference; }
+      header .who { font-size: 0.9rem; color: #fff; }
+      nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: clamp(12px, 2.5vw, 28px); }
+      nav a { color: #fff; text-decoration: none; display: inline-block; padding: 10px 2px; font-size: 0.95rem; }
+      nav a:hover { text-decoration: underline; text-underline-offset: 6px; }
+      /* Scroll runway: the cut sweeps across the name while the stage is pinned. */
+      .runway { height: 260svh; position: relative; }
+      .stage { position: sticky; top: 0; height: 100svh; overflow: hidden; container-type: inline-size; }
+      .name { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-58%); text-align: center; margin: 0; font-weight: 900; font-variation-settings: "wdth" 125; font-size: 12cqi; line-height: 0.82; letter-spacing: -0.045em; white-space: nowrap; }
+      .name .wire { color: transparent; -webkit-text-stroke: 1px #6e737a; background: repeating-linear-gradient(0deg, #3a3e44 0 1px, transparent 1px 0.09em); -webkit-background-clip: text; background-clip: text; }
+      .name .render { position: absolute; inset: 0; color: var(--ink); background: linear-gradient(180deg, #ffffff 0%, #e7ebef 42%, #9ea7b1 58%, #f2f2f0 72%, #c3cad2 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; clip-path: inset(0 0 0 var(--cut, 100%)); }
+      .cutline { position: absolute; top: 18%; bottom: 22%; left: var(--cut, 100%); width: 1px; background: var(--steel); }
+      .cutline span { position: absolute; top: -22px; left: 8px; font: 400 11px/1 "JetBrains Mono", monospace; color: var(--muted); white-space: nowrap; }
+      .lede { position: absolute; left: clamp(16px, 4vw, 48px); right: clamp(16px, 4vw, 48px); bottom: 7svh; display: grid; gap: 16px; }
+      @media (min-width: 860px) { .lede { grid-template-columns: 1.4fr 1fr 1fr; gap: 3vw; } }
+      .lede p { margin: 0; color: var(--steel); font-size: clamp(0.92rem, 1.1vw, 1.05rem); max-width: 40ch; }
+      .lede b { display: block; color: var(--ink); font-weight: 700; margin-bottom: 4px; }
+      .lede h1 { margin: 0 0 6px; font-size: clamp(1.25rem, 2vw, 1.7rem); line-height: 1.05; letter-spacing: -0.02em; font-weight: 800; color: var(--ink); }
+      .progress { display: none; position: absolute; right: clamp(16px, 4vw, 48px); top: 50%; font: 400 11px/1 "JetBrains Mono", monospace; color: var(--muted); writing-mode: vertical-rl; }
+      .after { min-height: 80svh; padding: 12svh clamp(16px, 4vw, 48px); border-top: 1px solid var(--line); }
+      .after h2 { margin: 0 0 24px; font-weight: 900; font-variation-settings: "wdth" 125; font-size: clamp(2rem, 6vw, 5rem); line-height: 0.9; letter-spacing: -0.035em; }
+      .frames { display: grid; gap: 16px; }
+      @media (min-width: 860px) { .frames { grid-template-columns: 1.5fr 1fr; } }
+      .frames div { aspect-ratio: 4 / 3; border-radius: 6px; background: radial-gradient(70% 80% at 35% 30%, #4a525d, #1a1d22); display: flex; align-items: flex-end; padding: 16px; color: var(--steel); font-size: 0.9rem; }
+      .draft { position: fixed; right: 12px; bottom: 12px; font: 400 11px/1.4 "JetBrains Mono", monospace; background: var(--ink); color: var(--ground); padding: 6px 10px; border-radius: 6px; max-width: 46ch; z-index: 6; }
+      @media (max-width: 640px) { .cutline { top: 36%; bottom: 40%; } .draft { left: 12px; right: 12px; max-width: none; } .progress { display: none; } }
+      @media (prefers-reduced-motion: reduce) { .runway { height: auto; } .stage { position: relative; } .name .render { clip-path: none; } .cutline { display: none; } }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#arbeten">Hoppa till arbeten</a>
+    <header><span class="who">Lorentzon Visualisation · Göteborg</span><nav aria-label="Huvudmeny"><ul><li><a href="#arbeten">Arbeten</a></li><li><a href="#">Om</a></li><li><a href="#">Kontakt</a></li></ul></nav></header>
+    <main>
+      <div class="runway" id="runway">
+        <section class="stage" aria-labelledby="h1">
+          <p class="name" aria-hidden="true"><span class="wire">LORENTZON</span><span class="render">LORENTZON</span></p>
+          <div class="cutline" aria-hidden="true"><span>trådmodell | render</span></div>
+          <span class="progress" aria-hidden="true" id="pct">scrolla</span>
+          <div class="lede">
+            <div><h1 id="h1">3D som säljer, förklarar och sparar tid.</h1><p>Jag heter Martin och gör produktfilm, interaktiv 3D och verktyg från Göteborg.</p></div>
+            <p><b>Produktfilm</b>Från CAD-filer till färdig lansering.</p>
+            <p><b>Verktyg</b>Blender-tillägg och egna pipelines.</p>
+          </div>
+        </section>
+      </div>
+      <section class="after" id="arbeten" aria-labelledby="arb">
+        <h2 id="arb">Arbeten</h2>
+        <div class="frames"><div>Plats för ett riktigt projekt</div><div>Plats för ett riktigt projekt</div></div>
+      </section>
+    </main>
+    <p class="draft">Utkast: prototyp av riktning Y. Ordet är typsnitt här; i bygget blir det en 3D-rendering.</p>
+    <script>
+      (function () {
+        const runway = document.getElementById("runway");
+        const stage = runway.querySelector(".stage");
+        const pct = document.getElementById("pct");
+        if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        let cur = 1, target = 1, t = 0;
+        function measure() {
+          const r = runway.getBoundingClientRect();
+          const span = runway.offsetHeight - innerHeight;
+          const p = Math.min(1, Math.max(0, -r.top / span));
+          // Cut runs right to left: 100% (all wire) at the top, 0% (all render) at the end of the runway.
+          target = 1 - p;
+        }
+        addEventListener("scroll", measure, { passive: true });
+        addEventListener("resize", measure);
+        measure();
+        function frame(now) {
+          requestAnimationFrame(frame);
+          // At rest, the cut breathes a little so the idea is visible without scrolling.
+          const idle = target > 0.98 ? 0.94 + Math.sin(now / 900) * 0.02 : target;
+          cur += (idle - cur) * 0.14;
+          stage.style.setProperty("--cut", (cur * 100).toFixed(2) + "%");
+          pct.textContent = Math.round((1 - cur) * 100) + "% render";
+        }
+        requestAnimationFrame(frame);
+      })();
+    </script>
+  </body>
+</html>
