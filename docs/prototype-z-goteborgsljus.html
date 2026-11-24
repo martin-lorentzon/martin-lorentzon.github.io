@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Göteborgsljus Prototyp</title>
+    <!-- Internal draft: a working prototype of direction Z's hero (round 3). Not linked from the site.
+         The sun position over Gothenburg is calculated in the browser from the clock; no location is asked for.
+         Three.js r128 classic build from cdnjs so it opens straight from disk. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+    <style>
+      :root { --ink: #14181c; --muted: #5e6b75; --light: #eef1f3; --focus: #e9c9a1; --sky-top: #2b3e63; --sky-mid: #8094b4; --sky-low: #e9c9a1; --text-on-sky: #eef1f3; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: var(--light); color: var(--ink); }
+      body { font: 16px/1.5 "Archivo", system-ui, sans-serif; }
+      a, button, input { color: inherit; }
+      a:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+      .skip { position: absolute; left: 16px; top: -60px; background: var(--ink); color: var(--light); padding: 8px 12px; border-radius: 6px; z-index: 10; }
+      .skip:focus { top: 12px; }
+      .stage { position: relative; height: 100svh; min-height: 560px; overflow: hidden; background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 40%, var(--sky-low) 62%); transition: background 1.2s; }
+      .stage canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
+      header { position: absolute; inset: 0 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 18px clamp(16px, 4vw, 48px); color: var(--text-on-sky); z-index: 2; }
+      .mark { font-weight: 900; font-variation-settings: "wdth" 125; letter-spacing: -0.02em; text-decoration: none; }
+      nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: clamp(12px, 2.5vw, 28px); }
+      nav a { text-decoration: none; display: inline-block; padding: 10px 2px; }
+      nav a:hover { text-decoration: underline; text-underline-offset: 6px; }
+      .copy { position: absolute; left: clamp(16px, 4vw, 48px); top: 16svh; color: var(--text-on-sky); z-index: 2; max-width: min(48vw, 640px); }
+      h1 { margin: 0; font-weight: 900; font-variation-settings: "wdth" 125; font-size: clamp(2.2rem, 5.4vw, 5rem); line-height: 0.92; letter-spacing: -0.035em; }
+      .clock { position: absolute; right: clamp(16px, 4vw, 48px); top: 16svh; text-align: right; font: 400 0.82rem/1.7 "JetBrains Mono", monospace; color: var(--text-on-sky); z-index: 2; }
+      .foot { position: absolute; left: clamp(16px, 4vw, 48px); right: clamp(16px, 4vw, 48px); bottom: 5svh; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 16px; z-index: 2; color: var(--text-on-sky); opacity: 0.85; }
+      .foot b { color: inherit; }
+      .scrub { color: #14181c; display: flex; align-items: center; gap: 10px; font: 400 0.78rem/1 "JetBrains Mono", monospace; background: #ffffffcc; padding: 8px 12px; border-radius: 999px; }
+      .scrub input { width: min(260px, 50vw); accent-color: #2b3e63; }
+      .scrub button { font: inherit; border: 1px solid #c3ccd4; background: transparent; border-radius: 999px; padding: 4px 10px; min-height: 30px; cursor: pointer; }
+      .draft { margin: 12px 16px;  font: 400 11px/1.4 "JetBrains Mono", monospace; background: var(--ink); color: var(--light); padding: 6px 10px; border-radius: 6px; max-width: 46ch; z-index: 6; }
+      @media (max-width: 640px) { .copy { top: 12svh; } .clock { top: auto; bottom: 22svh; right: 16px; } .foot { flex-direction: column; align-items: flex-start; bottom: 4svh; } }
+      @media (prefers-reduced-motion: reduce) { .stage { transition: none; } }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main">Hoppa till innehållet</a>
+    <main id="main">
+      <section class="stage" id="stage" aria-labelledby="h1">
+        <header><a class="mark" href="#">LORENTZON</a><nav aria-label="Huvudmeny"><ul><li><a href="#">Arbeten</a></li><li><a href="#">Om</a></li><li><a href="#">Kontakt</a></li></ul></nav></header>
+        <canvas id="gl" aria-hidden="true"></canvas>
+        <div class="copy"><h1 id="h1">Gjort i Göteborg, i&nbsp;det här ljuset.</h1></div>
+        <p class="clock" id="clock" aria-live="off">Göteborg --:--<br />Solhöjd --°<br />&nbsp;</p>
+        <div class="foot">
+          <span><b>Martin Lorentzon</b>, 3D-generalist · Produktfilm · Interaktiv 3D · Verktyg</span>
+          <label class="scrub">Prova en annan tid <input id="scrub" type="range" min="0" max="1439" step="1" aria-label="Tid på dygnet i Göteborg" /> <button type="button" id="now">Nu</button></label>
+        </div>
+      </section>
+    </main>
+    <p class="draft">Utkast: prototyp av riktning Z. Ljuset följer solens riktiga läge över Göteborg. Objektet är en platshållare.</p>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+      (function () {
+        const LAT = 57.7089, LON = 11.9746; // Göteborg
+        const rad = Math.PI / 180;
+        // Low-precision solar position (good to a fraction of a degree): returns altitude and azimuth (from north, clockwise) in degrees.
+        function sun(date) {
+          const d = date.getTime() / 86400000 + 2440587.5 - 2451545.0;
+          const g = (357.529 + 0.98560028 * d) * rad;
+          const q = 280.459 + 0.98564736 * d;
+          const L = (q + 1.915 * Math.sin(g) + 0.02 * Math.sin(2 * g)) * rad;
+          const e = (23.439 - 0.00000036 * d) * rad;
+          const ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L));
+          const dec = Math.asin(Math.sin(e) * Math.sin(L));
+          const gmst = (18.697374558 + 24.06570982441908 * d) % 24;
+          const H = (gmst * 15 + LON) * rad - ra;
+          const phi = LAT * rad;
+          const alt = Math.asin(Math.sin(phi) * Math.sin(dec) + Math.cos(phi) * Math.cos(dec) * Math.cos(H));
+          const az = Math.atan2(-Math.sin(H), Math.tan(dec) * Math.cos(phi) - Math.sin(phi) * Math.cos(H));
+          return { alt: alt / rad, az: ((az / rad) + 360) % 360 };
+        }
+        const dirName = (az) => ["norr", "nordost", "öster", "sydost", "söder", "sydväst", "väster", "nordväst"][Math.round(az / 45) % 8];
+        const fmt = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm", hour: "2-digit", minute: "2-digit" });
+        const hm = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Stockholm", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+
+        // Sky palettes by sun altitude (degrees).
+        const KEYS = [
+          { alt: -12, top: "#070b14", mid: "#101a2c", low: "#1b2638", text: "#dfe6ee", floor: 0x1a212b },
+          { alt: -4, top: "#1b2744", mid: "#3d4f78", low: "#a27f86", text: "#eef1f3", floor: 0x6d7480 },
+          { alt: 2, top: "#2b3e63", mid: "#8094b4", low: "#e9c9a1", text: "#eef1f3", floor: 0xc9ccd0 },
+          { alt: 14, top: "#5d7aa6", mid: "#a9bdd6", low: "#e6dccb", text: "#14181c", floor: 0xe3e6e9 },
+          { alt: 40, top: "#7f9cc6", mid: "#c3d3e6", low: "#eef1f3", text: "#14181c", floor: 0xeef1f3 },
+        ];
+        const lerpHex = (a, b, t) => { const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16); const c = [16, 8, 0].map((s) => Math.round(((pa >> s) & 255) * (1 - t) + ((pb >> s) & 255) * t)); return "#" + c.map((v) => v.toString(16).padStart(2, "0")).join(""); };
+        function palette(alt) {
+          let i = 0; while (i < KEYS.length - 2 && alt > KEYS[i + 1].alt) i++;
+          const a = KEYS[i], b = KEYS[i + 1]; const t = Math.min(1, Math.max(0, (alt - a.alt) / (b.alt - a.alt)));
+          return { top: lerpHex(a.top, b.top, t), mid: lerpHex(a.mid, b.mid, t), low: lerpHex(a.low, b.low, t), text: t < 0.5 ? a.text : b.text, floor: new THREE.Color(a.floor).lerp(new THREE.Color(b.floor), t) };
+        }
+
+        const stage = document.getElementById("stage");
+        const clock = document.getElementById("clock");
+        const scrub = document.getElementById("scrub");
+        const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        let override = null; // minutes after local midnight, or null for "now"
+
+        function dateFor(minutes) {
+          if (minutes == null) return new Date();
+          const now = new Date(); const [h, m] = hm.format(now).split(":").map(Number);
+          return new Date(now.getTime() + (minutes - (h * 60 + m)) * 60000);
+        }
+
+        let three = null;
+        if (window.THREE) {
+          const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("gl"), antialias: true, alpha: true });
+          renderer.setPixelRatio(Math.min(devicePixelRatio, matchMedia("(max-width: 768px)").matches ? 1.5 : 2));
+          renderer.outputEncoding = THREE.sRGBEncoding; renderer.physicallyCorrectLights = true;
+          renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.9;
+          renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+          const scene = new THREE.Scene();
+          scene.fog = new THREE.Fog(0xe9c9a1, 14, 46);
+          const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 200);
+          const pts = [[0, -1.2], [0.78, -1.2], [0.9, -1.12], [0.95, -0.9], [0.95, 0.7], [0.9, 0.98], [0.72, 1.12], [0.32, 1.18], [0, 1.18]].map(([x, y]) => new THREE.Vector2(x, y));
+          const obj = new THREE.Mesh(new THREE.LatheGeometry(pts, 96), new THREE.MeshPhysicalMaterial({ color: 0xd9d4cc, roughness: 0.42, clearcoat: 0.6, clearcoatRoughness: 0.25 }));
+          obj.castShadow = true; obj.position.y = 1.2; scene.add(obj);
+          const floorMat = new THREE.MeshStandardMaterial({ color: 0xeef1f3, roughness: 0.95 });
+          const floor = new THREE.Mesh(new THREE.CircleGeometry(60, 64), floorMat); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+          const hemi = new THREE.HemisphereLight(0xffffff, 0xcfd5db, 0.8); scene.add(hemi);
+          const sunLight = new THREE.DirectionalLight(0xfff1dd, 4); sunLight.castShadow = true;
+          sunLight.shadow.mapSize.set(2048, 2048); sunLight.shadow.radius = 4; Object.assign(sunLight.shadow.camera, { left: -12, right: 12, top: 12, bottom: -12, far: 80 });
+          scene.add(sunLight); scene.add(sunLight.target);
+          const lamp = new THREE.PointLight(0xffc98a, 0, 12, 2); lamp.position.set(-2.2, 3, 2); lamp.castShadow = true; scene.add(lamp);
+          three = { renderer, scene, camera, sunLight, hemi, lamp, floorMat, obj, fog: scene.fog };
+          const resize = () => { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); };
+          addEventListener("resize", resize); resize();
+        }
+
+        function apply(date, minutesSinceMidnight) {
+          const s = sun(date);
+          const p = palette(s.alt);
+          stage.style.setProperty("--sky-top", p.top); stage.style.setProperty("--sky-mid", p.mid); stage.style.setProperty("--sky-low", p.low); stage.style.setProperty("--text-on-sky", p.text);
+          const label = s.alt > 0 ? `Solhöjd ${s.alt.toFixed(0)}°, sol i ${dirName(s.az)}` : s.alt > -6 ? `Skymning, sol ${Math.abs(s.alt).toFixed(0)}° under horisonten` : "Natt: studiolampan är tänd";
+          clock.innerHTML = `Göteborg ${fmt.format(date)}${override != null ? " (vald tid)" : ""}<br />${label}`;
+          if (scrub !== document.activeElement) scrub.value = minutesSinceMidnight;
+          if (!three) return;
+          const { sunLight, hemi, lamp, floorMat, fog } = three;
+          fog.color.set(p.low);
+          const a = Math.max(s.alt, 0.5) * rad, z = s.az * rad;
+          // North is -z, east is +x; the camera stands south of the object looking north.
+          sunLight.position.set(Math.sin(z) * Math.cos(a) * 30, Math.sin(a) * 30, -Math.cos(z) * Math.cos(a) * 30);
+          const day = Math.min(1, Math.max(0, (s.alt + 4) / 10));
+          sunLight.intensity = 4.6 * day;
+          sunLight.color.set(s.alt < 8 ? 0xffd2a1 : 0xfff4e6);
+          hemi.intensity = 0.15 + 0.7 * day;
+          hemi.color.set(p.top);
+          lamp.intensity = 40 * (1 - day);
+          floorMat.color.copy(p.floor);
+        }
+
+        function minutesNow() { const [h, m] = hm.format(new Date()).split(":").map(Number); return h * 60 + m; }
+        scrub.addEventListener("input", () => { override = Number(scrub.value); });
+        document.getElementById("now").addEventListener("click", () => { override = null; });
+
+        let last = 0, orbit = 0;
+        function frame(now) {
+          requestAnimationFrame(frame);
+          if (document.hidden) return;
+          if (now - last > 250) { const mins = override ?? minutesNow(); apply(dateFor(override), mins); last = now; }
+          if (!three) return;
+          if (!reduce) orbit += 0.0006;
+          const { camera, renderer, scene } = three;
+          const narrow = camera.aspect < 1;
+          const r = narrow ? 16 : 13;
+          // Camera stands east of the object looking west, so the low southern sun rakes across it from the left.
+          const ca = (100 * rad) + Math.sin(orbit) * 0.25;
+          camera.position.set(Math.sin(ca) * r, narrow ? 3.2 : 2.6, -Math.cos(ca) * r);
+          camera.lookAt(0, 1.1, narrow ? 0 : 0.9);
+          renderer.render(scene, camera);
+        }
+        requestAnimationFrame(frame);
+      })();
+    </script>
+  </body>
+</html>
