@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Direction Feedback Tags</title>
+    <!-- Internal tool for the founder: tag each visual direction, then copy the result back to the creative web developer. Works offline; selections are kept in this browser only. -->
+    <style>
+      :root { --bg: #f4f4f2; --surface: #ffffff; --ink: #17181a; --muted: #5d6066; --line: #d6d6d2; --yes: #136f3a; --yes-bg: #dcf3e4; --no: #a3221b; --no-bg: #fbe1df; --focus: #1d5fd1; }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) { --bg: #121315; --surface: #1b1c1f; --ink: #ececea; --muted: #a3a6ad; --line: #34363b; --yes: #7fe0a4; --yes-bg: #173a25; --no: #ff9c94; --no-bg: #43201d; --focus: #7aa7ff; }
+      }
+      :root[data-theme="dark"] { --bg: #121315; --surface: #1b1c1f; --ink: #ececea; --muted: #a3a6ad; --line: #34363b; --yes: #7fe0a4; --yes-bg: #173a25; --no: #ff9c94; --no-bg: #43201d; --focus: #7aa7ff; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, "Segoe UI", sans-serif; }
+      .wrap { max-width: 1100px; margin: 0 auto; padding: 40px 16px 120px; }
+      @media (min-width: 720px) { .wrap { padding: 56px 32px 140px; } }
+      h1 { font-size: clamp(1.8rem, 4.5vw, 2.8rem); line-height: 1.05; margin: 0 0 12px; letter-spacing: -0.02em; }
+      .lead { color: var(--muted); max-width: 66ch; margin: 0 0 8px; }
+      .legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 16px 0 0; font-size: 0.9rem; color: var(--muted); }
+      .legend span { display: inline-flex; align-items: center; gap: 6px; }
+      .dot { width: 12px; height: 12px; border-radius: 3px; border: 1px solid var(--line); display: inline-block; }
+      .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 32px 0 16px; position: sticky; top: 0; background: var(--bg); padding: 10px 0; z-index: 2; border-bottom: 1px solid var(--line); }
+      .tabs button { font: inherit; font-size: 0.92rem; padding: 7px 12px; min-height: 40px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+      .tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+      .tabs button .n { font-size: 0.78rem; opacity: 0.7; margin-left: 4px; }
+      button:focus-visible, textarea:focus-visible, a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+      .dir { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+      @media (min-width: 720px) { .dir { padding: 28px; } }
+      .dir h2 { margin: 0; font-size: 1.5rem; }
+      .dir .sum { margin: 4px 0 0; color: var(--muted); max-width: 70ch; }
+      .dir .src { font-size: 0.85rem; margin: 6px 0 0; }
+      .dir .src a { color: inherit; }
+      fieldset { border: 0; padding: 0; margin: 22px 0 0; }
+      legend { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; margin-bottom: 8px; padding: 0; }
+      .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+      .tag { font: inherit; font-size: 0.92rem; padding: 6px 12px; min-height: 36px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; }
+      .tag[data-state="yes"] { background: var(--yes-bg); color: var(--yes); border-color: var(--yes); }
+      .tag[data-state="yes"]::before { content: "+ "; font-weight: 700; }
+      .tag[data-state="no"] { background: var(--no-bg); color: var(--no); border-color: var(--no); text-decoration: line-through; }
+      .tag[data-state="no"]::before { content: "− "; font-weight: 700; }
+      .rating { display: flex; gap: 6px; flex-wrap: wrap; }
+      .rating button { font: inherit; width: 44px; height: 40px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; }
+      .rating button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+      textarea { width: 100%; min-height: 84px; font: inherit; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); resize: vertical; }
+      .bar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--line); padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; z-index: 3; }
+      .bar button { font: inherit; font-weight: 600; padding: 10px 18px; min-height: 44px; border-radius: 10px; border: 1px solid var(--ink); background: var(--ink); color: var(--bg); cursor: pointer; }
+      .bar button.ghost { background: transparent; color: var(--ink); }
+      .bar .status { font-size: 0.9rem; color: var(--muted); min-width: 12ch; }
+      #out { margin-top: 28px; }
+      #out[hidden] { display: none; }
+      #out textarea { min-height: 260px; font-family: ui-monospace, Consolas, monospace; font-size: 0.85rem; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Tag the directions</h1>
+      <p class="lead">Pick a direction, then click tags. One click marks a tag as true (green, +). A second click marks it as wrong for us (red, −). A third click clears it. Add a score and a note if you like, then press <b>Copy feedback</b> at the bottom and paste the result back to me.</p>
+      <p class="lead">Your picks are kept in this browser, so you can stop and come back.</p>
+      <div class="legend"><span><i class="dot" style="background:var(--yes-bg);border-color:var(--yes)"></i>+ true / keep</span><span><i class="dot" style="background:var(--no-bg);border-color:var(--no)"></i>− wrong for us</span><span><i class="dot"></i>not marked</span></div>
+
+      <div class="tabs" role="tablist" aria-label="Directions" id="tabs"></div>
+      <div id="panel"></div>
+
+      <section id="out" hidden aria-labelledby="out-title">
+        <h2 id="out-title" style="font-size:1.2rem;margin:0 0 8px">Your feedback</h2>
+        <p class="lead" id="out-note">Copied to the clipboard. If it wasn't, select the text below and copy it.</p>
+        <textarea id="out-text" readonly aria-labelledby="out-title"></textarea>
+      </section>
+    </div>
+
+    <div class="bar">
+      <span class="status" id="status" aria-live="polite"></span>
+      <button type="button" class="ghost" id="reset">Clear all</button>
+      <button type="button" id="copy">Copy feedback</button>
+    </div>
+
+    <script>
+      const DIRECTIONS = [
+        { id: "A", round: 1, name: "Viewport → Render", sum: "Wireframe to solid to material to final render, in a dark 3D-viewport look.", file: "visual-directions.html" },
+        { id: "B", round: 1, name: "Clay & tape", sum: "A car-design clay model; tape lines draw the layout.", file: "visual-directions.html" },
+        { id: "C", round: 1, name: "Node graph", sum: "Your idea is the input node; services are nodes; wires lead to contact.", file: "visual-directions.html" },
+        { id: "1", round: 2, name: "Skiss → Klart", sum: "One object finished in four plain steps: sketch, shape, light, done.", file: "visual-directions-v2.html" },
+        { id: "2", round: 2, name: "Gör det synligt", sum: "A lens that shows what's inside things: cutaways, organs, the work behind a tool.", file: "visual-directions-v2.html" },
+        { id: "3", round: 2, name: "Låt den poppa", sum: "Each brief starts as a kernel and pops into the finished result.", file: "visual-directions-v2.html" },
+      ];
+
+      const GROUPS = [
+        { key: "feel", label: "Feel: how it comes across", tags: ["Premium", "Playful", "Serious", "Calm", "Bold", "Warm", "Cold", "Friendly", "Technical", "Artistic", "Corporate", "Personal", "Modern", "Timeless", "Trendy", "Nordic"] },
+        { key: "idea", label: "Idea", tags: ["Clear in 3 seconds", "Needs explaining", "Memorable", "Forgettable", "Original", "Seen it before", "Shows the process", "Shows the results", "Shows the person behind it", "Works for any field", "Too narrow", "Too abstract", "Too literal", "Gimmicky"] },
+        { key: "client", label: "Fit with clients and the company", tags: ["Clients would get it", "Only 3D people would get it", "Builds trust", "Sells the work", "On brand", "Off brand", "Fits product companies", "Fits medicine & education", "Fits industry", "Fits Blender add-on buyers", "Too safe", "Too risky"] },
+        { key: "look", label: "Look", tags: ["Right colours", "Wrong colours", "Too dark", "Too light", "Too colourful", "Too grey", "Right type", "Wrong type", "Too busy", "Too empty", "Looks expensive", "Looks cheap", "Looks like a template"] },
+        { key: "motion", label: "Motion & 3D", tags: ["Right amount of motion", "Too much motion", "Too little motion", "Signature moment works", "Signature moment is weak", "Good use of 3D", "3D feels forced", "Popcorn should stay", "Popcorn should go"] },
+        { key: "keep", label: "Carry forward", tags: ["Keep the idea", "Keep the palette", "Keep the type", "Keep the motion", "Keep the headline", "Combine with another direction", "Drop it"] },
+      ];
+
+      const KEY = "direction-feedback-v1";
+      let state = load();
+      let current = state.current || "A";
+
+      function blank() { return { tags: {}, score: 0, note: "" }; }
+      function load() {
+        try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.dirs) return s; } catch (e) {}
+        return { dirs: {}, overall: "" };
+      }
+      function save() { try { state.current = current; localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+      function dir(id) { return (state.dirs[id] = state.dirs[id] || blank()); }
+      function count(id) { const d = state.dirs[id]; return d ? Object.keys(d.tags).length + (d.score ? 1 : 0) + (d.note ? 1 : 0) : 0; }
+
+      const tabs = document.getElementById("tabs");
+      const panel = document.getElementById("panel");
+
+      function renderTabs() {
+        tabs.innerHTML = "";
+        [...DIRECTIONS, { id: "all", name: "Overall" }].forEach((d) => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.setAttribute("role", "tab");
+          b.setAttribute("aria-selected", String(d.id === current));
+          b.setAttribute("aria-controls", "panel");
+          b.textContent = d.id === "all" ? "Overall" : `${d.id}. ${d.name}`;
+          const n = d.id === "all" ? (state.overall ? 1 : 0) : count(d.id);
+          if (n) { const s = document.createElement("span"); s.className = "n"; s.textContent = `(${n})`; b.append(s); }
+          b.addEventListener("click", () => { current = d.id; save(); render(); });
+          tabs.append(b);
+        });
+      }
+
+      function el(tag, props = {}, ...kids) { const e = document.createElement(tag); Object.assign(e, props); e.append(...kids); return e; }
+
+      function renderPanel() {
+        panel.innerHTML = "";
+        const box = el("section", { className: "dir" });
+        box.setAttribute("role", "tabpanel");
+        if (current === "all") {
+          box.append(el("h2", { textContent: "Overall" }), el("p", { className: "sum", textContent: "Anything that applies to all of them: what's missing, a site you love, a feeling none of them hit." }));
+          const ta = el("textarea", { value: state.overall || "", placeholder: "For example: none of them feel like us because… / a site that gets it right is…" });
+          ta.setAttribute("aria-label", "Overall note");
+          ta.addEventListener("input", () => { state.overall = ta.value.trim() ? ta.value : ""; save(); renderTabs(); });
+          box.append(el("fieldset", {}, el("legend", { textContent: "Note" }), ta));
+          panel.append(box);
+          return;
+        }
+        const d = DIRECTIONS.find((x) => x.id === current);
+        const st = dir(d.id);
+        const link = el("a", { href: d.file, textContent: `round ${d.round} board`, target: "_blank" });
+        box.append(el("h2", { textContent: `${d.id}. ${d.name}` }), el("p", { className: "sum", textContent: d.sum }), el("p", { className: "src" }, "See it on the ", link));
+
+        GROUPS.forEach((g) => {
+          const wrap = el("div", { className: "tags" });
+          g.tags.forEach((t) => {
+            const b = el("button", { type: "button", className: "tag", textContent: t });
+            const s = st.tags[t];
+            if (s) b.dataset.state = s;
+            const label = () => b.setAttribute("aria-label", `${t}: ${b.dataset.state === "yes" ? "true" : b.dataset.state === "no" ? "wrong for us" : "not marked"}`);
+            label();
+            b.addEventListener("click", () => {
+              const next = !b.dataset.state ? "yes" : b.dataset.state === "yes" ? "no" : "";
+              if (next) { b.dataset.state = next; st.tags[t] = next; } else { delete b.dataset.state; delete st.tags[t]; }
+              label(); save(); renderTabs();
+            });
+            wrap.append(b);
+          });
+          box.append(el("fieldset", {}, el("legend", { textContent: g.label }), wrap));
+        });
+
+        const rate = el("div", { className: "rating" });
+        for (let i = 1; i <= 5; i++) {
+          const b = el("button", { type: "button", textContent: String(i) });
+          b.setAttribute("aria-pressed", String(st.score === i));
+          b.setAttribute("aria-label", `Score ${i} of 5`);
+          b.addEventListener("click", () => { st.score = st.score === i ? 0 : i; save(); render(); });
+          rate.append(b);
+        }
+        box.append(el("fieldset", {}, el("legend", { textContent: "Score: how close is it, 1 to 5" }), rate));
+
+        const ta = el("textarea", { value: st.note, placeholder: "Anything the tags don't say" });
+        ta.setAttribute("aria-label", `Note for ${d.name}`);
+        ta.addEventListener("input", () => { st.note = ta.value; save(); renderTabs(); });
+        box.append(el("fieldset", {}, el("legend", { textContent: "Note" }), ta));
+        panel.append(box);
+      }
+
+      function render() { renderTabs(); renderPanel(); }
+
+      function compile() {
+        const lines = ["DIRECTION FEEDBACK (site refresh)", ""];
+        DIRECTIONS.forEach((d) => {
+          const st = state.dirs[d.id];
+          if (!st || (!Object.keys(st.tags).length && !st.score && !st.note.trim())) return;
+          lines.push(`${d.id}. ${d.name} (round ${d.round})${st.score ? `, score ${st.score}/5` : ""}`);
+          GROUPS.forEach((g) => {
+            const yes = g.tags.filter((t) => st.tags[t] === "yes");
+            const no = g.tags.filter((t) => st.tags[t] === "no");
+            if (!yes.length && !no.length) return;
+            const parts = [];
+            if (yes.length) parts.push(`+ ${yes.join(", ")}`);
+            if (no.length) parts.push(`− ${no.join(", ")}`);
+            lines.push(`  ${g.label.split(":")[0]}: ${parts.join(" | ")}`);
+          });
+          if (st.note.trim()) lines.push(`  Note: ${st.note.trim()}`);
+          lines.push("");
+        });
+        if (state.overall && state.overall.trim()) lines.push(`OVERALL: ${state.overall.trim()}`);
+        return lines.join("\n").trim();
+      }
+
+      const status = document.getElementById("status");
+      document.getElementById("copy").addEventListener("click", async () => {
+        const text = compile();
+        const out = document.getElementById("out");
+        const ta = document.getElementById("out-text");
+        ta.value = text;
+        out.hidden = false;
+        let ok = false;
+        try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {}
+        if (!ok) { ta.focus(); ta.select(); try { ok = document.execCommand("copy"); } catch (e) {} }
+        document.getElementById("out-note").textContent = ok ? "Copied to the clipboard. Paste it to me in the chat." : "Couldn't copy automatically: the text below is selected, press Ctrl+C.";
+        status.textContent = ok ? "Copied" : "Select and copy below";
+        out.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      document.getElementById("reset").addEventListener("click", () => {
+        if (!confirm("Clear every tag, score and note?")) return;
+        state = { dirs: {}, overall: "" };
+        current = "A";
+        save(); render();
+        document.getElementById("out").hidden = true;
+        status.textContent = "Cleared";
+      });
+
+      render();
+    </script>
+  </body>
+</html>
