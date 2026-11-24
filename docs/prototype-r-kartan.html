@@ -91,7 +91,7 @@
     <div class="list" id="list" hidden role="dialog" aria-modal="true" aria-labelledby="l-title">
       <div class="box"><h2 id="l-title">Alla platser</h2><ul id="l-items"></ul><button type="button" class="close" id="l-close">Stäng</button></div>
     </div>
-    <p class="draft">Utkast: prototyp av riktning R. Klicka på en plats, eller gå med WASD.</p>
+    <p class="draft">Utkast: prototyp av riktning R. Klicka på en plats, eller kör med WASD.</p>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
@@ -166,13 +166,13 @@
         water.rotation.order = "YXZ"; water.rotation.set(-Math.PI / 2, Math.atan(0.15), 0); water.position.set(0, 0.05, 10); scene.add(water);
         const streetMat = mat(0xf7f4ee);
         function runs(a, b, ok) { const out = []; let s = null; for (let t = a; t <= b + 0.001; t += 0.5) { const good = ok(t) && t < b; if (good && s === null) s = t; if (!good && s !== null) { out.push([s, t]); s = null; } } return out; }
-        for (let x = -90; x <= 90; x += 20) runs(W.minZ, W.maxZ, (z) => !inWater(x, z)).forEach(([a, b]) => slab(scene, x, (a + b) / 2, 3, b - a, 0.1, 0.06, streetMat));
-        for (let z = -60; z <= 60; z += 20) runs(W.minX, W.maxX, (x) => !inWater(x, z)).forEach(([a, b]) => slab(scene, (a + b) / 2, z, b - a, 3, 0.1, 0.06, streetMat));
+        for (let x = -90; x <= 90; x += 20) runs(W.minZ, W.maxZ, (z) => !inWater(x, z)).forEach(([a, b]) => slab(scene, x, (a + b) / 2, 4, b - a, 0.1, 0.06, streetMat));
+        for (let z = -60; z <= 60; z += 20) runs(W.minX, W.maxX, (x) => !inWater(x, z)).forEach(([a, b]) => slab(scene, (a + b) / 2, z, b - a, 4, 0.1, 0.06, streetMat));
         const bridgeMat = mat(0xefe9de), railMat = mat(0xb9b0a2);
         BRIDGES.forEach((bx) => {
           const len = 2 * (9 / COSA) + 3;
-          slab(scene, bx, zc(bx), 5.2, len, 0.3, 0.15, bridgeMat);
-          slab(city, bx - 2.6, zc(bx), 0.2, len, 1, 0.8, railMat); slab(city, bx + 2.6, zc(bx), 0.2, len, 1, 0.8, railMat);
+          slab(scene, bx, zc(bx), 7, len, 0.3, 0.15, bridgeMat);
+          slab(city, bx - 3.5, zc(bx), 0.2, len, 1, 0.8, railMat); slab(city, bx + 3.5, zc(bx), 0.2, len, 1, 0.8, railMat);
         });
         const PARKS = [[-80, -30, 16, 16], [80, 50, 16, 14]];
         const parkMat = mat(0xb6c2a0), trunkMat = mat(0x8a7a66), crownMat = mat(0x93a47e);
@@ -190,14 +190,14 @@
         // MARK: City blocks (instanced)
         const PLAZAS = DEST.map((d) => ({ x: d.pos[0], z: d.pos[1] + 5, r: 18 })).concat([{ x: START[0], z: START[1], r: 9 }]);
         const lots = [];
-        for (let bx = -100; bx <= 100; bx += 20) for (let bz = -70; bz <= 70; bz += 20) for (const ox of [-4.25, 4.25]) for (const oz of [-4.25, 4.25]) {
+        for (let bx = -100; bx <= 100; bx += 20) for (let bz = -70; bz <= 70; bz += 20) for (const ox of [-3.9, 3.9]) for (const oz of [-3.9, 3.9]) {
           const x = bx + ox, z = bz + oz;
           if (x < W.minX + 4 || x > W.maxX - 4 || z < W.minZ + 4 || z > W.maxZ - 4) continue;
           if (waterDist(x, z) < 14) continue;
           if (PLAZAS.some((p) => Math.hypot(x - p.x, z - p.z) < p.r)) continue;
           if (PARKS.some(([px, pz, w, d]) => Math.abs(x - px) < w / 2 + 4 && Math.abs(z - pz) < d / 2 + 4)) continue;
           if (rnd() < 0.12) continue;
-          lots.push({ x, z, w: 5.6 + rnd() * 1.6, d: 5.6 + rnd() * 1.6, h: rnd() < 0.07 ? 12 + rnd() * 6 : 2.5 + rnd() * 6 });
+          lots.push({ x, z, w: 5.0 + rnd() * 1.4, d: 5.0 + rnd() * 1.4, h: rnd() < 0.07 ? 12 + rnd() * 6 : 2.5 + rnd() * 6 });
         }
         const bGeo = new THREE.BoxGeometry(1, 1, 1); bGeo.translate(0, 0.5, 0);
         const blocks = new THREE.InstancedMesh(bGeo, mat(0xffffff), lots.length);
@@ -286,13 +286,24 @@
           anim.push((t) => { flag.rotation.x = Math.sin(t * 1.4) * 0.15; });
         })();
 
-        // MARK: The visitor
+        // MARK: The visitor's car. Local +z is the front, local +x the left side.
         const me = new THREE.Group(); scene.add(me);
-        const body = new THREE.Group(); me.add(body);
-        const inkMat = mat(0x1a1a1a);
-        const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.62, 1.5, 16), inkMat); torso.position.y = 1.05; body.add(torso);
-        const head = new THREE.Mesh(new THREE.SphereGeometry(0.42, 16, 12), mat(0xe9e3d8)); head.position.y = 2.12; body.add(head);
-        const nose = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.3), mat(0x2b4cc4)); nose.position.set(0, 1.5, 0.5); body.add(nose);
+        const car = new THREE.Group(); me.add(car);          // turns with the heading
+        const carBody = new THREE.Group(); car.add(carBody); // leans in turns, dips when braking
+        const blueMat = mat(0x2b4cc4), creamMat = mat(0xf2eee7), glassMat = mat(0x9fbcc2);
+        slab(carBody, 0, 0, 1.6, 2.9, 0.55, 0.64, blueMat);
+        slab(carBody, 0, -0.15, 1.3, 1.5, 0.5, 1.14, creamMat);
+        slab(carBody, 0, 0.61, 1.16, 0.06, 0.36, 1.12, glassMat); slab(carBody, 0, -0.91, 1.16, 0.06, 0.34, 1.12, glassMat);
+        slab(carBody, 0.52, 1.46, 0.32, 0.04, 0.16, 0.72, mat(0xfff3c4)); slab(carBody, -0.52, 1.46, 0.32, 0.04, 0.16, 0.72, mat(0xfff3c4));
+        slab(carBody, 0, -1.46, 1.3, 0.04, 0.12, 0.74, mat(0x8a2b2b));
+        const wheelGeo = new THREE.CylinderGeometry(0.36, 0.36, 0.3, 14); wheelGeo.rotateZ(Math.PI / 2);
+        const tyreMat = mat(0x222222);
+        const wheels = [[0.8, 0.95, true], [-0.8, 0.95, true], [0.8, -0.95, false], [-0.8, -0.95, false]].map(([x, z, front]) => {
+          const pivot = new THREE.Group(); pivot.position.set(x, 0.36, z); car.add(pivot);
+          const w = new THREE.Mesh(wheelGeo, tyreMat); pivot.add(w);
+          slab(w, 0, 0, 0.32, 0.12, 0.5, 0, creamMat); // a spoke, so the spin shows
+          return { pivot, w, front, x, z };
+        });
         const dot = new THREE.Mesh(new THREE.CircleGeometry(1, 40), new THREE.MeshBasicMaterial({ color: 0x2b4cc4, transparent: true, opacity: 0.9 }));
         dot.rotation.x = -Math.PI / 2; dot.position.y = 0.3; me.add(dot);
         const halo = new THREE.Mesh(new THREE.RingGeometry(1.25, 1.9, 40), new THREE.MeshBasicMaterial({ color: 0x2b4cc4, transparent: true, opacity: 0.25 }));
@@ -300,12 +311,116 @@
         const tgt = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.85, 32), new THREE.MeshBasicMaterial({ color: 0x1a1a1a })); tgt.rotation.x = -Math.PI / 2; tgt.position.y = 0.2; tgt.visible = false; scene.add(tgt);
         const pos = new THREE.Vector2(START[0], START[1]);
         const follow = new THREE.Vector3(START[0], 0, START[1]);
-        let heading = Math.PI, target = null;
-        function blocked(x, z) {
-          if (x < W.minX + 1 || x > W.maxX - 1 || z < W.minZ + 1 || z > W.maxZ - 1) return true;
-          if (inWater(x, z) && !onBridge(x)) return true;
-          const r = 0.7;
+        let heading = Math.PI, camYaw = Math.PI, speed = 0, steer = 0;
+        let path = null, pathI = 0, pathGoal = null, stuckT = 0, reverseT = 0, revSteer = 1;
+        const CAR_R = 1.15;
+        const bridgeOk = (x, r) => BRIDGES.some((b) => Math.abs(x - b) < 3.5 - r);
+        function blocked(x, z, r = CAR_R) {
+          if (x < W.minX + r || x > W.maxX - r || z < W.minZ + r || z > W.maxZ - r) return true;
+          if (waterDist(x, z) < 9.6 && !bridgeOk(x, 1.0)) return true;
           return colliders.some((c) => x > c.x0 - r && x < c.x1 + r && z > c.z0 - r && z < c.z1 + r);
+        }
+
+        // MARK: Route finding for click-to-drive. A 1-unit grid; obstacles grown by a margin so routes keep to the middle of streets.
+        const GX = W.maxX - W.minX, GZ = W.maxZ - W.minZ, grid = new Uint8Array(GX * GZ);
+        (function () {
+          const M = 2.0;
+          for (let j = 0; j < GZ; j++) for (let i = 0; i < GX; i++) {
+            const x = W.minX + i + 0.5, z = W.minZ + j + 0.5;
+            if (x < W.minX + 2 || x > W.maxX - 2 || z < W.minZ + 2 || z > W.maxZ - 2 || (waterDist(x, z) < 10.2 && !bridgeOk(x, 1.7))) grid[j * GX + i] = 1;
+          }
+          colliders.forEach((c) => {
+            const i0 = Math.max(0, Math.floor(c.x0 - M - W.minX)), i1 = Math.min(GX - 1, Math.ceil(c.x1 + M - W.minX));
+            const j0 = Math.max(0, Math.floor(c.z0 - M - W.minZ)), j1 = Math.min(GZ - 1, Math.ceil(c.z1 + M - W.minZ));
+            for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) grid[j * GX + i] = 1;
+          });
+        })();
+        const cellOf = (x, z) => [clamp(Math.floor(x - W.minX), 0, GX - 1), clamp(Math.floor(z - W.minZ), 0, GZ - 1)];
+        function nearestFree(i, j) {
+          if (!grid[j * GX + i]) return [i, j];
+          for (let r = 1; r < 30; r++) for (let dj = -r; dj <= r; dj++) for (let di = -r; di <= r; di++) {
+            if (Math.max(Math.abs(di), Math.abs(dj)) !== r) continue;
+            const a = i + di, b = j + dj;
+            if (a >= 0 && b >= 0 && a < GX && b < GZ && !grid[b * GX + a]) return [a, b];
+          }
+          return null;
+        }
+        function lineClear(p, q) {
+          const n = Math.ceil(Math.hypot(q[0] - p[0], q[1] - p[1]) / 0.5);
+          for (let s = 1; s < n; s++) { const [i, j] = cellOf(lerp(p[0], q[0], s / n), lerp(p[1], q[1], s / n)); if (grid[j * GX + i]) return false; }
+          return true;
+        }
+        function findRoute(x0, z0, x1, z1) {
+          const s = nearestFree(...cellOf(x0, z0)), g = nearestFree(...cellOf(x1, z1));
+          if (!s || !g) return null;
+          const N = GX * GZ, cost = new Float32Array(N).fill(Infinity), from = new Int32Array(N).fill(-1), done = new Uint8Array(N);
+          const si = s[1] * GX + s[0], gi = g[1] * GX + g[0];
+          const heap = [];
+          const push = (f, k) => { heap.push([f, k]); let n = heap.length - 1; while (n > 0) { const p = (n - 1) >> 1; if (heap[p][0] <= heap[n][0]) break; [heap[p], heap[n]] = [heap[n], heap[p]]; n = p; } };
+          const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; let n = 0; for (;;) { const l = 2 * n + 1, r = l + 1; let m = n; if (l < heap.length && heap[l][0] < heap[m][0]) m = l; if (r < heap.length && heap[r][0] < heap[m][0]) m = r; if (m === n) break; [heap[m], heap[n]] = [heap[n], heap[m]]; n = m; } } return top; };
+          const est = (k) => { const dx = Math.abs((k % GX) - g[0]), dz = Math.abs(((k / GX) | 0) - g[1]); return dx + dz + (Math.SQRT2 - 2) * Math.min(dx, dz); };
+          const NB = [[1, 0, 1], [-1, 0, 1], [0, 1, 1], [0, -1, 1], [1, 1, Math.SQRT2], [1, -1, Math.SQRT2], [-1, 1, Math.SQRT2], [-1, -1, Math.SQRT2]];
+          cost[si] = 0; push(est(si), si);
+          while (heap.length) {
+            const k = pop()[1];
+            if (k === gi) break;
+            if (done[k]) continue; done[k] = 1;
+            const ci = k % GX, cj = (k / GX) | 0;
+            for (const [di, dj, c] of NB) {
+              const a = ci + di, b = cj + dj;
+              if (a < 0 || b < 0 || a >= GX || b >= GZ) continue;
+              const n = b * GX + a;
+              if (grid[n] || done[n] || (di && dj && (grid[cj * GX + a] || grid[b * GX + ci]))) continue;
+              if (cost[k] + c < cost[n]) { cost[n] = cost[k] + c; from[n] = k; push(cost[n] + est(n), n); }
+            }
+          }
+          if (gi !== si && from[gi] === -1) return null;
+          const pts = [];
+          for (let k = gi; k !== -1; k = from[k]) pts.push([W.minX + (k % GX) + 0.5, W.minZ + ((k / GX) | 0) + 0.5]);
+          pts.reverse();
+          const out = [pts[0]];
+          for (let a = 0; a < pts.length - 1; ) { let b = pts.length - 1; while (b > a + 1 && !lineClear(pts[a], pts[b])) b--; out.push(pts[b]); a = b; }
+          return out;
+        }
+        // The route ahead is drawn as a trail of dots.
+        const MAXD = 500;
+        const trail = new THREE.InstancedMesh(new THREE.CircleGeometry(0.3, 12).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0x2b4cc4 }), MAXD);
+        trail.count = 0; scene.add(trail);
+        function showRoute(pts) {
+          let n = 0;
+          if (pts) for (let s = 0; s < pts.length - 1; s++) {
+            const [x0, z0] = pts[s], [x1, z1] = pts[s + 1], d = Math.hypot(x1 - x0, z1 - z0);
+            for (let u = 1.2; u < d && n < MAXD; u += 1.6) { m4.makeTranslation(lerp(x0, x1, u / d), 0.3, lerp(z0, z1, u / d)); trail.setMatrixAt(n++, m4); }
+          }
+          trail.count = n; trail.instanceMatrix.needsUpdate = true;
+        }
+
+        // MARK: Cartoon smoke from the rear wheels: low-poly puffs that pop up, drift back and shrink away.
+        const PUFFS = 160;
+        const puffMesh = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 0), new THREE.MeshLambertMaterial({ color: 0xf7f4ee, flatShading: true }), PUFFS);
+        puffMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(puffMesh);
+        const puffs = Array.from({ length: PUFFS }, () => ({ age: 1, life: 0, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, s: 0, r: 0 }));
+        let puffNext = 0, puffAcc = 0, puffSide = 1;
+        function puff(x, z, size, vx, vz) {
+          const p = puffs[puffNext]; puffNext = (puffNext + 1) % PUFFS;
+          p.age = 0; p.life = 0.5 + Math.random() * 0.45; p.s = size * (0.8 + Math.random() * 0.5); p.r = Math.random() * 6;
+          p.x = x + (Math.random() - 0.5) * 0.3; p.y = 0.3; p.z = z + (Math.random() - 0.5) * 0.3;
+          p.vx = vx + (Math.random() - 0.5) * 1.4; p.vy = 1.4 + Math.random() * 1.4; p.vz = vz + (Math.random() - 0.5) * 1.4;
+        }
+        const pq = new THREE.Quaternion(), pe = new THREE.Euler(), ps = new THREE.Vector3(), pp = new THREE.Vector3();
+        function updatePuffs(dt) {
+          for (let i = 0; i < PUFFS; i++) {
+            const p = puffs[i]; let s = 0;
+            if (p.age < p.life) {
+              p.age += dt; const k = Math.min(1, p.age / p.life);
+              p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt; p.vx *= 0.93; p.vz *= 0.93; p.vy *= 0.95; p.r += dt * 2;
+              s = p.s * (k < 0.18 ? k / 0.18 : Math.pow(1 - (k - 0.18) / 0.82, 1.3));
+            }
+            pq.setFromEuler(pe.set(p.r, p.r * 0.7, 0));
+            m4.compose(pp.set(p.x, p.y, p.z), pq, ps.setScalar(Math.max(s, 0.0001)));
+            puffMesh.setMatrixAt(i, m4);
+          }
+          puffMesh.instanceMatrix.needsUpdate = true;
         }
         function findFree(x, z) {
           if (!blocked(x, z)) return [x, z];
@@ -320,7 +435,8 @@
           tween = { from: zoom, to, t0: performance.now(), ms, done };
         }
         const busy = () => tween !== null;
-        function placeAt(x, z, face) { pos.set(x, z); follow.set(x, 0, z); target = null; tgt.visible = false; if (face !== undefined) heading = face; }
+        function clearRoute() { path = null; reverseT = 0; stuckT = 0; tgt.visible = false; showRoute(null); }
+        function placeAt(x, z, face) { pos.set(x, z); follow.set(x, 0, z); clearRoute(); speed = 0; steer = 0; if (face !== undefined) heading = face; camYaw = heading; }
         function travel(d) {
           if (busy()) return;
           dismissed = null;
@@ -375,7 +491,7 @@
           if (!list.hidden || e.target.closest && e.target.closest("button, a") && e.key === " ") return;
           if (e.key === "m" || e.key === "M") { zoom > 0.5 ? toMap() : toClose(); return; }
           const k = e.key.toLowerCase();
-          if (["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright", "shift"].includes(k)) { keys[k] = true; if (k.startsWith("arrow")) e.preventDefault(); }
+          if (["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright", "shift", " "].includes(k)) { keys[k] = true; if (k.startsWith("arrow") || k === " ") e.preventDefault(); }
         });
         addEventListener("keyup", (e) => { keys[e.key.toLowerCase()] = false; });
         addEventListener("blur", () => { for (const k in keys) keys[k] = false; });
@@ -387,8 +503,11 @@
           ndc.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
           ray.setFromCamera(ndc, camera);
           if (!ray.ray.intersectPlane(plane, hit)) return;
-          if (zoom < 0.5) { const [x, z] = findFree(hit.x, hit.z); placeAt(x, z); dismissed = null; zoomTo(1, 1300); }
-          else if (zoom > 0.98) { target = new THREE.Vector2(hit.x, hit.z); tgt.position.set(hit.x, 0.2, hit.z); tgt.visible = true; }
+          if (zoom < 0.5) { const [x, z] = findFree(hit.x, hit.z); placeAt(x, z, portrait ? Math.PI / 2 : Math.PI); dismissed = null; zoomTo(1, 1300); }
+          else if (zoom > 0.98) {
+            const r = findRoute(pos.x, pos.y, hit.x, hit.z);
+            if (r && r.length > 1) { path = r; pathI = 1; pathGoal = r[r.length - 1]; stuckT = 0; reverseT = 0; tgt.position.set(pathGoal[0], 0.2, pathGoal[1]); tgt.visible = true; }
+          }
         });
         let wheelAcc = 0;
         canvas.addEventListener("wheel", (e) => {
@@ -399,13 +518,13 @@
 
         // MARK: Resize
         // Portrait screens turn the map 90 degrees so the long river runs down the screen; the zoom turns it back.
-        let mapH = 400;
+        let mapH = 400, portrait = false;
         const UP_MAP = new THREE.Vector3(0, 0, -1), UP_CLOSE = new THREE.Vector3(0, 1, 0);
         function resize() {
           renderer.setSize(innerWidth, innerHeight, false);
           camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
           const k = 2 * Math.tan(THREE.MathUtils.degToRad(12));
-          const portrait = camera.aspect < 0.85, ex = W.maxX - W.minX, ez = W.maxZ - W.minZ;
+          portrait = camera.aspect < 0.85; const ex = W.maxX - W.minX, ez = W.maxZ - W.minZ;
           const vExt = portrait ? ex : ez, hExt = portrait ? ez : ex;
           mapH = Math.max((vExt * 1.06) / k, (hExt * 1.04) / (k * camera.aspect));
           UP_MAP.set(portrait ? 1 : 0, 0, portrait ? 0 : -1);
@@ -422,7 +541,7 @@
           if (el.classList.contains("mk")) el.style.pointerEvents = p.front && o > 0.3 ? "auto" : "none";
         }
         const clock = new THREE.Clock();
-        let walkT = 0, lastHint = "";
+        let lastHint = "";
         function frame() {
           requestAnimationFrame(frame);
           const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
@@ -431,44 +550,90 @@
             zoom = lerp(tween.from, tween.to, ease(p));
             if (p >= 1) { const d = tween.done; tween = null; if (d) d(); }
           }
-          // Movement, only in the close-up.
-          let mx = 0, mz = 0, moving = false;
+          // MARK: Driving. Keys drive directly; a clicked route drives itself (steer at the next corner, slow for turns, back up if stuck).
+          let throttle = 0, steerIn = 0, hand = false;
           if (zoom > 0.98 && !busy()) {
-            mx = (keys.d || keys.arrowright ? 1 : 0) - (keys.a || keys.arrowleft ? 1 : 0);
-            mz = (keys.s || keys.arrowdown ? 1 : 0) - (keys.w || keys.arrowup ? 1 : 0);
-            if (mx || mz) { target = null; tgt.visible = false; }
-            else if (target) { mx = target.x - pos.x; mz = target.y - pos.y; if (Math.hypot(mx, mz) < 0.5) { target = null; tgt.visible = false; mx = mz = 0; } }
-            const len = Math.hypot(mx, mz);
-            if (len > 0) {
-              const sp = (keys.shift ? 26 : 15) * dt, dx = (mx / len) * sp, dz = (mz / len) * sp;
-              let moved = false;
-              if (!blocked(pos.x + dx, pos.y)) { pos.x += dx; moved = true; }
-              if (!blocked(pos.x, pos.y + dz)) { pos.y += dz; moved = true; }
-              if (!moved && target) { target = null; tgt.visible = false; }
-              heading = Math.atan2(dx, dz); moving = moved;
+            const kT = (keys.w || keys.arrowup ? 1 : 0) - (keys.s || keys.arrowdown ? 1 : 0);
+            const kS = (keys.a || keys.arrowleft ? 1 : 0) - (keys.d || keys.arrowright ? 1 : 0);
+            hand = !!keys[" "];
+            if (kT || kS || hand) { if (path) clearRoute(); throttle = kT; steerIn = kS; }
+            else if (path) {
+              let [tx, tz] = path[pathI];
+              let dist = Math.hypot(tx - pos.x, tz - pos.y);
+              if (pathI < path.length - 1 && dist < 3.4) { pathI++; [tx, tz] = path[pathI]; dist = Math.hypot(tx - pos.x, tz - pos.y); }
+              let remain = dist;
+              for (let k = pathI; k < path.length - 1; k++) remain += Math.hypot(path[k + 1][0] - path[k][0], path[k + 1][1] - path[k][1]);
+              let err = Math.atan2(tx - pos.x, tz - pos.y) - heading; err = Math.atan2(Math.sin(err), Math.cos(err));
+              if (pathI === path.length - 1 && dist < 1.8) { clearRoute(); throttle = speed > 0.3 ? -1 : 0; }
+              else if (reverseT > 0) {
+                reverseT -= dt; throttle = -1; steerIn = revSteer;
+                if (reverseT <= 0) { const r = findRoute(pos.x, pos.y, pathGoal[0], pathGoal[1]); if (r && r.length > 1) { path = r; pathI = 1; } else clearRoute(); }
+              } else {
+                steerIn = clamp(err * 2.4, -1, 1);
+                const want = Math.min(18 * clamp(1 - Math.abs(err) / 1.4, 0.22, 1), 2.2 * remain + 2);
+                throttle = clamp((want - speed) * 0.35, -1, 1);
+                stuckT = Math.abs(speed) < 1.2 ? stuckT + dt : 0;
+                if (stuckT > 0.9) { stuckT = 0; reverseT = 0.8; revSteer = -Math.sign(err) || 1; }
+              }
             }
           }
+          // A simple bicycle model with arcade grip.
+          const maxV = keys.shift ? 30 : 20;
+          if (throttle && Math.sign(throttle) !== Math.sign(speed) && Math.abs(speed) > 0.5) speed += throttle * 42 * dt;
+          else speed += throttle * (throttle > 0 ? 24 : 14) * dt;
+          if (!throttle) speed -= speed * Math.min(1, (path ? 1.6 : 2.4) * dt);
+          if (hand) speed -= speed * Math.min(1, 2.5 * dt);
+          speed = clamp(speed, -9, maxV);
+          if (!throttle && Math.abs(speed) < 0.08) speed = 0;
+          steer += (steerIn - steer) * Math.min(1, dt * 8);
+          const maxSteer = 0.62 * (1 - 0.45 * Math.min(1, Math.abs(speed) / 28)) * (hand ? 1.5 : 1);
+          heading += (speed / 2.0) * Math.tan(steer * maxSteer) * dt;
+          const fx = Math.sin(heading), fz = Math.cos(heading);
+          const dx = fx * speed * dt, dz = fz * speed * dt;
+          if (dx || dz) {
+            if (!blocked(pos.x + dx, pos.y + dz)) { pos.x += dx; pos.y += dz; }
+            else if (!blocked(pos.x + dx, pos.y)) { pos.x += dx; speed *= 0.92; }
+            else if (!blocked(pos.x, pos.y + dz)) { pos.y += dz; speed *= 0.92; }
+            else speed *= -0.25;
+          }
+          if (path) showRoute([[pos.x, pos.y]].concat(path.slice(pathI)));
           me.position.set(pos.x, 0, pos.y);
-          let dh = heading - body.rotation.y; dh = Math.atan2(Math.sin(dh), Math.cos(dh)); body.rotation.y += dh * Math.min(1, dt * 12);
-          walkT += moving ? dt * 12 : 0; body.position.y = moving ? Math.abs(Math.sin(walkT)) * 0.18 : 0;
-          follow.lerp(v.set(pos.x, 0, pos.y), 1 - Math.exp(-dt * 6));
+          car.rotation.y = heading;
+          wheels.forEach((w) => { w.w.rotation.x += (speed * dt) / 0.36; if (w.front) w.pivot.rotation.y = steer * maxSteer; });
+          carBody.rotation.z = lerp(carBody.rotation.z, steer * clamp(speed / 20, -1, 1) * 0.1, Math.min(1, dt * 6));
+          carBody.rotation.x = lerp(carBody.rotation.x, -throttle * 0.035 * Math.sign(speed || 1), Math.min(1, dt * 6));
+          carBody.position.y = Math.abs(speed) > 1 ? Math.sin(t * 22) * 0.02 : 0;
+          // Smoke: more when going fast, accelerating, turning hard or on the handbrake.
+          if (zoom > 0.5 && Math.abs(speed) > 0.6) {
+            puffAcc += dt * (Math.abs(speed) * 0.9 + Math.max(0, throttle * Math.sign(speed)) * 10 + Math.abs(steer) * Math.abs(speed) * 0.9 + (hand ? 30 : 0));
+            const lx = Math.cos(heading), lz = -Math.sin(heading), size = 0.32 + Math.min(0.45, Math.abs(speed) / 45) + (hand ? 0.2 : 0);
+            while (puffAcc >= 1) {
+              puffAcc -= 1; puffSide = -puffSide;
+              puff(pos.x + lx * 0.8 * puffSide - fx * 1.15, pos.y + lz * 0.8 * puffSide - fz * 1.15, size, -fx * 1.6 * Math.sign(speed) + lx * steer * 1.4, -fz * 1.6 * Math.sign(speed) + lz * steer * 1.4);
+            }
+          }
+          updatePuffs(dt);
+          follow.lerp(v.set(pos.x, 0, pos.y), 1 - Math.exp(-dt * 9));
+          if (zoom > 0.5 && speed > 0.5) { let dy = heading - camYaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); camYaw += dy * Math.min(1, dt * 2.4); }
           // Pads change the product's material.
           pads.forEach((p) => { if (Math.hypot(pos.x - p.x, pos.y - p.z) < 2.1) objMat.color.lerp(p.c, 1 - Math.exp(-dt * 5)); });
           anim.forEach((f) => f(t, dt));
 
           // Camera: from straight above (map) to behind the visitor (close-up).
           const z = zoom, wxz = 1 - Math.pow(1 - z, 3);
-          const h = Math.exp(lerp(Math.log(mapH), Math.log(15), z));
-          camera.position.set(lerp(MAPC.x, follow.x, wxz), h, lerp(MAPC.z, follow.z, wxz) + 20 * z * z + 0.001);
-          look.set(lerp(MAPC.x, follow.x, wxz), lerp(0, 1.6, z), lerp(MAPC.z, follow.z, wxz));
+          const h = Math.exp(lerp(Math.log(mapH), Math.log(10.5), z));
+          const back = 17 * z * z, cfx = Math.sin(camYaw), cfz = Math.cos(camYaw);
+          camera.position.set(lerp(MAPC.x, follow.x, wxz) - cfx * back, h, lerp(MAPC.z, follow.z, wxz) - cfz * back + 0.001);
+          look.set(lerp(MAPC.x, follow.x, wxz) + cfx * 4 * z, lerp(0, 1.2, z), lerp(MAPC.z, follow.z, wxz) + cfz * 4 * z);
           camera.up.copy(UP_MAP).lerp(UP_CLOSE, z).normalize();
           camera.lookAt(look);
           camera.fov = lerp(24, 52, z); camera.updateProjectionMatrix();
           city.scale.y = lerp(0.04, 1, smooth(0.25, 0.95, z));
           scene.background.copy(SEA).lerp(SKY, smooth(0.3, 0.9, z));
           scene.fog.color.copy(scene.background); scene.fog.near = lerp(4000, 70, smooth(0.4, 1, z)); scene.fog.far = lerp(9000, 190, smooth(0.4, 1, z));
-          const ds = lerp(mapH / 95, 0.75, smooth(0, 0.8, z)); dot.scale.setScalar(ds); halo.scale.setScalar(ds);
-          body.visible = z > 0.4; body.scale.setScalar(smooth(0.4, 0.8, z) || 0.001);
+          const ds = lerp(mapH / 95, 1.35, smooth(0, 0.8, z)); dot.scale.setScalar(ds); halo.scale.setScalar(ds);
+          dot.material.opacity = 0.9 * (1 - smooth(0.5, 0.9, z));
+          car.visible = z > 0.4; car.scale.setScalar(smooth(0.4, 0.8, z) || 0.001);
           renderer.render(scene, camera);
 
           // Overlays follow the same camera.
@@ -498,7 +663,7 @@
             DEST.forEach((d) => d.chip.setAttribute("aria-current", d === near ? "true" : "false"));
           }
           panel.classList.toggle("open", !!current && current !== dismissed);
-          const hTxt = z < 0.5 ? "Klicka på en plats för att åka dit, eller var som helst på kartan för att gå ner." : "Gå: WASD, piltangenterna eller klicka på marken · Shift springer · M eller − visar kartan";
+          const hTxt = z < 0.5 ? "Klicka på en plats för att åka dit, eller var som helst på kartan för att köra ner." : "Kör: W/S gas och broms, A/D styr, Space handbroms, Shift turbo · Klicka på marken så kör bilen dit · M visar kartan";
           if (hTxt !== lastHint) { hint.textContent = hTxt; lastHint = hTxt; }
         }
         requestAnimationFrame(frame);
