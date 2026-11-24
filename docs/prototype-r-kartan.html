@@ -304,6 +304,21 @@
           slab(w, 0, 0, 0.32, 0.12, 0.5, 0, creamMat); // a spoke, so the spin shows
           return { pivot, w, front, x, z };
         });
+        // Boat parts: a hull with a pointed bow and an outboard motor. They unfold when the car drives into the river.
+        const hull = new THREE.Group(); hull.visible = false; hull.scale.setScalar(0.001); carBody.add(hull);
+        slab(hull, 0, -0.15, 1.9, 2.6, 0.5, 0.3, mat(0xf7f4ee));
+        const bow = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.5, 3), mat(0xf7f4ee)); bow.position.set(0, 0.3, 1.15); bow.scale.z = 1.3; hull.add(bow);
+        slab(hull, 0, -0.15, 1.94, 2.64, 0.12, 0.48, blueMat);
+        slab(hull, 0, -1.62, 0.42, 0.42, 0.85, 0.62, mat(0x1a1a1a));
+        // Silhouette: where something hides the car, its outline shows through in flat blue. Two extra passes after the scene:
+        // 1) mark the car's visible pixels in the stencil buffer, 2) draw the whole car in blue except on those pixels.
+        const markMat = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false, transparent: true, stencilWrite: true, stencilRef: 1, stencilFunc: THREE.AlwaysStencilFunc, stencilZPass: THREE.ReplaceStencilOp });
+        const silMat = new THREE.MeshBasicMaterial({ color: 0x2b4cc4, transparent: true, opacity: 0.8, depthTest: false, depthWrite: false, stencilWrite: true, stencilRef: 1, stencilFunc: THREE.NotEqualStencilFunc });
+        const carMeshes = []; car.traverse((o) => { if (o.isMesh) carMeshes.push(o); });
+        carMeshes.forEach((o) => {
+          const a = new THREE.Mesh(o.geometry, markMat), b = new THREE.Mesh(o.geometry, silMat);
+          a.renderOrder = 10; b.renderOrder = 11; o.add(a, b);
+        });
         const dot = new THREE.Mesh(new THREE.CircleGeometry(1, 40), new THREE.MeshBasicMaterial({ color: 0x2b4cc4, transparent: true, opacity: 0.9 }));
         dot.rotation.x = -Math.PI / 2; dot.position.y = 0.3; me.add(dot);
         const halo = new THREE.Mesh(new THREE.RingGeometry(1.25, 1.9, 40), new THREE.MeshBasicMaterial({ color: 0x2b4cc4, transparent: true, opacity: 0.25 }));
@@ -312,17 +327,29 @@
         const pos = new THREE.Vector2(START[0], START[1]);
         const follow = new THREE.Vector3(START[0], 0, START[1]);
         const vel = new THREE.Vector2();
-        let heading = Math.PI, camYaw = Math.PI, speed = 0, slip = 0, steer = 0, driftT = 0;
+        let heading = Math.PI, camYaw = Math.PI, speed = 0, slip = 0, steer = 0, drifting = false, boat = false, boatK = 0;
         let path = null, pathI = 0, pathGoal = null, stuckT = 0, gear = 1, gearT = 0, flips = 0;
         const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
         const camFace = () => (portrait ? Math.PI / 2 : Math.PI); // the close-up looks the same way as map-up, and never turns
         const spawnAt = (d) => (portrait ? findFree(d.pos[0] - 13, d.pos[1]) : d.spawn); // park in front of the place, as seen from the camera
         const CAR_R = 1.15;
         const bridgeOk = (x, r) => BRIDGES.some((b) => Math.abs(x - b) < 3.5 - r);
-        function blocked(x, z, r = CAR_R) {
+        function blocked(x, z, r = CAR_R, water = true) {
           if (x < W.minX + r || x > W.maxX - r || z < W.minZ + r || z > W.maxZ - r) return true;
-          if (waterDist(x, z) < 9.6 && !bridgeOk(x, 1.0)) return true;
+          if (water && waterDist(x, z) < 9.6 && !bridgeOk(x, 1.0)) return true;
           return colliders.some((c) => x > c.x0 - r && x < c.x1 + r && z > c.z0 - r && z < c.z1 + r);
+        }
+        // Driving and sailing: the river is open (that is where the car turns into a boat), but a car on a bridge
+        // can't drive off its side, and the bridges are too low for a boat to pass under.
+        const onDeck = (x, z) => waterDist(x, z) < 9.6 && bridgeOk(x, 0.2);
+        function blockedMove(x, z) {
+          if (blocked(x, z, CAR_R, false)) return true;
+          if (waterDist(x, z) >= 9.6) return false;
+          if (boat) return BRIDGES.some((b) => Math.abs(x - b) < 3.5 + CAR_R);
+          return onDeck(pos.x, pos.y) && !bridgeOk(x, 1.0);
+        }
+        function splash(n) {
+          for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, r = 0.8 + Math.random() * 0.8; puff(pos.x + Math.cos(a) * r, pos.y + Math.sin(a) * r, 0.45, Math.cos(a) * 3.5, Math.sin(a) * 3.5, SPRAY, 4.5, 0.55, 0.3); }
         }
 
         // MARK: Route finding for click-to-drive. A 1-unit grid; obstacles grown by a margin so routes keep to the middle of streets.
@@ -408,32 +435,58 @@
           trail.count = n; trail.instanceMatrix.needsUpdate = true;
         }
 
-        // MARK: Cartoon smoke from the rear wheels: low-poly puffs that pop up, drift back and shrink away.
-        const PUFFS = 160;
-        const puffMesh = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 0), new THREE.MeshLambertMaterial({ color: 0xf7f4ee, flatShading: true }), PUFFS);
-        puffMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(puffMesh);
-        const puffs = Array.from({ length: PUFFS }, () => ({ age: 1, life: 0, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, s: 0, r: 0 }));
+        // MARK: Cartoon puffs (tyre smoke, boat spray and wake): flat cloud shapes with an inked outline that always face the camera.
+        // One draw call: each puff is a point sprite; the cloud is three overlapping circles drawn in the fragment shader.
+        const PUFFS = 260;
+        const pGeo = new THREE.BufferGeometry();
+        const pPos = new Float32Array(PUFFS * 3), pSize = new Float32Array(PUFFS), pSeed = new Float32Array(PUFFS), pCol = new Float32Array(PUFFS * 3);
+        pGeo.setAttribute("position", new THREE.BufferAttribute(pPos, 3).setUsage(THREE.DynamicDrawUsage));
+        pGeo.setAttribute("aSize", new THREE.BufferAttribute(pSize, 1).setUsage(THREE.DynamicDrawUsage));
+        pGeo.setAttribute("aSeed", new THREE.BufferAttribute(pSeed, 1));
+        pGeo.setAttribute("aCol", new THREE.BufferAttribute(pCol, 3));
+        const puffMat = new THREE.ShaderMaterial({
+          uniforms: { uScale: { value: 400 } }, transparent: true,
+          vertexShader: `uniform float uScale; attribute float aSize, aSeed; attribute vec3 aCol; varying float vSeed; varying vec3 vCol;
+            #include <common>
+            #include <logdepthbuf_pars_vertex>
+            void main() { vSeed = aSeed; vCol = aCol; vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mv; gl_PointSize = aSize * uScale / -mv.z;
+              #include <logdepthbuf_vertex>
+            }`,
+          fragmentShader: `varying float vSeed; varying vec3 vCol;
+            #include <common>
+            #include <logdepthbuf_pars_fragment>
+            void main() {
+              #include <logdepthbuf_fragment>
+              vec2 q = gl_PointCoord * 2.0 - 1.0; float a = vSeed * 6.2831; vec2 p = mat2(cos(a), -sin(a), sin(a), cos(a)) * q;
+              float f = min(min(length(p - vec2(0.0, 0.2)) - 0.56, length(p - vec2(-0.4, -0.2)) - 0.42), length(p - vec2(0.42, -0.16)) - 0.45);
+              if (f > 0.0) discard;
+              vec3 c = q.y > 0.25 ? vCol * 0.9 : vCol;    // a shaded underside
+              if (f > -0.12) c = vCol * 0.6;              // the ink outline
+              gl_FragColor = vec4(c, 1.0);
+            }`,
+        });
+        const puffPts = new THREE.Points(pGeo, puffMat); puffPts.frustumCulled = false; puffPts.renderOrder = 12; scene.add(puffPts);
+        const puffs = Array.from({ length: PUFFS }, () => ({ age: 1, life: 0, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, s: 0, g: 0 }));
+        const SMOKE = [0.97, 0.955, 0.93], SPRAY = [0.9, 0.96, 0.98];
         let puffNext = 0, puffAcc = 0, puffSide = 1;
-        function puff(x, z, size, vx, vz) {
-          const p = puffs[puffNext]; puffNext = (puffNext + 1) % PUFFS;
-          p.age = 0; p.life = 0.5 + Math.random() * 0.45; p.s = size * (0.8 + Math.random() * 0.5); p.r = Math.random() * 6;
-          p.x = x + (Math.random() - 0.5) * 0.3; p.y = 0.3; p.z = z + (Math.random() - 0.5) * 0.3;
-          p.vx = vx + (Math.random() - 0.5) * 1.4; p.vy = 1.4 + Math.random() * 1.4; p.vz = vz + (Math.random() - 0.5) * 1.4;
+        function puff(x, z, size, vx, vz, col = SMOKE, vy = 1.4, life = 0.5, y = 0.3) {
+          const i = puffNext, p = puffs[i]; puffNext = (puffNext + 1) % PUFFS;
+          p.age = 0; p.life = life + Math.random() * 0.45; p.s = size * (0.8 + Math.random() * 0.5); p.g = col === SPRAY ? -9 : 0; // spray falls back, smoke floats
+          p.x = x + (Math.random() - 0.5) * 0.3; p.y = y; p.z = z + (Math.random() - 0.5) * 0.3;
+          p.vx = vx + (Math.random() - 0.5) * 1.4; p.vy = vy + Math.random() * vy; p.vz = vz + (Math.random() - 0.5) * 1.4;
+          pSeed[i] = Math.random(); pCol.set(col, i * 3); pGeo.attributes.aSeed.needsUpdate = true; pGeo.attributes.aCol.needsUpdate = true;
         }
-        const pq = new THREE.Quaternion(), pe = new THREE.Euler(), ps = new THREE.Vector3(), pp = new THREE.Vector3();
         function updatePuffs(dt) {
           for (let i = 0; i < PUFFS; i++) {
             const p = puffs[i]; let s = 0;
             if (p.age < p.life) {
               p.age += dt; const k = Math.min(1, p.age / p.life);
-              p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt; p.vx *= 0.93; p.vz *= 0.93; p.vy *= 0.95; p.r += dt * 2;
-              s = p.s * (k < 0.18 ? k / 0.18 : Math.pow(1 - (k - 0.18) / 0.82, 1.3));
+              p.x += p.vx * dt; p.y = Math.max(0.1, p.y + p.vy * dt); p.z += p.vz * dt; p.vx *= 0.93; p.vz *= 0.93; p.vy = p.vy * 0.95 + p.g * dt;
+              s = p.s * (k < 0.15 ? k / 0.15 : Math.pow(1 - (k - 0.15) / 0.85, 1.2));
             }
-            pq.setFromEuler(pe.set(p.r, p.r * 0.7, 0));
-            m4.compose(pp.set(p.x, p.y, p.z), pq, ps.setScalar(Math.max(s, 0.0001)));
-            puffMesh.setMatrixAt(i, m4);
+            pPos[i * 3] = p.x; pPos[i * 3 + 1] = p.y; pPos[i * 3 + 2] = p.z; pSize[i] = s * 2.4;
           }
-          puffMesh.instanceMatrix.needsUpdate = true;
+          pGeo.attributes.position.needsUpdate = true; pGeo.attributes.aSize.needsUpdate = true;
         }
         function findFree(x, z) {
           if (!blocked(x, z)) return [x, z];
@@ -451,13 +504,13 @@
         const busy = () => tween !== null || tour !== null;
         function clearRoute() { path = null; gear = 1; gearT = 0; stuckT = 0; flips = 0; tgt.visible = false; showRoute(null); }
         function setRoute(r) { path = r; pathI = 1; pathGoal = r[r.length - 1]; stuckT = 0; gear = 1; gearT = 0; flips = 0; tgt.position.set(pathGoal[0], 0.2, pathGoal[1]); tgt.visible = true; }
-        function placeAt(x, z, face) { pos.set(x, z); follow.set(x, 0, z); clearRoute(); speed = 0; slip = 0; vel.set(0, 0); steer = 0; if (face !== undefined) heading = face; camYaw = camFace(); }
-        function travel(d) {
-          if (busy()) return;
-          dismissed = null;
-          const s = spawnAt(d);
+        function placeAt(x, z, face) { pos.set(x, z); follow.set(x, 0, z); clearRoute(); speed = 0; slip = 0; vel.set(0, 0); steer = 0; drifting = false; boat = false; boatK = 0; if (face !== undefined) heading = face; camYaw = camFace(); }
+        // Every trip to a place or a clicked spot on the map draws the route line first, then drops in.
+        function travel(d) { dismissed = null; travelTo(spawnAt(d)); }
+        function travelTo(s) {
+          if (tour) return;
           const go = () => {
-            // On the map, draw the way there along the streets (the same route finder the car uses), then drop in.
+            // On the map, draw the way there along the streets, with the dot riding the tip of the line.
             const r = reduce ? null : findRoute(pos.x, pos.y, s[0], s[1], true);
             if (!r || r.length < 2) { placeAt(s[0], s[1], camFace()); zoomTo(1, 1300); return; }
             const pts = [[pos.x, pos.y]].concat(r, [s]);
@@ -465,6 +518,7 @@
             clearRoute(); speed = 0; slip = 0; vel.set(0, 0); lineOn = true;
             tour = { pts, len, s, t0: performance.now(), ms: clamp(400 + len * 3.5, 700, 1500) };
           };
+          if (tween) { if (tween.to === 0) tween.done = go; return; } // clicked while the map is still opening: go when it is open
           if (zoom > 0.5) zoomTo(0, 800, go); else go();
         }
         function toMap() { if (!busy() && zoom > 0.5) zoomTo(0, 1100); }
@@ -523,11 +577,12 @@
         let down = null;
         canvas.addEventListener("pointerdown", (e) => { down = { x: e.clientX, y: e.clientY }; });
         canvas.addEventListener("pointerup", (e) => {
-          if (!down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6 || busy()) return;
+          if (!down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6 || tour || (tween && tween.to !== 0)) return;
+          const onMap = zoom < 0.5 || (tween && tween.to === 0); // a click while the map is still opening counts as a map click
           ndc.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
           ray.setFromCamera(ndc, camera);
           if (!ray.ray.intersectPlane(plane, hit)) return;
-          if (zoom < 0.5) { const [x, z] = findFree(hit.x, hit.z); placeAt(x, z, camFace()); dismissed = null; zoomTo(1, 1300); }
+          if (onMap) { dismissed = null; travelTo(findFree(hit.x, hit.z)); }
           else if (zoom > 0.98) {
             // Forgiving: a click on a roof, the river or a wall drives to the nearest spot the car can reach.
             const r = findRoute(pos.x, pos.y, hit.x, hit.z);
@@ -558,31 +613,9 @@
 
         // MARK: Loop
         const MAPC = new THREE.Vector3(0, 0, (W.minZ + W.maxZ) / 2);
-        const v = new THREE.Vector3(), look = new THREE.Vector3();
+        const v = new THREE.Vector3(), look = new THREE.Vector3(), v2s = new THREE.Vector2();
         // Close-up camera: 30 units from the car (44 on phones), about 55 degrees down.
         const CAM_P = 0.96, camD = () => (portrait ? 44 : 30); // phones stand further back to see the street ahead
-
-        // MARK: See-through buildings. Anything in a tube from the camera to the car is drawn as a fine dot screen, so the car never hides.
-        const seeU = { uCar: { value: new THREE.Vector3() }, uCam: { value: new THREE.Vector3() }, uSee: { value: 0 }, uR: { value: 5.5 } };
-        const seeThrough = (shader) => {
-          Object.assign(shader.uniforms, seeU);
-          shader.vertexShader = "varying vec3 vWP;\n" + shader.vertexShader.replace("#include <project_vertex>", `#include <project_vertex>
-            vec4 wp = vec4(transformed, 1.0);
-            #ifdef USE_INSTANCING
-              wp = instanceMatrix * wp;
-            #endif
-            vWP = (modelMatrix * wp).xyz;`);
-          // uCam is our own camera uniform: r128 only sends cameraPosition to some material types, not Lambert.
-          shader.fragmentShader = "varying vec3 vWP;\nuniform vec3 uCar, uCam;\nuniform float uSee, uR;\nfloat bayer2(vec2 a) { a = floor(a); return fract(a.x / 2.0 + a.y * a.y * 0.75); }\n" + shader.fragmentShader.replace("#include <clipping_planes_fragment>", `#include <clipping_planes_fragment>
-            vec3 toCar = uCar - uCam; float len = length(toCar); vec3 dir = toCar / len;
-            float t = dot(vWP - uCam, dir), r = length(vWP - uCam - dir * t);
-            vec2 hz = toCar.xz; float hl = length(hz), th = dot(vWP.xz - uCam.xz, hz / hl); // only what stands nearer the camera than the car
-            float k = uSee * step(0.35, vWP.y) * (1.0 - smoothstep(hl - 3.0, hl - 1.2, th)) * (1.0 - smoothstep(uR * 0.7, uR, r));
-            // 4x4 ordered dither: at the centre only one pixel in five is kept, so the building reads as a ghost.
-            if (bayer2(0.5 * gl_FragCoord.xy) * 0.25 + bayer2(gl_FragCoord.xy) < k * 0.8) discard;`);
-        };
-        const patched = new Set();
-        city.traverse((o) => { if (o.isMesh && o.material && !patched.has(o.material)) { patched.add(o.material); o.material.onBeforeCompile = seeThrough; o.material.needsUpdate = true; } });
 
         // MARK: Travel line. Choosing a place on the map draws a quick route line along the streets, with the dot riding its tip.
         const MAXSEG = 64, lineW = 1.7;
@@ -687,47 +720,77 @@
               }
             }
           }
-          // Arcade handling: speed along the nose plus a sideways slip that the tyres soak up.
-          // Handbrake = drift button: it cuts the engine and brakes, the tail steps out, and sideways speed still bleeds off.
-          // Right after letting go, grip returns over about half a second, so you can power out of the slide.
-          const maxV = keys.shift ? 24 : 17, drive = hand ? 0 : throttle;
-          driftT = hand ? 0.6 : Math.max(0, driftT - dt);
+          // MARK: Handling. Speed along the nose plus a sideways slip that the tyres (or the hull) soak up.
+          // Drift: Space at speed throws the car sideways with little grip, and it keeps its pace. Steer into the slide
+          // to hold it, against it to straighten out. Let go of Space and the gas pushes you out of the drift.
+          const maxV = boat ? (keys.shift ? 30 : 22) : keys.shift ? 24 : 17, drive = hand && !boat ? 0 : throttle;
           let fx = Math.sin(heading), fz = Math.cos(heading), lx = Math.cos(heading), lz = -Math.sin(heading);
           speed = vel.x * fx + vel.y * fz; slip = vel.x * lx + vel.y * lz;
-          if (drive && Math.sign(drive) !== Math.sign(speed) && Math.abs(speed) > 0.5) speed += drive * 48 * dt;
-          else speed += drive * (drive > 0 ? 26 : 18) * dt;
-          if (!drive) speed -= speed * Math.min(1, (hand ? 0.6 : path ? 1.6 : 2.8) * dt);
-          if (hand) speed -= Math.sign(speed) * Math.min(Math.abs(speed), 6 * dt);
-          speed = clamp(speed, -8, maxV);
+          const angle = Math.atan2(slip, Math.abs(speed) + 0.01);
+          if (boat) drifting = false;
+          else if (hand && !drifting && Math.abs(speed) > 6) drifting = true;
+          else if (drifting && !hand && (Math.abs(angle) < 0.12 || Math.hypot(speed, slip) < 3)) drifting = false;
+          if (drive && Math.sign(drive) !== Math.sign(speed) && Math.abs(speed) > 0.5) speed += drive * (boat ? 20 : 48) * dt;
+          else speed += drive * (drive > 0 ? (boat ? 15 : drifting ? 20 : 26) : boat ? 10 : 18) * dt;
+          if (!drive) speed -= speed * Math.min(1, (hand ? 0.25 : boat ? 0.7 : path ? 1.6 : 2.8) * dt);
+          if (hand && !boat) speed -= Math.sign(speed) * Math.min(Math.abs(speed), 2.5 * dt);
+          speed = clamp(speed, boat ? -6 : -8, maxV);
           if (!drive && Math.abs(speed) < 0.08) speed = 0;
-          slip *= Math.exp(-(hand ? 2.2 : lerp(path ? 14 : 9, 2.5, driftT / 0.6)) * dt);
+          // Sideways grip. In a drift (and on water) most of the scrubbed sideways speed turns into forward speed, so the slide keeps its pace.
+          const grip = boat ? (hand ? 0.6 : 2.2) : drifting ? (hand ? 0.9 : 1.6) : path ? 14 : 9;
+          const lost = slip * (1 - Math.exp(-grip * dt)); slip -= lost;
+          if (drifting || boat) speed = clamp(speed + Math.abs(lost) * 0.6 * (Math.sign(speed) || 1), -8, maxV);
           steer += (steerIn - steer) * Math.min(1, dt * (steerIn ? 10 : 14));
-          // Turn rate builds over the first few units of speed (no spinning on the spot) and eases a little at top speed.
-          const turn = Math.min(1, Math.abs(speed) / 4) * (1 - 0.3 * Math.min(1, Math.abs(speed) / 24));
-          heading += steer * 2.7 * turn * Math.sign(speed) * (hand ? 1.7 : 1 + 0.4 * driftT / 0.6) * dt;
+          // Turn rate builds over the first few units of speed (no spinning on the spot) and eases a little at top speed. A boat turns slowly even when still.
+          const turn = boat ? Math.min(1, 0.25 + Math.abs(speed) / 5) * 1.6 : Math.min(1, Math.abs(speed) / 4) * (1 - 0.3 * Math.min(1, Math.abs(speed) / 24)) * 2.7;
+          let yaw = steer * turn * (Math.sign(speed) || 1) * (drifting ? 1.25 : 1) * (hand ? 1.3 : 1);
+          if (drifting && !hand) yaw += angle * 1.4; // with Space released the nose swings back toward where the car is going
+          heading += yaw * dt;
           vel.set(fx * speed + lx * slip, fz * speed + lz * slip);
           fx = Math.sin(heading); fz = Math.cos(heading); lx = Math.cos(heading); lz = -Math.sin(heading);
+          if (drifting) { // never more than ~65 degrees sideways, past that it would just spin
+            const sp = vel.x * fx + vel.y * fz, an = Math.atan2(vel.x * lx + vel.y * lz, Math.abs(sp) + 0.01);
+            if (sp > 0 && Math.abs(an) > 1.15) heading += Math.sign(an) * (Math.abs(an) - 1.15);
+          }
           const dx = vel.x * dt, dz = vel.y * dt;
           if (dx || dz) {
-            if (!blocked(pos.x + dx, pos.y + dz)) { pos.x += dx; pos.y += dz; }
-            else if (!blocked(pos.x + dx, pos.y)) { pos.x += dx; vel.x *= 0.97; vel.y *= -0.1; }
-            else if (!blocked(pos.x, pos.y + dz)) { pos.y += dz; vel.y *= 0.97; vel.x *= -0.1; }
+            if (!blockedMove(pos.x + dx, pos.y + dz)) { pos.x += dx; pos.y += dz; }
+            else if (!blockedMove(pos.x + dx, pos.y)) { pos.x += dx; vel.x *= 0.97; vel.y *= -0.1; }
+            else if (!blockedMove(pos.x, pos.y + dz)) { pos.y += dz; vel.y *= 0.97; vel.x *= -0.1; }
             else vel.multiplyScalar(-0.25);
           }
+          // Into the river: splash, the wheels fold away and a hull unfolds. Out on the far bank it turns back into a car.
+          const wd = waterDist(pos.x, pos.y);
+          if (!boat && wd < 8.4 && !onDeck(pos.x, pos.y)) { boat = true; drifting = false; splash(16); }
+          else if (boat && wd > 9.2) { boat = false; splash(8); }
+          boatK += ((boat ? 1 : 0) - boatK) * Math.min(1, dt * 7);
           if (path) showRoute([[pos.x, pos.y]].concat(path.slice(pathI)));
           me.position.set(pos.x, 0, pos.y);
           car.rotation.y = heading;
-          wheels.forEach((w) => { w.w.rotation.x += (speed * dt) / 0.36; if (w.front) w.pivot.rotation.y = steer * 0.55; });
-          carBody.rotation.z = lerp(carBody.rotation.z, clamp(steer * clamp(speed / 20, -1, 1) * 0.1 - slip * 0.012, -0.16, 0.16), Math.min(1, dt * 6));
-          carBody.rotation.x = lerp(carBody.rotation.x, -drive * 0.035 * Math.sign(speed || 1), Math.min(1, dt * 6));
-          carBody.position.y = Math.abs(speed) > 1 ? Math.sin(t * 22) * 0.02 : 0;
-          // Smoke: more when going fast, accelerating, turning hard or on the handbrake.
-          if (zoom > 0.5 && Math.abs(speed) > 0.6) {
-            puffAcc += dt * (Math.abs(speed) * 0.9 + Math.max(0, drive * Math.sign(speed)) * 10 + Math.abs(steer) * Math.abs(speed) * 0.9 + Math.abs(slip) * 6 + (hand ? 30 : 0));
-            const size = 0.32 + Math.min(0.45, Math.abs(speed) / 45) + Math.min(0.25, Math.abs(slip) / 30) + (hand ? 0.2 : 0);
-            while (puffAcc >= 1) {
-              puffAcc -= 1; puffSide = -puffSide;
-              puff(pos.x + lx * 0.8 * puffSide - fx * 1.15, pos.y + lz * 0.8 * puffSide - fz * 1.15, size, -fx * 1.6 * Math.sign(speed) + lx * steer * 1.4, -fz * 1.6 * Math.sign(speed) + lz * steer * 1.4);
+          wheels.forEach((w) => { w.w.rotation.x += (speed * dt) / 0.36; w.pivot.rotation.y = w.front ? steer * 0.55 : 0; w.pivot.scale.setScalar(Math.max(0.001, 1 - boatK)); });
+          hull.visible = boatK > 0.01; hull.scale.setScalar(Math.max(0.001, boatK));
+          carBody.rotation.z = lerp(carBody.rotation.z, clamp(steer * clamp(speed / 20, -1, 1) * 0.1 - slip * 0.012, -0.16, 0.16) + boatK * Math.sin(t * 1.7) * 0.04, Math.min(1, dt * 6));
+          carBody.rotation.x = lerp(carBody.rotation.x, -drive * 0.035 * Math.sign(speed || 1) * (1 - boatK) - boatK * (0.12 * clamp(speed / 22, 0, 1) + Math.sin(t * 2.3) * 0.03), Math.min(1, dt * 6));
+          carBody.position.y = (Math.abs(speed) > 1 ? Math.sin(t * 22) * 0.02 : 0) * (1 - boatK) + boatK * (Math.sin(t * 3) * 0.07 - 0.3);
+          // Tyre smoke on land: more when going fast, accelerating, turning hard, and lots in a drift. On water: wake and spray.
+          if (zoom > 0.5) {
+            const sp = Math.abs(speed);
+            if (boat) {
+              if (sp > 1 || Math.abs(slip) > 1) {
+                puffAcc += dt * (sp * 1.1 + Math.abs(slip) * 6 + (hand ? 18 : 0));
+                while (puffAcc >= 1) {
+                  puffAcc -= 1; puffSide = -puffSide;
+                  puff(pos.x - fx * 1.6 + lx * 0.8 * puffSide, pos.y - fz * 1.6 + lz * 0.8 * puffSide, 0.32 + sp / 70, lx * puffSide * 2.6 - fx * 0.6, lz * puffSide * 2.6 - fz * 0.6, SPRAY, 0.4, 1.0, 0.12);
+                  if (Math.random() < 0.35 + (hand ? 0.45 : 0)) puff(pos.x - fx * 1.9, pos.y - fz * 1.9, 0.28 + sp / 55, -fx * 2.2 - lx * slip * 0.3, -fz * 2.2 - lz * slip * 0.3, SPRAY, 3.6, 0.45, 0.35);
+                }
+              }
+            } else if (sp > 0.6 || Math.abs(slip) > 1) {
+              puffAcc += dt * (sp * 0.9 + Math.max(0, drive * Math.sign(speed)) * 10 + Math.abs(steer) * sp * 0.9 + Math.abs(slip) * 6 + (drifting ? 34 : 0));
+              const size = 0.32 + Math.min(0.45, sp / 45) + Math.min(0.25, Math.abs(slip) / 30) + (drifting ? 0.25 : 0);
+              while (puffAcc >= 1) {
+                puffAcc -= 1; puffSide = -puffSide;
+                puff(pos.x + lx * 0.8 * puffSide - fx * 1.15, pos.y + lz * 0.8 * puffSide - fz * 1.15, size, -fx * 1.6 * Math.sign(speed) + lx * steer * 1.4, -fz * 1.6 * Math.sign(speed) + lz * steer * 1.4);
+              }
             }
           }
           updatePuffs(dt);
@@ -748,7 +811,7 @@
           camera.up.copy(UP_MAP).lerp(UP_CLOSE, z).normalize();
           camera.lookAt(look);
           camera.fov = lerp(24, 42, z); camera.updateProjectionMatrix();
-          seeU.uCar.value.set(pos.x, 1, pos.y); seeU.uCam.value.copy(camera.position); seeU.uSee.value = smooth(0.6, 0.95, z);
+          silMat.opacity = 0.8 * smooth(0.6, 0.95, z); puffMat.uniforms.uScale.value = renderer.getDrawingBufferSize(v2s).y / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
           city.scale.y = lerp(0.04, 1, smooth(0.25, 0.95, z));
           scene.background.copy(SEA).lerp(SKY, smooth(0.3, 0.9, z));
           scene.fog.color.copy(scene.background); scene.fog.near = lerp(4000, 80, smooth(0.4, 1, z)); scene.fog.far = lerp(9000, 230, smooth(0.4, 1, z));
@@ -784,7 +847,7 @@
             DEST.forEach((d) => d.chip.setAttribute("aria-current", d === near ? "true" : "false"));
           }
           panel.classList.toggle("open", !!current && current !== dismissed);
-          const hTxt = z < 0.5 ? "Klicka på en plats för att åka dit, eller var som helst på kartan för att köra ner." : "Kör: W/S gas och broms, A/D styr, Space handbroms (drift), Shift turbo · Klicka på marken så kör bilen dit · M visar kartan";
+          const hTxt = z < 0.5 ? "Klicka på en plats för att åka dit, eller var som helst på kartan för att köra ner." : "Kör: W/S gas och broms, A/D styr, Space drift, Shift turbo · Klicka på marken så kör bilen dit · Kör ner i älven · M visar kartan";
           if (hTxt !== lastHint) { hint.textContent = hTxt; lastHint = hTxt; }
         }
         requestAnimationFrame(frame);
