@@ -33,7 +33,7 @@
       .mk b { font: 700 12px/1 "Inter Tight", sans-serif; background: #fff; padding: 4px 7px; border-radius: 4px; white-space: nowrap; }
       .dl { position: absolute; left: 0; top: 0; font: 800 16px/1 "Archivo", sans-serif; font-variation-settings: "wdth" 62; letter-spacing: 0.16em; text-transform: uppercase; color: #1a1a1a8c; white-space: nowrap; }
       .dl.river { font-style: italic; font-weight: 600; letter-spacing: 0.4em; color: #4f727a; font-size: 13px; }
-      .you { position: absolute; left: 0; top: 0; font: 600 11px/1 "JetBrains Mono", monospace; color: var(--you); white-space: nowrap; background: #ffffffcc; padding: 3px 5px; border-radius: 3px; }
+      .you { position: absolute; left: 0; top: 0; font: 600 11px/1 "JetBrains Mono", monospace; color: var(--you); white-space: nowrap; background: #ffffffd8; padding: 3px 6px; border-radius: 3px; }
       .leg { position: fixed; left: 16px; bottom: 16px; z-index: 3; background: var(--sand); border: 1.5px solid var(--ink); padding: 10px 14px; display: grid; gap: 4px; font: 400 11px/1.3 "JetBrains Mono", monospace; }
       .leg b { font: 800 12px/1.2 "Archivo", sans-serif; font-variation-settings: "wdth" 62; text-transform: uppercase; letter-spacing: 0.1em; }
       .ctl { position: fixed; right: 16px; bottom: 16px; z-index: 4; display: flex; gap: 6px; }
@@ -82,7 +82,7 @@
     <nav class="dest" aria-label="Platser"><ul id="chips"></ul></nav>
     <div class="leg" id="leg"><b>Teckenförklaring</b><span>▶ Film &amp; animation</span><span>◆ Interaktiv 3D</span><span>⚙ Verktyg &amp; tillägg</span><span>● Studion · ✉ Kontakt</span></div>
     <p class="hint" id="hint"></p>
-    <div class="ctl"><button type="button" id="zin" aria-label="Zooma in">+</button><button type="button" id="zout" aria-label="Zooma ut till kartan">−</button><button type="button" id="lst">Visa som lista</button></div>
+    <div class="ctl"><button type="button" id="tod" aria-label="Hoppa i dygnet" title="Dag / Skymning / Natt">☀</button><button type="button" id="zin" aria-label="Zooma in">+</button><button type="button" id="zout" aria-label="Zooma ut till kartan">−</button><button type="button" id="lst">Visa som lista</button></div>
     <aside class="panel" id="panel" aria-live="polite" aria-labelledby="p-title">
       <button type="button" class="x" id="p-x" aria-label="Stäng">×</button>
       <small id="p-kick"></small><h2 id="p-title"></h2><p id="p-text"></p><ul id="p-facts"></ul><p class="tip" id="p-tip"></p>
@@ -143,14 +143,21 @@
         const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, logarithmicDepthBuffer: true });
         renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
         const scene = new THREE.Scene();
-        const SEA = new THREE.Color(0x9fbcc2), SKY = new THREE.Color(0xe9e4da);
+        const SEA_DAY = new THREE.Color(0x9fbcc2), SEA_DUSK = new THREE.Color(0x698290), SEA_NIGHT = new THREE.Color(0x233544);
+        const SKY_DAY = new THREE.Color(0xe9e4da), SKY_DUSK = new THREE.Color(0xdba788), SKY_NIGHT = new THREE.Color(0x182133);
+        const GROUND_DAY = new THREE.Color(0xddd5c6), GROUND_DUSK = new THREE.Color(0xcab49d), GROUND_NIGHT = new THREE.Color(0x3a404d);
+        const SEA = SEA_DAY.clone(), SKY = SKY_DAY.clone();
         scene.background = SEA.clone();
         scene.fog = new THREE.Fog(SKY.clone(), 60, 10000);
         const camera = new THREE.PerspectiveCamera(24, 1, 0.5, 4000);
-        scene.add(new THREE.HemisphereLight(0xffffff, 0xb9ad98, 0.6));
-        const sun = new THREE.DirectionalLight(0xffffff, 0.48);
+        const hemi = new THREE.HemisphereLight(0xffffff, 0xb9ad98, 0.6);
+        scene.add(hemi);
+        const sun = new THREE.DirectionalLight(0xffffff, 0.50);
         sun.position.set(-0.5, 1, 0.3);
         scene.add(sun);
+        const moon = new THREE.DirectionalLight(0x9bb7e8, 0);
+        moon.position.set(-0.35, 0.95, 0.40);
+        scene.add(moon);
         const city = new THREE.Group(); // everything that rises when you zoom in
         scene.add(city);
         const colliders = [];
@@ -160,9 +167,11 @@
         function slab(parent, x, z, w, d, h, y, m) { const o = new THREE.Mesh(unit, m); o.scale.set(w, h, d); o.position.set(x, y, z); parent.add(o); return o; }
 
         // MARK: Ground, river, streets, bridges, parks
-        const ground = new THREE.Mesh(new THREE.PlaneGeometry(W.maxX - W.minX, W.maxZ - W.minZ), new THREE.MeshBasicMaterial({ color: 0xddd5c6 }));
+        const groundMat = new THREE.MeshBasicMaterial({ color: 0xddd5c6 });
+        const ground = new THREE.Mesh(new THREE.PlaneGeometry(W.maxX - W.minX, W.maxZ - W.minZ), groundMat);
         ground.rotation.x = -Math.PI / 2; ground.position.set(0, 0, (W.minZ + W.maxZ) / 2); scene.add(ground);
-        const water = new THREE.Mesh(new THREE.PlaneGeometry(232 / COSA, 18), new THREE.MeshBasicMaterial({ color: 0x9fbcc2 }));
+        const waterMat = new THREE.MeshBasicMaterial({ color: 0x9fbcc2 });
+        const water = new THREE.Mesh(new THREE.PlaneGeometry(232 / COSA, 18), waterMat);
         water.rotation.order = "YXZ"; water.rotation.set(-Math.PI / 2, Math.atan(0.15), 0); water.position.set(0, 0.05, 10); scene.add(water);
         const streetMat = mat(0xf7f4ee);
         function runs(a, b, ok) { const out = []; let s = null; for (let t = a; t <= b + 0.001; t += 0.5) { const good = ok(t) && t < b; if (good && s === null) s = t; if (!good && s !== null) { out.push([s, t]); s = null; } } return out; }
@@ -281,7 +290,7 @@
           slab(city, x, z, 4.4, 3.4, 3, 3.9, ink);
           const top = new THREE.Mesh(new THREE.CylinderGeometry(1.7, 1.7, 4.4, 24, 1, false, 0, Math.PI), ink); top.rotation.z = Math.PI / 2; top.rotation.y = Math.PI / 2; top.position.set(x, 5.4, z); top.scale.set(1, 1, 1.3); city.add(top);
           slab(city, x - 0.2, z + 1.72, 2.6, 0.05, 0.35, 4.6, mat(0xf2eee7));
-          const flag = slab(city, x + 2.5, z, 0.2, 0.4, 2.6, 5.2, mat(0x2b4cc4));
+          const flag = slab(city, x + 2.5, z, 0.2, 0.4, 2.6, 5.2, mat(0xe07a22));
           addBox(x, z, 4.4, 3.4);
           anim.push((t) => { flag.rotation.x = Math.sin(t * 1.4) * 0.15; });
         })();
@@ -291,15 +300,212 @@
         const car = new THREE.Group(); me.add(car);          // turns with the heading
         const carBody = new THREE.Group(); car.add(carBody); // leans in turns, dips when braking, leaps on transform
         const carMeshGroup = new THREE.Group(); carBody.add(carMeshGroup);
-        const blueMat = new THREE.MeshPhongMaterial({ color: 0x2648bf, shininess: 85, specular: 0x6b88e8 });
+        const bodyMat = new THREE.MeshPhongMaterial({ color: 0x2a2e35, shininess: 95, specular: 0x768091 });
         const creamMat = new THREE.MeshPhongMaterial({ color: 0xf4f0e8, shininess: 65, specular: 0x555555 });
-        const darkTrimMat = new THREE.MeshPhongMaterial({ color: 0x1e2024, shininess: 30, specular: 0x333333 });
-        const chromeMat = new THREE.MeshPhongMaterial({ color: 0xe6eaef, shininess: 140, specular: 0xffffff });
-        const glassMat = new THREE.MeshPhongMaterial({ color: 0x21313d, shininess: 120, specular: 0x9ec0cc });
-        const headLightMat = new THREE.MeshBasicMaterial({ color: 0xfff5cf });
-        const tailLightMat = new THREE.MeshBasicMaterial({ color: 0xd93426 });
-        const tyreMat = mat(0x1c1d20);
+        const pinMat = new THREE.MeshPhongMaterial({ color: 0xe68422, shininess: 95, specular: 0xffd7a1 });
+        const darkTrimMat = new THREE.MeshPhongMaterial({ color: 0x141619, shininess: 28, specular: 0x2c3038 });
+        const chromeMat = new THREE.MeshPhongMaterial({ color: 0xedf1f5, shininess: 150, specular: 0xffffff });
+        const glassMat = new THREE.MeshPhongMaterial({ color: 0x3b4d5a, shininess: 145, specular: 0xc2dce8 });
+        const headLightMat = new THREE.MeshBasicMaterial({ color: 0xfff6d6 });
+        const tailLightMat = new THREE.MeshBasicMaterial({ color: 0xc92a1e });
+        const navRedMat = new THREE.MeshBasicMaterial({ color: 0xe03224 });
+        const navGreenMat = new THREE.MeshBasicMaterial({ color: 0x2ec468 });
+        const tyreMat = mat(0x151619);
         const whiteRingMat = new THREE.MeshBasicMaterial({ color: 0xf0ece3 });
+
+        // Soft contact shadow + custom shader headlight beams, rear brake road wash & optical lensflares
+        const shadowTex = (function () {
+          const sc = document.createElement("canvas"); sc.width = 128; sc.height = 128;
+          const ctx = sc.getContext("2d");
+          const g = ctx.createRadialGradient(64, 64, 14, 64, 64, 60);
+          g.addColorStop(0, "rgba(14,16,22,0.52)"); g.addColorStop(0.62, "rgba(14,16,22,0.24)"); g.addColorStop(1, "rgba(14,16,22,0)");
+          ctx.fillStyle = g; ctx.fillRect(0, 0, 128, 128);
+          return new THREE.CanvasTexture(sc);
+        })();
+        const carShadowMat = new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, opacity: 0.72, depthWrite: false });
+        const carShadow = new THREE.Mesh(new THREE.PlaneGeometry(2.45, 4.35), carShadowMat);
+        carShadow.rotation.x = -Math.PI / 2; carShadow.position.y = 0.015; carShadow.renderOrder = 2; carShadow.userData.noSil = true;
+        car.add(carShadow);
+
+        // Unified dual-beam automotive headlight projection on the road (smooth Gaussian cones, wall-clipped, zero hard edges)
+        const headBeamGeo = new THREE.PlaneGeometry(11.0, 16.0);
+        headBeamGeo.rotateX(-Math.PI / 2);
+        headBeamGeo.translate(0, 0, 1.82 + 8.0);
+        const headBeamMat = new THREE.ShaderMaterial({
+          uniforms: { uIntensity: { value: 0 }, uClipDist: { value: 16.0 } },
+          transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: true,
+          vertexShader: `varying vec2 vLocal;
+            #include <common>
+            #include <logdepthbuf_pars_vertex>
+            void main() {
+              vLocal = position.xz;
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+              #include <logdepthbuf_vertex>
+            }`,
+          fragmentShader: `uniform float uIntensity, uClipDist;
+            varying vec2 vLocal;
+            #include <common>
+            #include <logdepthbuf_pars_fragment>
+            void main() {
+              #include <logdepthbuf_fragment>
+              if (uIntensity <= 0.003) discard;
+              float d = vLocal.y - 1.82;
+              if (d <= 0.0 || d >= 16.0) discard;
+              float lx = vLocal.x;
+              // Two overlapping parabolic low-beam cones with hot inner core + soft wide outer spill
+              float beam = 0.0;
+              float hot = 0.0;
+              for (int i = 0; i < 2; i++) {
+                float sgn = i == 0 ? -1.0 : 1.0;
+                float lampX = sgn * 0.52;
+                float dx = lx - lampX;
+                float aim = dx / (d + 0.72) - sgn * 0.045;
+                float coreCone = exp(-pow(aim / 0.165, 2.0)) * exp(-d * 0.155) * smoothstep(0.0, 0.55, d);
+                float spillCone = exp(-pow(aim / 0.36, 2.0)) * exp(-d * 0.23) * smoothstep(0.0, 0.35, d);
+                float nearWash = exp(-(dx * dx * 1.45 + pow(d - 0.38, 2.0) * 0.85)) * smoothstep(0.0, 0.18, d) * 0.42;
+                beam += coreCone * 0.58 + spillCone * 0.28 + nearWash;
+                hot += coreCone * 0.85 + nearWash * 0.7;
+              }
+              // Smooth fade at quad limits and soft clip against any building wall directly ahead
+              float wallFade = 1.0 - smoothstep(uClipDist - 1.4, uClipDist + 0.15, d);
+              float edgeFade = smoothstep(15.6, 8.5, d) * smoothstep(5.3, 3.0, abs(lx));
+              float a = clamp(beam, 0.0, 1.0) * wallFade * edgeFade * uIntensity;
+              if (a <= 0.002) discard;
+              vec3 warmOuter = vec3(1.0, 0.84, 0.58);
+              vec3 crispCore = vec3(1.0, 0.97, 0.88);
+              vec3 col = mix(warmOuter, crispCore, clamp(hot * 0.9, 0.0, 1.0));
+              gl_FragColor = vec4(col * a, a);
+            }`
+        });
+        const headBeamMesh = new THREE.Mesh(headBeamGeo, headBeamMat);
+        headBeamMesh.position.y = 0.028; headBeamMesh.renderOrder = 3; headBeamMesh.userData.noSil = true;
+        car.add(headBeamMesh);
+
+        // Soft dual-lamp crimson brake wash on the asphalt behind the rear bumper
+        const brakeWashGeo = new THREE.PlaneGeometry(5.6, 4.4);
+        brakeWashGeo.rotateX(-Math.PI / 2);
+        brakeWashGeo.translate(0, 0, -1.78 - 2.2);
+        const brakeWashMat = new THREE.ShaderMaterial({
+          uniforms: { uIntensity: { value: 0 } },
+          transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: true,
+          vertexShader: `varying vec2 vLocal;
+            #include <common>
+            #include <logdepthbuf_pars_vertex>
+            void main() {
+              vLocal = position.xz;
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+              #include <logdepthbuf_vertex>
+            }`,
+          fragmentShader: `uniform float uIntensity;
+            varying vec2 vLocal;
+            #include <common>
+            #include <logdepthbuf_pars_fragment>
+            void main() {
+              #include <logdepthbuf_fragment>
+              if (uIntensity <= 0.003) discard;
+              float d = -1.78 - vLocal.y;
+              if (d <= 0.0 || d >= 4.4) discard;
+              float lx = vLocal.x;
+              float gL = exp(-(pow((lx + 0.52) * 0.95, 2.0) + pow((d - 0.35) * 0.72, 2.0)));
+              float gR = exp(-(pow((lx - 0.52) * 0.95, 2.0) + pow((d - 0.35) * 0.72, 2.0)));
+              float spread = exp(-(lx * lx * 0.22 + d * d * 0.24)) * 0.45;
+              float edge = smoothstep(0.0, 0.20, d) * smoothstep(4.3, 1.8, d) * smoothstep(2.75, 1.4, abs(lx));
+              float a = clamp((gL + gR) * 0.52 + spread, 0.0, 1.0) * edge * uIntensity;
+              if (a <= 0.002) discard;
+              vec3 col = mix(vec3(0.76, 0.08, 0.06), vec3(0.95, 0.22, 0.14), clamp((gL + gR) * 0.55, 0.0, 1.0));
+              gl_FragColor = vec4(col * a, a);
+            }`
+        });
+        const brakeWashMesh = new THREE.Mesh(brakeWashGeo, brakeWashMat);
+        brakeWashMesh.position.y = 0.028; brakeWashMesh.renderOrder = 3; brakeWashMesh.userData.noSil = true;
+        car.add(brakeWashMesh);
+
+        // Screen-aligned crisp graphic/vector optical glints:
+        // shape 0 = horizontal-biased 4-point diamond star (headlights, AdditiveBlending)
+        // shape 1 = compact diagonal X-star with subtle squared/diamond core (rear brake lights, NormalBlending for deep red)
+        // shape 2 = crisp compact graphic diamond/X glint (boat nav lights, NormalBlending)
+        const flareQuadGeo = new THREE.PlaneGeometry(2, 2);
+        const flareVert = `uniform vec2 uSize; uniform float uAspect, uFovTan;
+          varying vec2 vUv;
+          void main() {
+            vUv = uv * 2.0 - 1.0;
+            vec4 mv = modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+            vec4 clip = projectionMatrix * mv;
+            float dist = max(1.0, -mv.z);
+            vec2 ndc = uSize / (dist * uFovTan);
+            ndc.x /= max(0.25, uAspect);
+            clip.xy += position.xy * ndc * clip.w;
+            gl_Position = clip;
+          }`;
+        const flareFrag = `uniform vec3 uCoreCol, uEdgeCol;
+          uniform float uIntensity, uShape, uAngle, uAdditive;
+          varying vec2 vUv;
+          void main() {
+            if (uIntensity <= 0.004) discard;
+            vec2 p = vUv;
+            float r = length(p);
+            float env = smoothstep(1.0, 0.80, max(abs(p.x), abs(p.y)));
+            if (env <= 0.001) discard;
+            float c = cos(uAngle), s = sin(uAngle);
+            vec2 q = mat2(c, -s, s, c) * p;
+
+            float mask = 0.0;
+            float coreMix = 0.0;
+            if (uShape < 0.5) {
+              // Headlight: crisp horizontal-biased 4-point diamond star + tiny tight core
+              vec2 qh = vec2(q.x / 0.94, q.y / 0.56);
+              float ast = pow(abs(qh.x), 0.46) + pow(abs(qh.y), 0.46);
+              float star = 1.0 - smoothstep(0.84, 1.02, ast);
+              float dia = 1.0 - smoothstep(0.18, 0.34, abs(q.x) * 1.15 + abs(q.y) * 1.65);
+              float tight = exp(-r * r * 18.0) * 0.24;
+              mask = clamp(max(star * 0.92, dia) + tight, 0.0, 1.0);
+              coreMix = clamp(dia * 0.95 + exp(-r * r * 42.0) * 0.65, 0.0, 1.0);
+            } else if (uShape < 1.5) {
+              // Rear brake light: bright luminous crimson glow + crisp 45-deg diagonal X-flare & beveled square core
+              float ca = cos(0.78539816 + uAngle), sa = sin(0.78539816 + uAngle);
+              vec2 qx = mat2(ca, -sa, sa, ca) * p;
+              float xStar = pow(abs(qx.x) / 0.88, 0.50) + pow(abs(qx.y) / 0.88, 0.50);
+              float blades = (1.0 - smoothstep(0.74, 1.02, xStar)) * 0.78;
+              float sqDia = max(abs(p.x), abs(p.y)) * 0.62 + (abs(p.x) + abs(p.y)) * 0.38;
+              float sqCore = (1.0 - smoothstep(0.16, 0.30, sqDia)) * 0.88;
+              float outerGlow = exp(-r * r * 5.8) * 0.74;
+              float innerGlow = exp(-r * r * 20.0) * 0.88;
+              mask = clamp(outerGlow + innerGlow + max(blades, sqCore) * 0.65, 0.0, 1.45);
+              coreMix = clamp(innerGlow * 0.65 + sqCore * 0.55, 0.0, 1.0);
+            } else {
+              // Boat nav light: crisp compact diamond/X glint
+              float ca = cos(0.78539816 + uAngle), sa = sin(0.78539816 + uAngle);
+              vec2 qx = mat2(ca, -sa, sa, ca) * p;
+              float xStar = pow(abs(qx.x) / 0.84, 0.52) + pow(abs(qx.y) / 0.84, 0.52);
+              float blades = 1.0 - smoothstep(0.80, 1.02, xStar);
+              float dia = 1.0 - smoothstep(0.16, 0.28, abs(p.x) + abs(p.y));
+              mask = clamp(max(blades * 0.86, dia * 0.94), 0.0, 1.0);
+              coreMix = clamp(dia * 0.80, 0.0, 1.0);
+            }
+            vec3 col = mix(uEdgeCol, uCoreCol, coreMix);
+            float a = mask * env * uIntensity;
+            if (a <= 0.003) discard;
+            gl_FragColor = uAdditive > 0.5 ? vec4(col * a, a) : vec4(col, a);
+          }`;
+        const headFlares = [], brakeFlares = [], boatNavFlares = [];
+        function addOpticalFlare(parent, coreHex, edgeHex, x, y, z, dirZ, sx, sy, shape = 0, additive = true) {
+          const m = new THREE.ShaderMaterial({
+            uniforms: {
+              uSize: { value: new THREE.Vector2(sx, sy) },
+              uAspect: { value: 1 }, uFovTan: { value: 0.38 },
+              uCoreCol: { value: new THREE.Color(coreHex) },
+              uEdgeCol: { value: new THREE.Color(edgeHex) },
+              uIntensity: { value: 0 }, uShape: { value: shape },
+              uAngle: { value: 0 }, uAdditive: { value: additive ? 1 : 0 }
+            },
+            vertexShader: flareVert, fragmentShader: flareFrag,
+            transparent: true, blending: additive ? THREE.AdditiveBlending : THREE.NormalBlending, depthWrite: false, depthTest: false
+          });
+          const mesh = new THREE.Mesh(flareQuadGeo, m);
+          mesh.position.set(x, y, z); mesh.renderOrder = 14; mesh.frustumCulled = false; mesh.userData.noSil = true;
+          parent.add(mesh);
+          return { mesh, mat: m, dirZ, occ: 1, baseSx: sx, baseSy: sy };
+        }
 
         function extrudeProfile(pts, width, bevel = 0.04) {
           const sh = new THREE.Shape();
@@ -327,7 +533,7 @@
             [1.78, 0.68], [1.70, 0.80], [0.42, 0.84], [-0.46, 0.84],
             [-1.02, 0.90], [-1.66, 0.86], [-1.76, 0.81]
           ], 1.66, 0.05);
-          addPart(carMeshGroup, bodyGeo, blueMat);
+          addPart(carMeshGroup, bodyGeo, bodyMat);
 
           // Wide sculpted front & rear fender haunches for a planted muscle stance
           const rearHaunchGeo = extrudeProfile([
@@ -337,13 +543,14 @@
             [0.52, 0.42], [1.66, 0.42], [1.66, 0.78], [0.58, 0.82]
           ], 0.10, 0.025);
           for (const side of [-1, 1]) {
-            addPart(carMeshGroup, rearHaunchGeo, blueMat, side * 0.84, 0, 0);
-            addPart(carMeshGroup, frontHaunchGeo, blueMat, side * 0.83, 0, 0);
+            addPart(carMeshGroup, rearHaunchGeo, bodyMat, side * 0.84, 0, 0);
+            addPart(carMeshGroup, frontHaunchGeo, bodyMat, side * 0.83, 0, 0);
             // Dark wheel-well cutouts so the wide tyres sit deep inside the arches
             slab(carMeshGroup, side * 0.82, 1.06, 0.18, 0.82, 0.46, 0.46, darkTrimMat);
             slab(carMeshGroup, side * 0.84, -1.02, 0.22, 0.90, 0.52, 0.50, darkTrimMat);
-            // Chrome rocker sill trim + aerodynamic bullet door mirror
+            // Chrome rocker sill trim + thin burnt-orange/gold side body pinstripe + bullet door mirror
             slab(carMeshGroup, side * 0.89, 0.02, 0.04, 1.24, 0.06, 0.30, chromeMat);
+            slab(carMeshGroup, side * 0.895, 0.02, 0.025, 1.18, 0.032, 0.66, pinMat);
             const mir = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 8), chromeMat);
             mir.scale.set(0.9, 0.75, 1.4); mir.position.set(side * 0.89, 0.91, 0.28); carMeshGroup.add(mir);
           }
@@ -352,12 +559,12 @@
           const cabinGeo = extrudeProfile([
             [0.44, 0.82], [-0.04, 1.25], [-0.64, 1.25], [-1.52, 0.87], [-1.52, 0.82]
           ], 1.32, 0.04);
-          addPart(carMeshGroup, cabinGeo, blueMat);
+          addPart(carMeshGroup, cabinGeo, bodyMat);
 
-          // Tinted wraparound glass: raked windshield, side windows, sloping fastback rear window
+          // Clean tinted wraparound glass
           const ws = slab(carMeshGroup, 0, 0.21, 1.22, 0.04, 0.56, 1.05, glassMat);
           ws.rotation.x = -0.84;
-          const rearGlassMat = new THREE.MeshPhongMaterial({ color: 0x162028, shininess: 35, specular: 0x3b4d59 });
+          const rearGlassMat = new THREE.MeshPhongMaterial({ color: 0x26343e, shininess: 60, specular: 0x6c8899 });
           const rw = slab(carMeshGroup, 0, -1.07, 1.18, 0.04, 0.86, 1.07, rearGlassMat);
           rw.rotation.x = 1.16;
           for (const side of [-1, 1]) {
@@ -366,7 +573,7 @@
             ], 0.03, 0);
             addPart(carMeshGroup, sideWinGeo, glassMat, side * 0.70, 0, 0);
             // B-pillar divider
-            const bp = slab(carMeshGroup, side * 0.71, -0.44, 0.04, 0.08, 0.34, 1.04, blueMat);
+            const bp = slab(carMeshGroup, side * 0.71, -0.44, 0.04, 0.08, 0.34, 1.04, bodyMat);
             bp.rotation.x = 0.22;
           }
           // Classic fastback rear window louvers (4 angled dark slats)
@@ -376,11 +583,15 @@
             lv.rotation.x = 0.22;
           }
 
-          // Twin cream Le Mans racing stripes (hood, roof, rear deck)
+          // Twin cream Le Mans racing stripes + thin burnt-orange/gold outer pinstripes (hood, roof, rear deck)
           for (const sx of [-0.20, 0.20]) {
             const hs = slab(carMeshGroup, sx, 1.09, 0.20, 1.26, 0.025, 0.875, creamMat); hs.rotation.x = 0.032;
             slab(carMeshGroup, sx, -0.34, 0.19, 0.58, 0.025, 1.295, creamMat);
             const ts = slab(carMeshGroup, sx, -1.60, 0.20, 0.24, 0.025, 0.895, creamMat); ts.rotation.x = -0.05;
+            const px = sx + Math.sign(sx) * 0.135;
+            const hp = slab(carMeshGroup, px, 1.09, 0.034, 1.26, 0.026, 0.875, pinMat); hp.rotation.x = 0.032;
+            slab(carMeshGroup, px - Math.sign(sx) * 0.005, -0.34, 0.032, 0.58, 0.026, 1.295, pinMat);
+            const tp = slab(carMeshGroup, px, -1.60, 0.034, 0.24, 0.026, 0.895, pinMat); tp.rotation.x = -0.05;
           }
 
           // Sculpted shaker hood scoop / power bulge
@@ -394,7 +605,7 @@
           const sp = slab(carMeshGroup, 0, -1.67, 1.56, 0.22, 0.06, 0.97, darkTrimMat); sp.rotation.x = -0.18;
           for (const sx of [-0.52, 0.52]) slab(carMeshGroup, sx, -1.64, 0.08, 0.14, 0.12, 0.91, darkTrimMat);
 
-          // Recessed aggressive front grille, chrome surround, quad round headlights, bumper & chin splitter
+          // Recessed aggressive front grille, chrome surround, quad round headlights + always-on lensflares, bumper & chin splitter
           slab(carMeshGroup, 0, 1.79, 1.52, 0.08, 0.28, 0.61, darkTrimMat);
           slab(carMeshGroup, 0, 1.81, 1.58, 0.04, 0.04, 0.74, chromeMat);
           slab(carMeshGroup, 0, 1.81, 1.58, 0.04, 0.04, 0.48, chromeMat);
@@ -404,13 +615,19 @@
             addPart(carMeshGroup, hlRimGeo, chromeMat, hx, 0.61, 1.82);
             addPart(carMeshGroup, hlLensGeo, headLightMat, hx, 0.61, 1.83);
           }
+          for (const fx of [-0.52, 0.52]) {
+            headFlares.push(addOpticalFlare(carMeshGroup, 0xfffef4, 0xffd28a, fx, 0.61, 1.88, 1, 1.48, 0.96, 0, true));
+          }
           slab(carMeshGroup, 0, 1.86, 1.78, 0.12, 0.13, 0.39, chromeMat);
           slab(carMeshGroup, 0, 1.78, 1.58, 0.24, 0.07, 0.26, darkTrimMat); // chin splitter
 
-          // Recessed dark rear panel, iconic tri-bar crimson taillights, chrome rear bumper & dual exhausts
+          // Recessed dark rear panel, reactive tri-bar crimson taillights + dark-mode brake glints, chrome rear bumper & dual exhausts
           slab(carMeshGroup, 0, -1.78, 1.56, 0.06, 0.24, 0.66, darkTrimMat);
           for (const tx of [-0.66, -0.50, -0.34, 0.34, 0.50, 0.66]) {
             slab(carMeshGroup, tx, -1.80, 0.10, 0.05, 0.15, 0.66, tailLightMat);
+          }
+          for (const bx of [-0.50, 0.50]) {
+            brakeFlares.push(addOpticalFlare(carMeshGroup, 0xff5a38, 0xe81812, bx, 0.66, -1.86, -1, 1.28, 1.24, 1, true));
           }
           slab(carMeshGroup, 0, -1.84, 1.78, 0.12, 0.13, 0.41, chromeMat);
           const exGeo = new THREE.CylinderGeometry(0.055, 0.055, 0.24, 10); exGeo.rotateX(Math.PI / 2);
@@ -506,10 +723,10 @@
           );
           lowerTris.push(tp[1][0], tp[1][1], tp[1][2], tp[2][0], tp[2][1], tp[2][2], tp[3][0], tp[3][1], tp[3][2]);
           meshFromTris(lowerTris, creamMat);
-          meshFromTris(sideTris, blueMat);
-          meshFromTris(deckTris, blueMat);
+          meshFromTris(sideTris, bodyMat);
+          meshFromTris(deckTris, bodyMat);
 
-          // Chrome sheer rub-rail segments along both sides (oriented strictly in hull-local space)
+          // Chrome sheer rub-rail + thin burnt-orange/gold hull accent pinstripe along both sides
           for (let i = 0; i < ST.length - 1; i++) {
             const s0 = ST[i], s1 = ST[i + 1];
             for (const side of [-1, 1]) {
@@ -521,21 +738,35 @@
               rail.rotation.order = "YXZ";
               rail.rotation.y = Math.atan2(dx, dz);
               rail.rotation.x = -Math.atan2(dy, Math.hypot(dx, dz));
+              const px0 = side * (lerp(s0[2], s0[1], 0.72) + 0.012), py0 = lerp(s0[4], s0[5], 0.72);
+              const px1 = side * (lerp(s1[2], s1[1], 0.72) + 0.012), py1 = lerp(s1[4], s1[5], 0.72);
+              const pdx = px1 - px0, pdy = py1 - py0, pdz = z1 - z0;
+              const plen = Math.hypot(pdx, pdy, pdz);
+              const pstrip = slab(hull, (px0 + px1) / 2, (z0 + z1) / 2, 0.028, plen + 0.03, 0.032, (py0 + py1) / 2, pinMat);
+              pstrip.rotation.order = "YXZ";
+              pstrip.rotation.y = Math.atan2(pdx, pdz);
+              pstrip.rotation.x = -Math.atan2(pdy, Math.hypot(pdx, pdz));
             }
           }
 
-          // Foredeck warm teak center inlay + twin tapered cream racing stripes + chrome bow cleat
+          // Foredeck warm teak center inlay + twin tapered cream racing stripes + burnt-orange/gold pinstripes + chrome bow cleat
           const foreWood = slab(hull, 0, 1.15, 0.20, 1.65, 0.025, 0.945, woodMat); foreWood.rotation.x = -0.055;
           for (const side of [-1, 1]) {
             const fs = slab(hull, side * 0.24, 1.05, 0.14, 1.48, 0.025, 0.925, creamMat);
             fs.rotation.x = -0.055; fs.rotation.y = -side * 0.10;
+            const fp = slab(hull, side * 0.34, 1.03, 0.030, 1.42, 0.026, 0.916, pinMat);
+            fp.rotation.x = -0.055; fp.rotation.y = -side * 0.11;
             const as = slab(hull, side * 0.22, -1.40, 0.16, 0.72, 0.025, 0.825, creamMat);
             as.rotation.x = -0.05;
+            const ap = slab(hull, side * 0.33, -1.40, 0.030, 0.72, 0.026, 0.822, pinMat);
+            ap.rotation.x = -0.05;
           }
           slab(hull, 0, 1.98, 0.07, 0.20, 0.05, 0.98, chromeMat); // bow cleat
-          // Navigation bow lights (port red, starboard green)
-          slab(hull, 0.43, 1.56, 0.06, 0.10, 0.04, 0.93, tailLightMat);
-          slab(hull, -0.43, 1.56, 0.06, 0.10, 0.04, 0.93, new THREE.MeshBasicMaterial({ color: 0x2ec468 }));
+          // Navigation bow lights (port red, starboard green) + night glow flares
+          slab(hull, 0.43, 1.56, 0.06, 0.10, 0.04, 0.93, navRedMat);
+          slab(hull, -0.43, 1.56, 0.06, 0.10, 0.04, 0.93, navGreenMat);
+          boatNavFlares.push(addOpticalFlare(hull, 0xf23626, 0xb81610, 0.44, 0.96, 1.57, 1, 0.58, 0.58, 2, false));
+          boatNavFlares.push(addOpticalFlare(hull, 0x3ce07c, 0x169c4a, -0.44, 0.96, 1.57, 1, 0.58, 0.58, 2, false));
 
           // Recessed cockpit tub, twin bolster bucket seats, dashboard & steering wheel
           slab(hull, 0, -0.45, 1.46, 1.10, 0.14, 0.42, darkTrimMat); // cockpit floor
@@ -544,7 +775,7 @@
           for (const sx of [-0.36, 0.36]) {
             slab(hull, sx, -0.48, 0.50, 0.48, 0.14, 0.54, seatMat); // seat base
             const bk = slab(hull, sx, -0.72, 0.50, 0.14, 0.44, 0.74, seatMat); bk.rotation.x = -0.22; // backrest
-            slab(hull, sx, -0.52, 0.54, 0.46, 0.12, 0.60, blueMat); // side bolster accent
+            slab(hull, sx, -0.52, 0.54, 0.46, 0.12, 0.60, bodyMat); // side bolster accent
           }
           // Steering wheel on port/starboard dash
           const sw = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.025, 8, 16), chromeMat);
@@ -575,8 +806,9 @@
           const cowlGeo = extrudeProfile([
             [-0.24, 0.04], [0.22, 0.04], [0.24, 0.36], [0.10, 0.48], [-0.18, 0.46], [-0.26, 0.32]
           ], 0.38, 0.03);
-          addPart(outboardPivot, cowlGeo, blueMat);
+          addPart(outboardPivot, cowlGeo, bodyMat);
           slab(outboardPivot, 0, 0.00, 0.12, 0.34, 0.03, 0.50, creamMat); // top racing stripe
+          for (const side of [-1, 1]) slab(outboardPivot, side * 0.085, 0.00, 0.025, 0.32, 0.03, 0.498, pinMat);
           slab(outboardPivot, 0, -0.02, 0.16, 0.24, 0.48, -0.18, darkTrimMat); // mid-section leg
           const bullet = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 0.38, 12), darkTrimMat);
           bullet.rotation.x = Math.PI / 2; bullet.position.set(0, -0.38, -0.04); outboardPivot.add(bullet);
@@ -593,19 +825,21 @@
             bl.rotation.z = a - Math.PI / 2; bl.rotation.y = 0.35;
           }
         })();
-        // Silhouette: where something hides the car, its outline shows through in flat blue. Two extra passes after the scene:
-        // 1) mark the car's visible pixels in the stencil buffer, 2) draw the whole car in blue except on those pixels.
-        const markMat = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false, transparent: true, stencilWrite: true, stencilRef: 1, stencilFunc: THREE.AlwaysStencilFunc, stencilZPass: THREE.ReplaceStencilOp });
-        const silMat = new THREE.MeshBasicMaterial({ color: 0x2b4cc4, transparent: true, opacity: 0.8, depthTest: false, depthWrite: false, stencilWrite: true, stencilRef: 1, stencilFunc: THREE.NotEqualStencilFunc });
-        const carMeshes = []; car.traverse((o) => { if (o.isMesh) carMeshes.push(o); });
+        // Silhouette: when a building hides the car, ONLY occluded pixels render as a solid opaque dark charcoal-grey shadow.
+        // Both markMat and silMat are opaque (transparent: false) so Three.js strictly executes renderOrder 10 (mark visible car) before 11 (draw occluded shadow).
+        const markMat = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false, transparent: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, stencilWrite: true, stencilRef: 1, stencilFunc: THREE.AlwaysStencilFunc, stencilZPass: THREE.ReplaceStencilOp });
+        const silMat = new THREE.MeshBasicMaterial({ color: 0x5a5752, transparent: false, depthTest: false, depthWrite: false, stencilWrite: true, stencilRef: 1, stencilFunc: THREE.NotEqualStencilFunc });
+        const carMeshes = [], silMeshes = []; car.traverse((o) => { if (o.isMesh && !o.userData.noSil) carMeshes.push(o); });
         carMeshes.forEach((o) => {
           const a = new THREE.Mesh(o.geometry, markMat), b = new THREE.Mesh(o.geometry, silMat);
-          a.renderOrder = 10; b.renderOrder = 11; o.add(a, b);
+          a.renderOrder = 10; b.renderOrder = 11; b.visible = false; o.add(a, b); silMeshes.push(b);
         });
-        const dot = new THREE.Mesh(new THREE.CircleGeometry(1, 40), new THREE.MeshBasicMaterial({ color: 0x2b4cc4, transparent: true, opacity: 0.9 }));
-        dot.rotation.x = -Math.PI / 2; dot.position.y = 0.3; me.add(dot);
-        const halo = new THREE.Mesh(new THREE.RingGeometry(1.25, 1.9, 40), new THREE.MeshBasicMaterial({ color: 0x2b4cc4, transparent: true, opacity: 0.25 }));
-        halo.rotation.x = -Math.PI / 2; halo.position.y = 0.29; me.add(halo);
+        const dotMat = new THREE.MeshBasicMaterial({ color: 0x2b4cc4, transparent: true, opacity: 0.92 });
+        const dot = new THREE.Mesh(new THREE.CircleGeometry(1, 40), dotMat);
+        dot.rotation.x = -Math.PI / 2; dot.position.y = 0.34; me.add(dot);
+        const haloMat = new THREE.MeshBasicMaterial({ color: 0x2b4cc4, transparent: true, opacity: 0.32 });
+        const halo = new THREE.Mesh(new THREE.RingGeometry(1.25, 1.85, 40), haloMat);
+        halo.rotation.x = -Math.PI / 2; halo.position.y = 0.33; me.add(halo);
         const tgt = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.85, 32), new THREE.MeshBasicMaterial({ color: 0x1a1a1a })); tgt.rotation.x = -Math.PI / 2; tgt.position.y = 0.2; tgt.visible = false; scene.add(tgt);
         const pos = new THREE.Vector2(START[0], START[1]);
         const follow = new THREE.Vector3(START[0], 0, START[1]);
@@ -731,7 +965,8 @@
         }
         // The route ahead is drawn as a trail of dots.
         const MAXD = 500;
-        const trail = new THREE.InstancedMesh(new THREE.CircleGeometry(0.3, 12).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0x2b4cc4 }), MAXD);
+        const trailMat = new THREE.MeshBasicMaterial({ color: 0x2b4cc4 });
+        const trail = new THREE.InstancedMesh(new THREE.CircleGeometry(0.3, 12).rotateX(-Math.PI / 2), trailMat, MAXD);
         trail.count = 0; scene.add(trail);
         function showRoute(pts) {
           let n = 0;
@@ -742,129 +977,118 @@
           trail.count = n; trail.instanceMatrix.needsUpdate = true;
         }
 
-        // MARK: Stylized puffs (tyre smoke, boat spray and wake): simple clean discs with per-puff shape, tint, opacity and motion variation.
-        // One draw call: each puff is a soft-edged simple disc (no multi-lobe outline clutter), expanding and fading smoothly over its lifetime.
-        const PUFFS = 320;
-        const pGeo = new THREE.BufferGeometry();
-        const pPos = new Float32Array(PUFFS * 3), pSize = new Float32Array(PUFFS), pAlpha = new Float32Array(PUFFS);
-        const pStyle = new Float32Array(PUFFS * 4), pCol = new Float32Array(PUFFS * 3);
-        pGeo.setAttribute("position", new THREE.BufferAttribute(pPos, 3).setUsage(THREE.DynamicDrawUsage));
-        pGeo.setAttribute("aSize", new THREE.BufferAttribute(pSize, 1).setUsage(THREE.DynamicDrawUsage));
-        pGeo.setAttribute("aAlpha", new THREE.BufferAttribute(pAlpha, 1).setUsage(THREE.DynamicDrawUsage));
-        pGeo.setAttribute("aStyle", new THREE.BufferAttribute(pStyle, 4).setUsage(THREE.DynamicDrawUsage));
-        pGeo.setAttribute("aCol", new THREE.BufferAttribute(pCol, 3).setUsage(THREE.DynamicDrawUsage));
+        // MARK: Stylized 3D instanced puffs (tyre smoke, boat spray and wake): two-tone cel-shaded spheres with subtle normal blending so overlapping puffs fuse cleanly.
+        const PUFFS = 220;
+        const puffGeo = new THREE.SphereGeometry(1, 10, 8);
+        const pColArr = new Float32Array(PUFFS * 3);
+        const pColAttr = new THREE.InstancedBufferAttribute(pColArr, 3);
+        puffGeo.setAttribute("aCol", pColAttr);
         const puffMat = new THREE.ShaderMaterial({
-          uniforms: { uScale: { value: 400 } }, transparent: true, depthWrite: false,
-          vertexShader: `uniform float uScale; attribute float aSize, aAlpha; attribute vec4 aStyle; attribute vec3 aCol;
-            varying float vAlpha; varying vec4 vStyle; varying vec3 vCol;
+          uniforms: {
+            uLightDir: { value: new THREE.Vector3(-0.4, 0.85, 0.3).normalize() },
+            uLitTint: { value: new THREE.Color(0xffffff) },
+            uShadowTint: { value: new THREE.Color(0xcbc6bd) }
+          },
+          vertexShader: `attribute vec3 aCol;
+            varying vec3 vWorldNormal; varying vec3 vCol;
             #include <common>
             #include <logdepthbuf_pars_vertex>
             void main() {
-              vAlpha = aAlpha; vStyle = aStyle; vCol = aCol;
-              vec4 mv = modelViewMatrix * vec4(position, 1.0);
+              vCol = aCol;
+              vWorldNormal = normalize(mat3(instanceMatrix) * normal);
+              vec4 mv = modelViewMatrix * instanceMatrix * vec4(position, 1.0);
               gl_Position = projectionMatrix * mv;
-              gl_PointSize = aSize * uScale / -mv.z;
               #include <logdepthbuf_vertex>
             }`,
-          fragmentShader: `varying float vAlpha; varying vec4 vStyle; varying vec3 vCol;
+          fragmentShader: `uniform vec3 uLightDir, uLitTint, uShadowTint;
+            varying vec3 vWorldNormal; varying vec3 vCol;
             #include <common>
             #include <logdepthbuf_pars_fragment>
             void main() {
               #include <logdepthbuf_fragment>
-              if (vAlpha <= 0.004) discard;
-              vec2 q = gl_PointCoord * 2.0 - 1.0;
-              float c0 = cos(vStyle.x), s0 = sin(vStyle.x);
-              vec2 p = mat2(c0, -s0, s0, c0) * q;
-              p.x *= vStyle.y; p.y /= vStyle.y;
-              float d = length(p);
-              if (d > 1.0) discard;
-              float edge = vStyle.w > 0.5 ? 0.24 : vStyle.z;
-              float mask = 1.0 - smoothstep(1.0 - edge, 1.0, d);
-              vec3 shade = vStyle.w > 0.5
-                ? mix(vCol * 1.04, vCol * 0.94, clamp(q.y * 0.5 + 0.5, 0.0, 1.0))
-                : mix(vCol, vCol * 0.91, clamp(q.y * 0.5 + 0.5, 0.0, 1.0));
-              gl_FragColor = vec4(shade, mask * vAlpha);
-            }`,
+              vec3 n = normalize(vWorldNormal);
+              vec3 l = normalize(uLightDir);
+              vec3 biasDir = normalize(vec3(0.0, 0.72, 0.0) + l * 0.28);
+              vec3 nb = normalize(mix(n, biasDir, 0.32));
+              float band = smoothstep(-0.07, 0.07, dot(nb, l));
+              gl_FragColor = vec4(vCol * mix(uShadowTint, uLitTint, band), 1.0);
+            }`
         });
-        const puffPts = new THREE.Points(pGeo, puffMat); puffPts.frustumCulled = false; puffPts.renderOrder = 12; scene.add(puffPts);
+        const puffMesh = new THREE.InstancedMesh(puffGeo, puffMat, PUFFS);
+        puffMesh.frustumCulled = false;
+        const pDummy = new THREE.Object3D(), pTmpCol = new THREE.Color();
+        pDummy.scale.setScalar(0); pDummy.updateMatrix();
+        for (let i = 0; i < PUFFS; i++) {
+          puffMesh.setMatrixAt(i, pDummy.matrix);
+          pTmpCol.setHex(0xf8f5ef); pColArr[i * 3] = pTmpCol.r; pColArr[i * 3 + 1] = pTmpCol.g; pColArr[i * 3 + 2] = pTmpCol.b;
+        }
+        puffMesh.instanceMatrix.needsUpdate = true; pColAttr.needsUpdate = true;
+        scene.add(puffMesh);
         const puffs = Array.from({ length: PUFFS }, () => ({
           age: 1, life: 0, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0,
-          s: 0, g: 0, drag: 0.93, rot: 0, spin: 0, aspect: 1, soft: 0.22,
-          peakA: 0.7, fadePow: 1.4, grow: 1, kind: 0
+          s: 0, g: 0, drag: 0.92, rx: 0, ry: 0, rz: 0, spinX: 0, spinY: 0,
+          sx: 1, sy: 0.85, sz: 1, kind: 0
         }));
-        const SMOKE = [0.96, 0.95, 0.92], SPRAY = [0.91, 0.97, 0.99];
-        const SMOKE_PAL = [
-          [0.99, 0.985, 0.96],
-          [0.95, 0.935, 0.90],
-          [0.90, 0.885, 0.855],
-          [0.84, 0.83, 0.81],
-          [0.78, 0.765, 0.74]
-        ];
+        const SMOKE = 0, SPRAY = 1;
+        const SMOKE_PAL = [0xf8f5ef, 0xf2eee6, 0xebe5db];
+        const SPRAY_PAL = [0xf6fdff, 0xe6f5f9, 0xd6edf3];
         let puffNext = 0, puffAcc = 0, puffSide = 1;
+        const groundYAt = (x, z) => (waterDist(x, z) < 9.2 && onDeck(x, z)) ? 0.30 : (waterDist(x, z) < 9.0 ? 0.06 : 0.11);
         function puff(x, z, size, vx, vz, col = SMOKE, vy = 1.3, life = 0.55, y = 0.42, opts = null) {
           const i = puffNext, p = puffs[i]; puffNext = (puffNext + 1) % PUFFS;
           const isSpray = col === SPRAY;
-          const heavy = opts && opts.heavy ? 1 : 0;
           const rBand = Math.random();
-          const wisp = !isSpray && rBand < 0.42;
+          const small = !isSpray && rBand < 0.38;
           const billow = !isSpray && rBand > 0.78;
           p.age = 0;
-          p.life = life * (wisp ? 0.50 + Math.random() * 0.40 : billow ? 0.95 + Math.random() * 0.65 : 0.72 + Math.random() * 0.55);
-          p.s = size * (wisp ? 0.42 + Math.random() * 0.34 : billow ? 1.05 + Math.random() * 0.45 : 0.72 + Math.random() * 0.38);
-          p.g = isSpray ? -9.5 : 0.12 + Math.random() * 0.32;
-          p.drag = isSpray ? 0.95 : 0.88 + Math.random() * 0.07;
-          p.x = x + (Math.random() - 0.5) * (isSpray ? 0.32 : 0.55);
-          p.y = Math.max(0.42, y) + Math.random() * 0.16;
-          p.z = z + (Math.random() - 0.5) * (isSpray ? 0.32 : 0.55);
-          p.vx = vx + (Math.random() - 0.5) * (isSpray ? 1.4 : 2.6);
-          p.vy = vy * (0.50 + Math.random() * 1.10);
-          p.vz = vz + (Math.random() - 0.5) * (isSpray ? 1.4 : 2.6);
-          p.rot = Math.random() * Math.PI * 2;
-          p.spin = (Math.random() - 0.5) * (isSpray ? 1.0 : 2.6);
-          p.aspect = isSpray ? 0.90 + Math.random() * 0.20 : 0.78 + Math.random() * 0.44;
-          p.soft = isSpray ? 0.16 : 0.08 + Math.random() * 0.16;
-          p.peakA = opts && opts.alpha !== undefined
-            ? opts.alpha * (wisp ? 0.52 + Math.random() * 0.32 : 0.76 + Math.random() * 0.24)
-            : (isSpray ? 0.68 + Math.random() * 0.24 : 0.48 + Math.random() * 0.32);
-          p.fadePow = isSpray ? 1.25 : 1.15 + Math.random() * 0.95;
-          p.grow = isSpray ? 0 : (wisp ? 0.35 + Math.random() * 0.4 : 0.55 + Math.random() * 0.65);
+          p.life = life * (small ? 0.60 + Math.random() * 0.32 : billow ? 0.95 + Math.random() * 0.45 : 0.78 + Math.random() * 0.38);
+          p.s = size * (isSpray ? 0.62 + Math.random() * 0.38 : small ? 0.55 + Math.random() * 0.28 : billow ? 1.02 + Math.random() * 0.32 : 0.76 + Math.random() * 0.30);
+          p.g = isSpray ? -9.2 : 0.35 + Math.random() * 0.45;
+          p.drag = isSpray ? 0.95 : 0.89 + Math.random() * 0.06;
+          p.x = x + (Math.random() - 0.5) * (isSpray ? 0.28 : 0.42);
+          p.z = z + (Math.random() - 0.5) * (isSpray ? 0.28 : 0.42);
+          p.sx = 0.92 + Math.random() * 0.26;
+          p.sy = isSpray ? 0.86 + Math.random() * 0.26 : 0.76 + Math.random() * 0.24;
+          p.sz = 0.92 + Math.random() * 0.26;
+          const minY = groundYAt(p.x, p.z) + p.s * p.sy * 0.72;
+          p.y = Math.max(minY, y) + Math.random() * 0.08;
+          p.vx = vx + (Math.random() - 0.5) * (isSpray ? 1.2 : 1.9);
+          p.vy = vy * (0.55 + Math.random() * 0.85);
+          p.vz = vz + (Math.random() - 0.5) * (isSpray ? 1.2 : 1.9);
+          p.rx = Math.random() * Math.PI * 2; p.ry = Math.random() * Math.PI * 2; p.rz = Math.random() * Math.PI * 2;
+          p.spinX = (Math.random() - 0.5) * 2.2; p.spinY = (Math.random() - 0.5) * 2.2;
           p.kind = isSpray ? 1 : 0;
-          const tint = isSpray ? SPRAY : SMOKE_PAL[Math.min(SMOKE_PAL.length - 1, Math.floor(Math.random() * (heavy ? 5 : 4)))];
-          pCol.set(tint, i * 3);
-          pGeo.attributes.aCol.needsUpdate = true;
+          const pal = isSpray ? SPRAY_PAL : SMOKE_PAL;
+          pTmpCol.setHex(pal[(Math.random() * pal.length) | 0]);
+          pColArr[i * 3] = pTmpCol.r; pColArr[i * 3 + 1] = pTmpCol.g; pColArr[i * 3 + 2] = pTmpCol.b;
+          pColAttr.needsUpdate = true;
         }
         function updatePuffs(dt) {
           for (let i = 0; i < PUFFS; i++) {
-            const p = puffs[i]; let s = 0, al = 0;
+            const p = puffs[i];
             if (p.age < p.life) {
               p.age += dt;
               const k = Math.min(1, p.age / p.life);
               const dDrag = Math.pow(p.drag, dt * 60);
-              p.x += p.vx * dt; p.y = Math.max(0.42, p.y + p.vy * dt); p.z += p.vz * dt;
+              p.x += p.vx * dt; p.z += p.vz * dt;
               p.vx *= dDrag; p.vz *= dDrag;
               p.vy = p.vy * Math.pow(0.95, dt * 60) + p.g * dt;
-              p.rot += p.spin * dt;
-              if (p.kind > 0.5) {
-                s = p.s * (k < 0.14 ? k / 0.14 : Math.pow(1 - (k - 0.14) / 0.86, 1.15));
-                al = p.peakA * (k < 0.12 ? k / 0.12 : Math.pow(1 - (k - 0.12) / 0.88, 1.25));
-              } else {
-                // Smoke puffs expand gently as they rise and soften away cleanly
-                const easeGrow = 0.45 + (0.55 + p.grow * 0.45) * Math.pow(k, 0.62);
-                s = p.s * easeGrow;
-                const fadeIn = Math.min(1, k / 0.10);
-                const fadeOut = Math.pow(Math.max(0, 1 - k), p.fadePow);
-                al = p.peakA * fadeIn * fadeOut;
-              }
+              p.rx += p.spinX * dt; p.ry += p.spinY * dt;
+              const popIn = smooth(0, 0.13, k) * (1 + Math.sin(Math.min(1, k / 0.22) * Math.PI) * 0.14);
+              const shrink = Math.pow(Math.max(0, 1 - smooth(p.kind > 0.5 ? 0.18 : 0.24, 1.0, k)), p.kind > 0.5 ? 1.25 : 1.38);
+              const r = p.s * popIn * shrink;
+              const floorY = groundYAt(p.x, p.z) + r * p.sy * 0.72;
+              p.y = Math.max(floorY, p.y + p.vy * dt);
+              pDummy.position.set(p.x, p.y, p.z);
+              pDummy.rotation.set(p.rx, p.ry, p.rz);
+              pDummy.scale.set(r * p.sx, r * p.sy, r * p.sz);
+            } else {
+              pDummy.scale.setScalar(0);
             }
-            pPos[i * 3] = p.x; pPos[i * 3 + 1] = p.y; pPos[i * 3 + 2] = p.z;
-            pSize[i] = s * 1.9;
-            pAlpha[i] = al;
-            pStyle[i * 4] = p.rot; pStyle[i * 4 + 1] = p.aspect; pStyle[i * 4 + 2] = p.soft; pStyle[i * 4 + 3] = p.kind;
+            pDummy.updateMatrix();
+            puffMesh.setMatrixAt(i, pDummy.matrix);
           }
-          pGeo.attributes.position.needsUpdate = true;
-          pGeo.attributes.aSize.needsUpdate = true;
-          pGeo.attributes.aAlpha.needsUpdate = true;
-          pGeo.attributes.aStyle.needsUpdate = true;
+          puffMesh.instanceMatrix.needsUpdate = true;
         }
         function findFree(x, z) {
           if (!blocked(x, z)) return [x, z];
@@ -885,16 +1109,65 @@
         function placeAt(x, z, face) { pos.set(x, z); follow.set(x, 0, z); clearRoute(); speed = 0; slip = 0; vel.set(0, 0); steer = 0; drifting = false; boat = false; boatK = 0; morph.active = false; morph.t = 0; landBounce = 0; morphCool = 0; if (face !== undefined) heading = face; camYaw = camFace(); }
         // Every trip to a place or a clicked spot on the map draws the route line first, then drops in.
         function travel(d) { dismissed = null; travelTo(spawnAt(d)); }
+        function buildTourTiming(pts, len) {
+          // Build a car-like arc-length speed profile: accelerate on straights, brake smoothly into each turn, accelerate out, and ease to a stop.
+          const corners = [];
+          let acc = 0;
+          for (let i = 1; i < pts.length - 1; i++) {
+            const dx0 = pts[i][0] - pts[i - 1][0], dz0 = pts[i][1] - pts[i - 1][1];
+            const dx1 = pts[i + 1][0] - pts[i][0], dz1 = pts[i + 1][1] - pts[i][1];
+            const l0 = Math.hypot(dx0, dz0), l1 = Math.hypot(dx1, dz1);
+            acc += l0;
+            if (l0 > 0.5 && l1 > 0.5) {
+              const dot = clamp((dx0 * dx1 + dz0 * dz1) / (l0 * l1), -1, 1);
+              const bend = Math.acos(dot);
+              if (bend > 0.25) corners.push({ d: acc, severity: clamp(bend / (Math.PI * 0.5), 0.35, 1.15) });
+            }
+          }
+          const N = 180;
+          const cumT = new Float32Array(N + 1);
+          const ds = len / N;
+          for (let i = 0; i < N; i++) {
+            const u = (i + 0.5) * ds;
+            // Launch acceleration + destination braking envelope
+            const launch = 0.20 + 0.80 * smooth(0, Math.min(18, len * 0.35), u);
+            const stop = 0.16 + 0.84 * smooth(0, Math.min(20, len * 0.38), len - u);
+            let spd = Math.min(launch, stop);
+            // Smooth braking entering each corner, brisk acceleration exiting
+            for (let c = 0; c < corners.length; c++) {
+              const delta = u - corners[c].d;
+              const span = delta < 0 ? 10.5 : 12.5;
+              const k = Math.exp(-Math.pow(delta / span, 2) * 2.2);
+              const cornerSpd = lerp(1.0, Math.max(0.20, 0.34 - 0.12 * corners[c].severity), k);
+              spd = Math.min(spd, cornerSpd);
+            }
+            cumT[i + 1] = cumT[i] + ds / Math.max(0.14, spd);
+          }
+          const total = cumT[N] || 1;
+          for (let i = 0; i <= N; i++) cumT[i] /= total;
+          return { cumT, N, turns: corners.length };
+        }
+        function sampleTourDist(tour, p) {
+          const { cumT, N, len } = tour;
+          let lo = 0, hi = N;
+          while (lo < hi) { const mid = (lo + hi) >> 1; if (cumT[mid] < p) lo = mid + 1; else hi = mid; }
+          if (lo <= 0) return 0;
+          if (lo >= N) return len;
+          const t0 = cumT[lo - 1], t1 = cumT[lo];
+          const frac = t1 > t0 ? (p - t0) / (t1 - t0) : 0;
+          return ((lo - 1 + frac) / N) * len;
+        }
         function travelTo(s) {
           if (tour) return;
           const go = () => {
-            // On the map, draw the way there along the streets, with the dot riding the tip of the line.
+            // On the map, draw the way there along the streets (crisp 90-deg turns) with car-like corner deceleration/acceleration.
             const r = reduce ? null : findRoute(pos.x, pos.y, s[0], s[1], true);
             if (!r || r.length < 2) { placeAt(s[0], s[1], camFace()); zoomTo(1, 1300); return; }
             const pts = [[pos.x, pos.y]].concat(r, [s]);
             let len = 0; for (let i = 0; i < pts.length - 1; i++) len += Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]);
             clearRoute(); speed = 0; slip = 0; vel.set(0, 0); lineOn = true;
-            tour = { pts, len, s, t0: performance.now(), ms: clamp(400 + len * 3.5, 700, 1500) };
+            const timing = buildTourTiming(pts, Math.max(len, 0.01));
+            tour = { pts, len, s, cumT: timing.cumT, N: timing.N, t0: performance.now(), ms: clamp(550 + len * 4.4 + timing.turns * 150, 800, 2200) };
           };
           if (tween) { if (tween.to === 0) tween.done = go; return; } // clicked while the map is still opening: go when it is open
           if (zoom > 0.5) zoomTo(0, 800, go); else go();
@@ -938,6 +1211,56 @@
         document.getElementById("skip").addEventListener("click", (e) => { e.preventDefault(); openList(); });
         document.getElementById("zin").addEventListener("click", toClose);
         document.getElementById("zout").addEventListener("click", toMap);
+        const todBtn = document.getElementById("tod");
+        let todPhase = 0.05, todTween = null, brakeK = 0; // 0 = noon, 0.25 = sunset, 0.5 = midnight, 0.75 = sunrise
+        todBtn.addEventListener("click", () => {
+          const cur = todPhase % 1;
+          const target = (cur < 0.18 || cur >= 0.78) ? 0.24 : cur < 0.40 ? 0.50 : 0.04;
+          let delta = target - cur;
+          if (delta <= 0) delta += 1;
+          if (reduce) { todPhase = target; todTween = null; }
+          else todTween = { from: cur, delta, t0: performance.now(), ms: 900 };
+        });
+        const HEMI_SKY_DAY = new THREE.Color(0xffffff), HEMI_SKY_DUSK = new THREE.Color(0xffcfa3), HEMI_SKY_NIGHT = new THREE.Color(0x526b96);
+        const HEMI_GND_DAY = new THREE.Color(0xb9ad98), HEMI_GND_DUSK = new THREE.Color(0x8e6b58), HEMI_GND_NIGHT = new THREE.Color(0x222938);
+        const SUN_DAY = new THREE.Color(0xfffdf8), SUN_DUSK = new THREE.Color(0xff9b52);
+        const TAIL_IDLE = new THREE.Color(0xa82018), TAIL_NIGHT = new THREE.Color(0xd62d20), TAIL_BRAKE = new THREE.Color(0xff4226);
+        const SIL_DAY = new THREE.Color(0x5a5752), SIL_NIGHT = new THREE.Color(0x2c3340);
+        const ROUTE_DAY = new THREE.Color(0x2b4cc4), ROUTE_NIGHT = new THREE.Color(0x5a80f5);
+        const PUFF_LIT_DAY = new THREE.Color(0xffffff), PUFF_LIT_DUSK = new THREE.Color(0xffe1c2), PUFF_LIT_NIGHT = new THREE.Color(0x9cb0d4);
+        const PUFF_SHD_DAY = new THREE.Color(0xcbc5bc), PUFF_SHD_DUSK = new THREE.Color(0xb29292), PUFF_SHD_NIGHT = new THREE.Color(0x556484);
+        const tmpCol = new THREE.Color(), tmpW = new THREE.Vector3(), tmpDir = new THREE.Vector3(), tmpFwd = new THREE.Vector3();
+        function rayOccluded(ax, ay, az, bx, by, bz) {
+          const dx = bx - ax, dy = by - ay, dz = bz - az;
+          for (let i = 0; i < colliders.length; i++) {
+            const c = colliders[i];
+            if (c.h < 1.8) continue;
+            let t0 = 0.02, t1 = 0.98;
+            if (Math.abs(dx) < 1e-6) { if (ax < c.x0 || ax > c.x1) continue; }
+            else { let a = (c.x0 - ax) / dx, b = (c.x1 - ax) / dx; if (a > b) { const q = a; a = b; b = q; } t0 = Math.max(t0, a); t1 = Math.min(t1, b); if (t0 > t1) continue; }
+            if (Math.abs(dz) < 1e-6) { if (az < c.z0 || az > c.z1) continue; }
+            else { let a = (c.z0 - az) / dz, b = (c.z1 - az) / dz; if (a > b) { const q = a; a = b; b = q; } t0 = Math.max(t0, a); t1 = Math.min(t1, b); if (t0 > t1) continue; }
+            const ch = c.h * city.scale.y;
+            if (Math.abs(dy) < 1e-6) { if (ay < 0 || ay > ch) continue; }
+            else { let a = (0 - ay) / dy, b = (ch - ay) / dy; if (a > b) { const q = a; a = b; b = q; } t0 = Math.max(t0, a); t1 = Math.min(t1, b); if (t0 > t1) continue; }
+            return true;
+          }
+          return false;
+        }
+        function wallDistAhead(ox, oz, fdx, fdz, maxD = 16) {
+          let best = maxD;
+          for (let i = 0; i < colliders.length; i++) {
+            const c = colliders[i];
+            if (c.h < 1.2) continue;
+            let t0 = 0, t1 = best;
+            if (Math.abs(fdx) < 1e-6) { if (ox < c.x0 - 0.55 || ox > c.x1 + 0.55) continue; }
+            else { let a = (c.x0 - 0.55 - ox) / fdx, b = (c.x1 + 0.55 - ox) / fdx; if (a > b) { const q = a; a = b; b = q; } t0 = Math.max(t0, a); t1 = Math.min(t1, b); if (t0 > t1) continue; }
+            if (Math.abs(fdz) < 1e-6) { if (oz < c.z0 - 0.55 || oz > c.z1 + 0.55) continue; }
+            else { let a = (c.z0 - 0.55 - oz) / fdz, b = (c.z1 + 0.55 - oz) / fdz; if (a > b) { const q = a; a = b; b = q; } t0 = Math.max(t0, a); t1 = Math.min(t1, b); if (t0 > t1) continue; }
+            if (t0 > 0 && t0 < best) best = t0;
+          }
+          return best;
+        }
         const hint = document.getElementById("hint");
 
         // MARK: Input
@@ -998,7 +1321,8 @@
         // MARK: Travel line. Choosing a place on the map draws a quick route line along the streets, with the dot riding its tip.
         const MAXSEG = 64, lineW = 1.7;
         const lineGeo = new THREE.BufferGeometry(); lineGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(MAXSEG * 18), 3));
-        const lineMesh = new THREE.Mesh(lineGeo, new THREE.MeshBasicMaterial({ color: 0x2b4cc4, transparent: true, depthTest: false, side: THREE.DoubleSide }));
+        const lineMat = new THREE.MeshBasicMaterial({ color: 0x2b4cc4, transparent: true, depthTest: false, side: THREE.DoubleSide });
+        const lineMesh = new THREE.Mesh(lineGeo, lineMat);
         lineMesh.renderOrder = 5; lineMesh.frustumCulled = false; lineMesh.visible = false; scene.add(lineMesh);
         function drawLine(pts, upto) {
           const a = lineGeo.attributes.position.array; let n = 0, run = 0;
@@ -1038,7 +1362,7 @@
             if (p >= 1) { const d = tween.done; tween = null; if (d) d(); }
           }
           if (tour) {
-            const p = clamp((performance.now() - tour.t0) / tour.ms, 0, 1), run = smooth(0, 1, p) * tour.len;
+            const p = clamp((performance.now() - tour.t0) / tour.ms, 0, 1), run = sampleTourDist(tour, p);
             drawLine(tour.pts, run);
             const [hx, hz] = pointAt(tour.pts, run); pos.set(hx, hz); follow.set(hx, 0, hz); // the "you are here" dot rides the tip
             if (p >= 1) { const s = tour.s; tour = null; placeAt(s[0], s[1], camFace()); zoomTo(1, 1300); }
@@ -1208,8 +1532,9 @@
           const reboundPitch = landBounce > 0 && landDir > 0 ? Math.sin(landBounce * Math.PI * 2.0) * landBounce * 0.14 : 0;
 
           if (path) showRoute([[pos.x, pos.y]].concat(path.slice(pathI)));
+          const baseY = boat ? 0 : (onDeck(pos.x, pos.y) ? 0.30 : 0.11);
           me.position.set(pos.x, 0, pos.y);
-          car.position.y = jumpY;
+          car.position.y = baseY + jumpY;
           car.rotation.y = heading;
           wheels.forEach((w) => {
             w.w.rotation.x += (speed * dt) / w.r;
@@ -1226,37 +1551,100 @@
           if (outboardPivot) outboardPivot.rotation.y = -steer * 0.48;
           if (boatProp && hull.visible) boatProp.rotation.z += (speed * 7 + (boat ? 3 : 0)) * dt;
 
+          // Smooth day / night cycle (two separate directional lights: sun + moon, zero jumps or flashes)
+          if (todTween) {
+            const p = clamp((performance.now() - todTween.t0) / todTween.ms, 0, 1);
+            todPhase = (todTween.from + todTween.delta * ease(p)) % 1;
+            if (p >= 1) todTween = null;
+          } else if (!reduce) {
+            todPhase = (todPhase + dt / 100) % 1;
+          }
+          const sunAngle = todPhase * Math.PI * 2;
+          const sunElev = Math.cos(sunAngle);
+          const night = smooth(0.18, -0.32, sunElev);
+          const dusk = Math.exp(-Math.pow((sunElev - 0.02) / 0.26, 2));
+          const dark = clamp(night + dusk * 0.45, 0, 1);
+          const todIcon = night > 0.55 ? "☾" : dusk > 0.45 ? "◐" : "☀";
+          if (todBtn.textContent !== todIcon) todBtn.textContent = todIcon;
+          hemi.color.copy(HEMI_SKY_DAY).lerp(HEMI_SKY_DUSK, dusk * 0.82).lerp(HEMI_SKY_NIGHT, night);
+          hemi.groundColor.copy(HEMI_GND_DAY).lerp(HEMI_GND_DUSK, dusk * 0.78).lerp(HEMI_GND_NIGHT, night);
+          hemi.intensity = lerp(0.62, 0.44, night);
+          const sunVis = smooth(-0.14, 0.24, sunElev);
+          sun.position.set(-Math.sin(sunAngle) * 1.15 - 0.25, Math.max(0.08, sunElev * 1.1 + 0.14), 0.35 + Math.sin(sunAngle) * 0.14);
+          sun.color.copy(SUN_DAY).lerp(SUN_DUSK, smooth(0.42, -0.05, sunElev));
+          sun.intensity = 0.52 * sunVis;
+          const moonVis = smooth(-0.06, 0.34, -sunElev);
+          moon.position.set(Math.sin(sunAngle) * 0.50 - 0.35, 0.95, 0.40);
+          moon.intensity = 0.34 * moonVis;
+          SEA.copy(SEA_DAY).lerp(SEA_DUSK, dusk * 0.72).lerp(SEA_NIGHT, night);
+          SKY.copy(SKY_DAY).lerp(SKY_DUSK, dusk * 0.78).lerp(SKY_NIGHT, night);
+          groundMat.color.copy(GROUND_DAY).lerp(GROUND_DUSK, dusk * 0.68).lerp(GROUND_NIGHT, night);
+          waterMat.color.copy(SEA);
+          trailMat.color.copy(ROUTE_DAY).lerp(ROUTE_NIGHT, night * 0.85);
+          lineMat.color.copy(ROUTE_DAY).lerp(ROUTE_NIGHT, night * 0.85);
+          dotMat.color.copy(ROUTE_DAY).lerp(ROUTE_NIGHT, night * 0.85);
+          haloMat.color.copy(ROUTE_DAY).lerp(ROUTE_NIGHT, night * 0.85);
+          silMat.color.copy(SIL_DAY).lerp(SIL_NIGHT, night);
+          puffMat.uniforms.uLightDir.value.copy(sun.position).normalize().lerp(tmpDir.copy(moon.position).normalize(), night).normalize();
+          puffMat.uniforms.uLitTint.value.copy(PUFF_LIT_DAY).lerp(PUFF_LIT_DUSK, dusk * 0.78).lerp(PUFF_LIT_NIGHT, night);
+          puffMat.uniforms.uShadowTint.value.copy(PUFF_SHD_DAY).lerp(PUFF_SHD_DUSK, dusk * 0.75).lerp(PUFF_SHD_NIGHT, night);
+
+          const braking = !boat && (drive < -0.1 || hand || drifting);
+          brakeK += ((braking ? 1 : 0) - brakeK) * Math.min(1, dt * 16);
+          tmpCol.copy(TAIL_IDLE).lerp(TAIL_NIGHT, dark);
+          tailLightMat.color.copy(tmpCol).lerp(TAIL_BRAKE, brakeK);
+          const groundFade = (1 - boatK) * Math.max(0, 1 - jumpY * 0.55) * smooth(0.45, 0.78, zoom);
+          const headBeamI = 0.72 * dark * groundFade;
+          headBeamMesh.position.y = 0.026 - jumpY;
+          headBeamMat.uniforms.uIntensity.value = headBeamI;
+          headBeamMesh.visible = headBeamI > 0.008;
+          if (headBeamMesh.visible) {
+            headBeamMat.uniforms.uClipDist.value = wallDistAhead(pos.x + fx * 1.82, pos.y + fz * 1.82, fx, fz, 16);
+          }
+          const brakeWashI = (0.14 + 0.54 * brakeK) * dark * groundFade;
+          brakeWashMesh.position.y = 0.026 - jumpY;
+          brakeWashMat.uniforms.uIntensity.value = brakeWashI;
+          brakeWashMesh.visible = brakeWashI > 0.008;
+          carShadow.position.y = 0.015 - jumpY;
+          const shScale = Math.max(0.35, 1 - jumpY * 0.18);
+          carShadow.scale.setScalar(shScale);
+          carShadowMat.opacity = 0.70 * (1 - boatK) * Math.max(0, 1 - jumpY * 0.26) * lerp(1, 0.55, night);
+          carShadow.visible = carShadowMat.opacity > 0.02;
+
           const baseRoll = clamp(steer * clamp(speed / 20, -1, 1) * 0.1 - slip * 0.012, -0.16, 0.16) + boatK * Math.sin(t * 1.7) * 0.04;
           const basePitch = -drive * 0.045 * Math.sign(speed || 1) * (1 - boatK) - boatK * (0.14 * clamp(speed / 22, 0, 1) + Math.sin(t * 2.3) * 0.03);
           carBody.rotation.z = lerp(carBody.rotation.z, baseRoll + jumpRoll, Math.min(1, dt * (morph.active ? 14 : 6)));
           carBody.rotation.x = lerp(carBody.rotation.x, basePitch + jumpPitch + reboundPitch, Math.min(1, dt * (morph.active ? 14 : 6)));
           carBody.position.y = (Math.abs(speed) > 1 ? Math.sin(t * 22) * 0.02 : 0) * (1 - boatK) + boatK * (Math.sin(t * 3) * 0.07 - 0.24) + reboundY;
-          // Tyre smoke on land (suppressed while airborne in a jump): subtle wisps on cruise, punchier bursts on launch, varied billowing plumes in a drift. On water: wake and spray.
+          // Clean 3D instanced puffs: straight cruising stays clean; smoke pops on launch, sharp cornering, and drifts. On water: crisp wake and spray.
           if (zoom > 0.5 && !morph.active) {
             const sp = Math.abs(speed);
             if (boat) {
-              if (sp > 1 || Math.abs(slip) > 1) {
-                puffAcc += dt * (sp * 1.15 + Math.abs(slip) * 6 + (hand ? 18 : 0));
+              if (sp > 1.2 || Math.abs(slip) > 1) {
+                puffAcc += dt * (sp * 0.95 + Math.abs(slip) * 4.5 + (hand ? 14 : 0));
                 while (puffAcc >= 1) {
                   puffAcc -= 1; puffSide = -puffSide;
-                  puff(pos.x - fx * 1.7 + lx * 0.82 * puffSide, pos.y - fz * 1.7 + lz * 0.82 * puffSide, 0.30 + sp / 68, lx * puffSide * 2.7 - fx * 0.6, lz * puffSide * 2.7 - fz * 0.6, SPRAY, 0.45, 0.95, 0.12);
-                  if (Math.random() < 0.38 + (hand ? 0.45 : 0)) puff(pos.x - fx * 2.05, pos.y - fz * 2.05, 0.26 + sp / 52, -fx * 2.4 - lx * slip * 0.3, -fz * 2.4 - lz * slip * 0.3, SPRAY, 3.8, 0.45, 0.32);
+                  puff(pos.x - fx * 1.65 + lx * 0.80 * puffSide, pos.y - fz * 1.65 + lz * 0.80 * puffSide, 0.30 + sp / 62, lx * puffSide * 2.5 - fx * 0.5, lz * puffSide * 2.5 - fz * 0.5, SPRAY, 0.55, 0.82, 0.18);
+                  if (Math.random() < 0.34 + (hand ? 0.42 : 0)) puff(pos.x - fx * 2.02, pos.y - fz * 2.02, 0.24 + sp / 54, -fx * 2.2 - lx * slip * 0.25, -fz * 2.2 - lz * slip * 0.25, SPRAY, 3.6, 0.42, 0.34);
                 }
               }
-            } else if (sp > 0.8 || Math.abs(slip) > 1.2) {
+            } else {
               const accel = Math.max(0, drive * Math.sign(speed || 1));
-              const rate = sp * 0.65 + accel * 11 + Math.abs(steer) * sp * 0.85 + Math.abs(slip) * 6.5 + (drifting ? 34 : 0);
-              puffAcc += dt * rate;
-              const heavy = drifting || Math.abs(slip) > 4.5 || (accel > 0.5 && keys.shift);
-              const baseSize = 0.26 + Math.min(0.42, sp / 46) + Math.min(0.28, Math.abs(slip) / 26) + (drifting ? 0.24 : 0);
-              const baseAlpha = drifting ? 0.78 : heavy ? 0.64 : accel > 0.4 ? 0.52 : 0.36;
-              const baseLife = drifting ? 0.78 : heavy ? 0.64 : 0.48;
-              while (puffAcc >= 1) {
-                puffAcc -= 1; puffSide = -puffSide;
-                const wx = pos.x + lx * 0.86 * puffSide - fx * 1.10;
-                const wz = pos.y + lz * 0.86 * puffSide - fz * 1.10;
-                const push = -1.5 * Math.sign(speed || 1);
-                puff(wx, wz, baseSize, fx * push + lx * (steer * 1.5 - slip * 0.15), fz * push + lz * (steer * 1.5 - slip * 0.15), SMOKE, drifting ? 1.5 : 1.0, baseLife, 0.24, { alpha: baseAlpha, heavy });
+              const launch = accel > 0.35 && (sp < 12 || keys.shift);
+              const hardTurn = Math.abs(steer) > 0.36 && sp > 7.5;
+              const sliding = drifting || Math.abs(slip) > 1.8 || (hand && sp > 3.5);
+              if (launch || hardTurn || sliding) {
+                const rate = (launch ? accel * (keys.shift ? 15 : 10) : 0) + (hardTurn ? Math.abs(steer) * sp * 0.62 : 0) + (sliding ? Math.abs(slip) * 5.2 + (drifting ? 26 : 10) : 0);
+                puffAcc += dt * rate;
+                const baseSize = 0.28 + Math.min(0.28, Math.abs(slip) / 24) + (drifting ? 0.22 : launch ? 0.08 : 0);
+                const baseLife = drifting ? 0.76 : sliding ? 0.62 : 0.50;
+                while (puffAcc >= 1) {
+                  puffAcc -= 1; puffSide = -puffSide;
+                  const wx = pos.x + lx * 0.86 * puffSide - fx * 1.08;
+                  const wz = pos.y + lz * 0.86 * puffSide - fz * 1.08;
+                  const push = -1.4 * Math.sign(speed || 1);
+                  puff(wx, wz, baseSize, fx * push + lx * (steer * 1.3 - slip * 0.14), fz * push + lz * (steer * 1.3 - slip * 0.14), SMOKE, drifting ? 1.45 : 0.95, baseLife, 0.26);
+                }
               }
             }
           }
@@ -1278,13 +1666,58 @@
           camera.up.copy(UP_MAP).lerp(UP_CLOSE, z).normalize();
           camera.lookAt(look);
           camera.fov = lerp(24, 42, z); camera.updateProjectionMatrix();
-          silMat.opacity = 0.8 * smooth(0.6, 0.95, z); puffMat.uniforms.uScale.value = renderer.getDrawingBufferSize(v2s).y / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
           city.scale.y = lerp(0.04, 1, smooth(0.25, 0.95, z));
           scene.background.copy(SEA).lerp(SKY, smooth(0.3, 0.9, z));
           scene.fog.color.copy(scene.background); scene.fog.near = lerp(4000, 80, smooth(0.4, 1, z)); scene.fog.far = lerp(9000, 230, smooth(0.4, 1, z));
           const ds = lerp(mapH / 95, 1.35, smooth(0, 0.8, z)); dot.scale.setScalar(ds); halo.scale.setScalar(ds);
-          dot.material.opacity = 0.9 * (1 - smooth(0.5, 0.9, z));
+          const mapDotFade = 1 - smooth(0.40, 0.78, z);
+          dot.material.opacity = 0.92 * mapDotFade; dot.visible = dot.material.opacity > 0.008;
+          halo.material.opacity = 0.42 * mapDotFade; halo.visible = halo.material.opacity > 0.008;
           car.visible = z > 0.4; car.scale.setScalar(smooth(0.4, 0.8, z) || 0.001);
+          me.updateMatrixWorld(true);
+
+          // Solid opaque architectural cut-out silhouette ONLY when a building actually occludes part of the car
+          const cy = baseY + jumpY + 0.75;
+          const behindBldg = z > 0.62 && (
+            rayOccluded(pos.x, cy, pos.y, camera.position.x, camera.position.y, camera.position.z) ||
+            rayOccluded(pos.x + fx * 1.45, cy, pos.y + fz * 1.45, camera.position.x, camera.position.y, camera.position.z) ||
+            rayOccluded(pos.x - fx * 1.45, cy, pos.y - fz * 1.45, camera.position.x, camera.position.y, camera.position.z) ||
+            rayOccluded(pos.x + lx * 0.85, cy, pos.y + lz * 0.85, camera.position.x, camera.position.y, camera.position.z) ||
+            rayOccluded(pos.x - lx * 0.85, cy, pos.y - lz * 0.85, camera.position.x, camera.position.y, camera.position.z)
+          );
+          for (let i = 0; i < silMeshes.length; i++) silMeshes[i].visible = behindBldg;
+
+          // View-direction & occlusion aware screen-space crisp graphic optical glints
+          const fovTan = Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5));
+          const zFlare = smooth(0.45, 0.76, z);
+          const updateFlare = (f, baseI, sxMul, syMul, twinkle, active) => {
+            if (!active || baseI <= 0.004) { f.mesh.visible = false; f.mat.uniforms.uIntensity.value = 0; return; }
+            f.mesh.getWorldPosition(tmpW);
+            const occTarget = rayOccluded(tmpW.x, tmpW.y, tmpW.z, camera.position.x, camera.position.y, camera.position.z) ? 0 : 1;
+            f.occ += (occTarget - f.occ) * Math.min(1, dt * 20);
+            tmpDir.subVectors(camera.position, tmpW).normalize();
+            tmpFwd.set(fx * f.dirZ, 0.08, fz * f.dirZ).normalize();
+            const facing = tmpDir.dot(tmpFwd);
+            const angBoost = 0.44 + 0.56 * smooth(-0.32, 0.62, facing);
+            const inten = baseI * angBoost * f.occ;
+            f.mesh.visible = inten > 0.006;
+            if (!f.mesh.visible) return;
+            const u = f.mat.uniforms;
+            u.uAspect.value = camera.aspect;
+            u.uFovTan.value = fovTan;
+            const sc = 0.86 + 0.22 * angBoost;
+            u.uSize.value.set(f.baseSx * sxMul * sc, f.baseSy * syMul * sc);
+            u.uIntensity.value = inten;
+            u.uAngle.value = Math.sin(heading * 1.5 + (f.dirZ > 0 ? 0.3 : -0.3)) * twinkle;
+          };
+          const carFlareOn = car.visible && carMeshGroup.visible && zFlare > 0.01;
+          const headBaseI = (0.48 + 0.46 * dark) * zFlare;
+          headFlares.forEach((f) => updateFlare(f, headBaseI, lerp(0.76, 1.15, dark), lerp(0.76, 1.10, dark), 0.14, carFlareOn));
+          const brakeBaseI = ((0.46 + 0.92 * brakeK) * dark + 0.34 * brakeK * (1 - dark)) * zFlare;
+          brakeFlares.forEach((f) => updateFlare(f, brakeBaseI, lerp(0.72, 1.32, brakeK), lerp(0.72, 1.28, brakeK), 0.16, carFlareOn));
+          const boatFlareOn = car.visible && hull.visible && zFlare > 0.01;
+          const navBaseI = (0.16 + 0.64 * dark) * zFlare;
+          boatNavFlares.forEach((f) => updateFlare(f, navBaseI, 0.92, 0.92, 0.14, boatFlareOn));
           renderer.render(scene, camera);
 
           // Overlays follow the same camera.
